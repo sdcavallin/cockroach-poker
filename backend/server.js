@@ -1,4 +1,5 @@
 import express from 'express';
+import "socket.io";
 
 const app = express();
 
