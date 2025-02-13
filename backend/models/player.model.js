@@ -2,8 +2,9 @@ import mongoose from 'mongoose';
 
 /*
 Player Schema
+'hand' and 'pile' are number arrays that refer to the Cards constant
 */
-const playerSchema = new mongoose.Schema({
+export const PlayerSchema = new mongoose.Schema({
   uuid: {
     type: String,
     required: true,
@@ -35,8 +36,8 @@ const playerSchema = new mongoose.Schema({
 });
 
 // Create an index on uuid for fast lookups
-playerSchema.index({ uuid: 1 });
+PlayerSchema.index({ uuid: 1 });
 
-const Player = mongoose.model('Player', playerSchema);
+const Player = mongoose.model('Player', PlayerSchema);
 
 export default Player;
