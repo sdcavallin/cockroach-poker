@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 Represents a player in an active game and their cards.
 */
 export const PlayerSchema = new mongoose.Schema({
-  // uuid: Unique id to identify players.
+  // uuid: Unique id to identify players. Will be stored on the client (probably as a cookie).
   uuid: {
     type: String,
     required: true,

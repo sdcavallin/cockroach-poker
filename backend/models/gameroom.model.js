@@ -30,6 +30,7 @@ const GameRoomSchema = new mongoose.Schema(
       required: true,
     },
     // players: Array of players currently in the game. See PlayerSchema.
+    // TODO: Possibly represent this as reference by ID.
     players: {
       type: [PlayerSchema],
       require: true,
