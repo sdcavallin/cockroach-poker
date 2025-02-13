@@ -1,9 +1,12 @@
 import mongoose from 'mongoose';
 
 /*
-GameAction Schema
+* GameAction Schema *
+Represents an action taken by a player.
+
+* Notes *
 References prevPlayer and turnPlayer by ObjectId to avoid redundancy.
-TODO: Possibly reference them by UUID instead.
+TODO: Possibly reference them by UUID or embedded instead.
 */
 export const GameActionSchema = new mongoose.Schema({
   // prevPlayer: The player who handed the card to the current player. If the turn is just starting, prevPlayer == turnPlayer.

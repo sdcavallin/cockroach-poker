@@ -3,7 +3,8 @@ import { PlayerSchema } from './player.model';
 import GameAction, { GameActionSchema } from './gameaction.model';
 
 /*
-GameRoom Schema
+* GameRoom Schema *
+Represents the entire state of a game.
 */
 const GameRoomSchema = new mongoose.Schema(
   {

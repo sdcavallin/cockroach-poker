@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
 /*
-Player Schema
-'hand' and 'pile' are number arrays that refer to the Cards constant.
+* Player Schema *
+Represents a player in an active game and their cards.
 */
 export const PlayerSchema = new mongoose.Schema({
   // uuid: Unique id to identify players.
