@@ -39,9 +39,6 @@ export const GameActionSchema = new mongoose.Schema({
   },
 });
 
-// Create an index on roomCode for fast lookups
-GameActionSchema.index({ roomCode: 1 });
-
 const GameAction = mongoose.model('GameAction', GameActionSchema);
 
 export default GameAction;
