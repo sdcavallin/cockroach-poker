@@ -46,9 +46,6 @@ const GameRoomSchema = new mongoose.Schema(
   }
 );
 
-// Create an index on roomCode for fast lookups
-GameRoomSchema.index({ roomCode: 1 });
-
 const GameRoom = mongoose.model('GameRoom', GameRoomSchema);
 
 export default GameRoom;

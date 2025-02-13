@@ -14,7 +14,13 @@ app.use(express.json()); // allows us to parse JSON data in request body
 app.use('/api/players', playerRoutes);
 
 app.get('/', (req, res) => {
-  res.send('Hi ' + CardNumberToString[Cards.COCKROACH]);
+  res.send(
+    `I thought it was a ${
+      CardNumberToString[Cards.COCKROACH]
+    } but it was actually a ${
+      CardNumberToString[Math.floor(Math.random() * 9)]
+    }!`
+  );
 });
 
 app.listen(PORT, () => {

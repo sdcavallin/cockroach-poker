@@ -42,9 +42,6 @@ export const PlayerSchema = new mongoose.Schema({
   },
 });
 
-// Create an index on uuid for fast lookups
-PlayerSchema.index({ uuid: 1 });
-
 const Player = mongoose.model('Player', PlayerSchema);
 
 export default Player;
