@@ -37,7 +37,7 @@ const GameRoomSchema = new mongoose.Schema(
     },
     // currentAction: Current action being taken in the game. See GameActionSchema.
     currentAction: {
-      type: [GameActionSchema],
+      type: GameActionSchema,
       require: true,
     },
   },

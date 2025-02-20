@@ -2,7 +2,8 @@ import mongoose from 'mongoose';
 
 /*
 * GameAction Schema *
-Represents an action taken by a player.
+Represents an action taken by a player. 
+A GameAction is not standalone; they are used only in GameRoom.
 
 * Notes *
 References prevPlayer and turnPlayer by ObjectId to avoid redundancy.
