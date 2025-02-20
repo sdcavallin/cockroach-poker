@@ -14,9 +14,9 @@ const FlippingCard = ({ frontColor, backColor }) => {
       borderRadius="md"
       position="relative"
       cursor="pointer"
-      onClick={() => setIsFlipped(!isFlipped)} // Flip when clicked
-      animate={{ rotateY: isFlipped ? 180 : 0 }} // Animate rotation
-      transition={{ duration: 0.6 }} // Smooth flip animation
+      onClick={() => setIsFlipped(!isFlipped)} 
+      animate={{ rotateY: isFlipped ? 180 : 0 }}
+      transition={{ duration: 0.6 }} 
       transformStyle="preserve-3d"
     >
       {/* Card Front */}
