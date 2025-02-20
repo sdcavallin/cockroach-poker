@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Image, Text, Grid, Button } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import FlippingCard from "./FlippingCard.jsx";
@@ -6,6 +6,41 @@ import { Link } from "react-router-dom";
 
 
 const StartBoard = () => {
+
+  const [players, setNumPlayers] = useState([]); // Array of player objects from backend 
+  const [loading, setIsLoading] = useState(true); // Loading state for fetching data  
+  const [error, setError] = useState(null); // Error state for fetching data  
+
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      try { 
+        const response = await fetch("http://localhost:5000/players"); // API key here I think 
+        const data = await response.json();
+
+        if (data.success) {
+          setNumPlayers(data.players);
+        } else {
+          setError(data.error);
+        }
+      }
+      catch (error) {
+        setError(error);
+      }
+      finally {
+        setIsLoading(false);
+      } 
+    };
+  
+    fetchPlayers();
+
+    const interval = setInterval(fetchPlayers, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const playerCount = players.length;
+
+
   return (
     <Box //  Background
       display="flex"
@@ -75,34 +110,28 @@ const StartBoard = () => {
           room code: SKD33
         </Text>
 
-        {/* Bottom Cards */}
-        <Grid
-          templateColumns="repeat(5, 1fr)"
-          gap={10}
-          position="absolute"
-          bottom="10px"
-          left="20px" 
-          width="500px"
-        >
-          <FlippingCard frontColor="#E9C46A" backColor="#F4A261" />
-          <FlippingCard frontColor="#F4A261" backColor="#E9C46A" />
-          <FlippingCard frontColor="#E9C46A" backColor="#F4A261" />
-          <FlippingCard frontColor="#F4A261" backColor="#E9C46A" />
-          <FlippingCard frontColor="#E9C46A" backColor="#F4A261" />
+        {/* Bottom Cards - Flips based on player count */}
+        <Grid templateColumns="repeat(5, 1fr)" gap={10} position="absolute" bottom="10px" left="20px" width="500px">
+          {[...Array(5)].map((_, index) => (
+            <FlippingCard
+              key={index}
+              frontColor="#E9C46A"
+              backColor="#F4A261"
+              isFlipped={index < playerCount} // Flip based on player count
+            />
+          ))}
         </Grid>
 
-        {/* Side Cards */}
-        <Grid
-          templateRows="repeat(4, 1fr)"
-          gap={3}
-          position="absolute"
-          right={4}
-          height="150px"
-        >
-          <FlippingCard frontColor="#F4A261" backColor="#E9C46A" width="120px" height="160px" />
-          <FlippingCard frontColor="#E9C46A" backColor="#F4A261" width="120px" height="160px" />
-          <FlippingCard frontColor="#F4A261" backColor="#E9C46A" width="120px" height="160px" />
-          <FlippingCard frontColor="#a3b18a" backColor="#F4A261" width="120px" height="160px" />
+        {/* Side Cards - Flips based on player count */}
+        <Grid templateRows="repeat(4, 1fr)" gap={3} position="absolute" right={4} height="150px">
+          {[...Array(4)].map((_, index) => (
+            <FlippingCard
+              key={index + 5} // Ensure unique keys
+              frontColor={index === 3 ? "#a3b18a" : "#F4A261"}
+              backColor={index % 2 === 0 ? "#E9C46A" : "#F4A261"}
+              isFlipped={index + 5 < playerCount} // Flip based on player count
+            />
+          ))}
         </Grid>
       </Box>
     </Box>

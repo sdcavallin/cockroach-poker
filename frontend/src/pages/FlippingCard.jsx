@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Box } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 const MotionBox = motion(Box);
 
-const FlippingCard = ({ frontColor, backColor }) => {
+const FlippingCard = ({ frontColor, backColor, isFlipped, width = "120px", height = "160px" }) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
   return (
