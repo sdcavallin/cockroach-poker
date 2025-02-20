@@ -12,13 +12,12 @@ const StartBoard = () => {
       justifyContent="center"
       alignItems="center"
       height="100vh"
-      bg="#c9cba3"
-      bgImage={"/images/spiral_tree.png"}
+      bg="#264653"
     >
       <Box // Gameboard
         width="1000px"
         height="700px"
-        bg="#a44a3f"
+        bg="#2A9D8F"
         p={4}
         display="flex"
         flexDirection="column"
@@ -31,6 +30,7 @@ const StartBoard = () => {
           top={1} 
           left={3} 
           fontSize={30}
+          color="#264653"
           fontWeight="bold">
           Cockroach Poker
         </Text>
@@ -42,7 +42,7 @@ const StartBoard = () => {
           left={10}
           width="800px"
           height="450px"
-          bg="#faf3dd"
+          bg="#F4A261"
           borderRadius="md"
           boxShadow="md"
         >
@@ -50,14 +50,14 @@ const StartBoard = () => {
             as={Link} 
             to="/gameboard"
             width="20%"
-            bg="black"
-            color="white"
+            bg="#E9C46A"
+            color="#264653"
             fontSize="xl"
             position="absolute"
             bottom="10px"
             left="50%"
             transform="translateX(-50%)" 
-            _hover={{ bg: "#d00000" }}
+            _hover={{ bg: "#E76F51" }}
           >
             Start Game
           </Button>
@@ -69,7 +69,8 @@ const StartBoard = () => {
           position="absolute"
           top="300px"
           left="200px"
-          fontSize="2xl" 
+          fontSize="52px" 
+          color="#264653"
           fontWeight="bold" mt={4}>
           room code: SKD33
         </Text>
@@ -83,11 +84,11 @@ const StartBoard = () => {
           left="20px" 
           width="500px"
         >
-          <FlippingCard frontColor="#606c38" backColor="#283618" />
-          <FlippingCard frontColor="#283618" backColor="#606c38" />
-          <FlippingCard frontColor="#a3b18a" backColor="#344e41" />
-          <FlippingCard frontColor="#344e41" backColor="#a3b18a" />
-          <FlippingCard frontColor="#606c38" backColor="#344e41" />
+          <FlippingCard frontColor="#E9C46A" backColor="#F4A261" />
+          <FlippingCard frontColor="#F4A261" backColor="#E9C46A" />
+          <FlippingCard frontColor="#E9C46A" backColor="#F4A261" />
+          <FlippingCard frontColor="#F4A261" backColor="#E9C46A" />
+          <FlippingCard frontColor="#E9C46A" backColor="#F4A261" />
         </Grid>
 
         {/* Side Cards */}
@@ -98,10 +99,10 @@ const StartBoard = () => {
           right={4}
           height="150px"
         >
-          <FlippingCard frontColor="#606c38" backColor="#283618" width="120px" height="160px" />
-          <FlippingCard frontColor="#344e41" backColor="#a3b18a" width="120px" height="160px" />
-          <FlippingCard frontColor="#606c38" backColor="#344e41" width="120px" height="160px" />
-          <FlippingCard frontColor="#a3b18a" backColor="#283618" width="120px" height="160px" />
+          <FlippingCard frontColor="#F4A261" backColor="#E9C46A" width="120px" height="160px" />
+          <FlippingCard frontColor="#E9C46A" backColor="#F4A261" width="120px" height="160px" />
+          <FlippingCard frontColor="#F4A261" backColor="#E9C46A" width="120px" height="160px" />
+          <FlippingCard frontColor="#a3b18a" backColor="#F4A261" width="120px" height="160px" />
         </Grid>
       </Box>
     </Box>

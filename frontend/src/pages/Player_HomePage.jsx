@@ -1,99 +1,106 @@
-import { Box, Button, Text, Image } from "@chakra-ui/react";
+import { Box, Button, Text, Image, VStack, HStack } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-
-
+import { useMediaQuery } from "@chakra-ui/react";
 
 const LandingPage = () => {
-
-  console.log("Image Path:", window.location.origin + "/images/cards.png");
+  const [isDesktop] = useMediaQuery("(min-width: 768px)"); // Switch at 768px
 
   return (
-    <Box // Light Green BG
+    <Box
       width="100vw"
       height="100vh"
-      bg="#c9cba3" 
+      bg="#2A9D8F" // teal background for the landing page
       display="flex"
       justifyContent="center"
       alignItems="center"
+      flexDirection="column"
+      overflow="hidden"
+      p={[2, 4]}
     >
-      {/* Main Area */}
-      <Box // Red `Phone Screen
-        width="323px"
-        height="700px"
-        zIndex={0}
-        bg="#780000"  
-        border="2px white"        
-        borderRadius="md"
-        boxShadow="lg"
-        position="relative"
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        p={6}
-        overflow="hidden"
-      >
-        {/* Tree Silhouette Inside Phone Screen */}
-        <Box position="absolute" top="1" left="-200px" width="1200px" height="1000px" zIndex="-2"> 
+      {isDesktop ? (
+        // Big Layout for Desktop
+        <HStack
+          spacing={10}
+          width="80%"
+          height="80vh"
+          justifyContent="center"
+          alignItems="center"
+        >
+          {/* Phone Screen Box */}
+          <Box
+            width="700px"
+            height="700px"
+            bg="#F4A261"
+            border="2px solid #E9C46A"
+            borderRadius="md"
+            boxShadow="lg"
+            position="relative"
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            p={6}
+            overflow="hidden"
+          >
+            {/* Title */}
+            <Text
+              fontSize="4xl"
+              fontWeight="bold"
+              textAlign="center"
+              mb={6}
+              p={4}
+              borderRadius="md"
+              color="#264653"
+              width="90%"
+            >
+              COCKROACH <br /> POKER
+            </Text>
+
+            {/* Create & Join Buttons */}
+            <Button as={Link} to="/host" width="80%" fontSize="2xl" mb={4} color="#264653" bg="#E9C46A">
+              CREATE
+            </Button>
+            <Button as={Link} to="/host" width="80%" fontSize="2xl" mb={4} color="#264653" bg="#E9C46A">
+              JOIN
+            </Button>
+          </Box>
+
+          {/* Cards Image on Desktop */}
           <Image
-            transform="rotate(15deg)"
-            src="/images/spiral_tree.png"
-            alt="Creepy Tree"
-            width="750px"
-            height="auto"
-            objectFit="contain" 
-            opacity={0.5}
-          />
-        </Box>
-
-        {/* Title */}
-        <Text // Cockroach Poker Box Background 
-          fontSize="4xl"
-          fontWeight="bold"
-          textAlign="center"
-          mb={6}
-          bg="#f4f1de"
-          p={4}
-          borderRadius="md"
-          boxShadow="md"
-          color="red.700"
-        >
-          COCKROACH <br /> POKER
-        </Text>
-
-        {/* Create & Join Buttons */}
-        <Button
-          as={Link} 
-          to="/host"
-          width="80%"
-          bg="#f4f1de"
-          fontSize="2xl"
-          mb={4}
-          _hover={{ bg: "#d00000" }}
-        >
-          CREATE
-        </Button>
-
-        <Button
-          as={Link}
-          width="80%"
-          bg="#f4f1de"
-          fontSize="2xl"
-          _hover={{ bg: "#7ae582" }}
-        >
-          JOIN
-        </Button>
-
-        
-      </Box>
-      {/* Overlapping Cards */}
-      <Box position="absolute" bottom="-130px" right="350px"> 
-          <Image 
-            transform="rotate(20deg)"
             src="/images/cards.png"
             alt="Cards"
-            width="200"
+            width="250px"
+            transform="rotate(20deg)"
+            position="relative"
           />
-        </Box>
+        </HStack>
+      ) : (
+        // Small Layout for Mobile
+        <VStack spacing={6}>
+          {/* Title */}
+          <Text
+            fontSize="3xl"
+            fontWeight="bold"
+            textAlign="center"
+            bg="#F4A261" 
+            p={4}
+            borderRadius="md"
+            color="#264653"
+            >
+            COCKROACH <br /> POKER
+          </Text>
+
+          {/* Create & Join Buttons */}
+          <Button as={Link} to="/host" width="90%" fontSize="xl">
+            CREATE
+          </Button>
+          <Button width="90%" fontSize="xl">
+            JOIN
+          </Button>
+
+          {/* Cards Image on Mobile */}
+          <Image src="/images/cards.png" alt="Cards" width="150px" />
+        </VStack>
+      )}
     </Box>
   );
 };
