@@ -6,6 +6,7 @@ import playerRoutes from './routes/player.route.js';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
+import { addCardToHand } from './helpers/player.helper.js';
 
 dotenv.config();
 
@@ -26,16 +27,19 @@ app.use(express.json()); // allows us to parse JSON data in request body
 app.use('/api/players', playerRoutes);
 
 app.get('/', (req, res) => {
+  // TODO: '/' should only return basic message or status for testing purposes until deployed to prod
   res.sendFile(path.resolve('backend/index.test.html'));
+  //res.send('Hi');
 });
 
 app.get('/message', (req, res) => {
+  const card = Math.floor(Math.random() * 9);
   const message = `I thought it was a ${
     CardNumberToString[Cards.COCKROACH]
-  } but it was actually a ${
-    CardNumberToString[Math.floor(Math.random() * 9)]
-  }!`;
+  } but it was actually a ${CardNumberToString[card]}!`;
   res.send(message);
+  // Example of using addCardToHand()
+  //addCardToHand('67ad6bd71b76340c29212842', card);
 });
 
 // Websocket connection
