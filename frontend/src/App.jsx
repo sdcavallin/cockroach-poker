@@ -7,6 +7,7 @@ import GameBoard from './pages/GameBoard.jsx';
 import ChooseCardPage from './pages/ChooseCard.jsx';
 import ChoosePlayerPage from './pages/ChoosePlayer.jsx';
 import ChooseStatementPage from './pages/ChooseStatement.jsx';
+import DummyPlayer from './pages/DummyPlayer.jsx';
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/" element={<h1>Welcome! Select a page.</h1>} />
         <Route path="/host" element={<Host_HomePage />} />
         <Route path="/player" element={<Player_HomePage />} />
+        <Route path="/dummyplayer" element={<DummyPlayer />} />
         <Route path="/gameboard" element={<GameBoard/>} />
         <Route path="/choosecard" element={<ChooseCardPage/>} />
         <Route path="/chooseplayer" element={<ChoosePlayerPage/>} />
