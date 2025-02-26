@@ -19,7 +19,7 @@ const DummyPlayerPage = () => {
   }, []);
 
   const handleSendCockroach = () => {
-    socket.emit('sendCard', '67ad6bd71b76340c29212842', 3);
+    socket.emit('sendCard', '67ad6bd71b76340c29212842', 4);
   };
 
   return (
