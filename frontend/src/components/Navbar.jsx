@@ -34,6 +34,9 @@ function Navbar() {
         <Button as={Link} to='/dummyplayer' colorScheme='teal' varant='solid'>
           DummyPlayer
         </Button>
+        <Button as={Link} to='/dummyhost' colorScheme='teal' varant='solid'>
+          DummyHost
+        </Button>
       </HStack>
     </Box>
   );

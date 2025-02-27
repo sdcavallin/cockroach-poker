@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 
 const socket = io('http://localhost:5000', { autoConnect: false });
 
-const DummyPlayerPage = () => {
+const DummyHostPage = () => {
   const [message, setMessage] = useState('Connecting socket...');
   const [hand, setHand] = useState('?');
 
@@ -47,4 +47,4 @@ const DummyPlayerPage = () => {
   );
 };
 
-export default DummyPlayerPage;
+export default DummyHostPage;

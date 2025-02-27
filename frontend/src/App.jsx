@@ -8,6 +8,7 @@ import ChooseCardPage from './pages/ChooseCard.jsx';
 import ChoosePlayerPage from './pages/ChoosePlayer.jsx';
 import ChooseStatementPage from './pages/ChooseStatement.jsx';
 import DummyPlayerPage from './pages/DummyPlayer.jsx';
+import DummyHostPage from './pages/DummyHost.jsx';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path='/chooseplayer' element={<ChoosePlayerPage />} />
         <Route path='/choosestatement' element={<ChooseStatementPage />} />
         <Route path='/dummyplayer' element={<DummyPlayerPage />} />
+        <Route path='/dummyhost' element={<DummyHostPage />} />
       </Routes>
     </Box>
   );
