@@ -32,16 +32,22 @@ const DummyPlayerPage = () => {
     };
   }, []);
 
+  // Old function using sendCard
+  //   const handleSendCockroach = () => {
+  //     socket.emit('sendCard', '67ad6bd71b76340c29212842', 4);
+  //   };
+
+  // Uses gameRoomSendCard to target Players inside GameRoom objects
   const handleSendCockroach = () => {
-    socket.emit('sendCard', '67ad6bd71b76340c29212842', 4);
+    socket.emit('gameRoomSendCard', '123B', '12345', 3);
   };
 
   return (
     <Container>
+      <Container>Socket state: {message}</Container>
       <Button onClick={() => handleSendCockroach()}>
         Add Cockroach to Sebastian's Hand
       </Button>
-      <Container>Socket state: {message}</Container>
       <Container>Sebastian Hand: {hand}</Container>
     </Container>
   );

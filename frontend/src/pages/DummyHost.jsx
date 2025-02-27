@@ -1,5 +1,15 @@
-import { Button, Container } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import {
+  Box,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Container,
+  Heading,
+  Stack,
+  StackDivider,
+  Text,
+} from '@chakra-ui/react';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
 
@@ -7,7 +17,7 @@ const socket = io('http://localhost:5000', { autoConnect: false });
 
 const DummyHostPage = () => {
   const [message, setMessage] = useState('Connecting socket...');
-  const [hand, setHand] = useState('?');
+  const [gameRoom, setGameRoom] = useState(null);
 
   useEffect(() => {
     if (!socket.connected) {
@@ -18,31 +28,55 @@ const DummyHostPage = () => {
 
     const handleConnect = () => {
       setMessage(`Connected with id ${socket.id}`);
+      handleJoinRoom('123B');
     };
-    const handleReceiveHand = (hand) => {
-      setHand(JSON.stringify(hand));
+
+    const handleJoinRoom = (roomCode) => {
+      socket.emit('joinRoom', roomCode);
+    };
+
+    const handleReturnGameRoom = (gameRoom) => {
+      console.log(gameRoom);
+      setGameRoom(gameRoom);
     };
 
     socket.on('connect', handleConnect);
-    socket.on('receiveHand', handleReceiveHand);
+    socket.on('returnGameRoom', handleReturnGameRoom);
 
     return () => {
       socket.off('connect', handleConnect);
-      socket.off('receiveHand', handleReceiveHand);
+      socket.off('returnGameRoom', handleReturnGameRoom);
     };
   }, []);
 
-  const handleSendCockroach = () => {
-    socket.emit('sendCard', '67ad6bd71b76340c29212842', 4);
+  const handleRequestGameRoom = () => {
+    socket.emit('requestGameRoom', '123B');
   };
 
   return (
     <Container>
-      <Button onClick={() => handleSendCockroach()}>
-        Add Cockroach to Sebastian's Hand
-      </Button>
       <Container>Socket state: {message}</Container>
-      <Container>Sebastian Hand: {hand}</Container>
+      <Button onClick={() => handleRequestGameRoom()}>Request Room Info</Button>
+      {gameRoom ? (
+        <Card>
+          <CardHeader>
+            <Heading size='lg'>Game Room: {gameRoom.roomCode}</Heading>
+          </CardHeader>
+          <CardBody>
+            <Stack divider={<StackDivider />} spacing='4'>
+              {gameRoom.players.map((player, index) => (
+                <Box key={index}>
+                  <Heading size='md'>Player: {player.nickname}</Heading>
+                  <Text size='sm'>Hand: {JSON.stringify(player.hand)}</Text>
+                  <Text size='sm'>Pile: {JSON.stringify(player.pile)}</Text>
+                </Box>
+              ))}
+            </Stack>
+          </CardBody>
+        </Card>
+      ) : (
+        ''
+      )}
     </Container>
   );
 };

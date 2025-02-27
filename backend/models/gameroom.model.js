@@ -9,6 +9,7 @@ Represents the entire state of a game.
 const GameRoomSchema = new mongoose.Schema(
   {
     // roomCode: Room code used by players to join the room.
+    // TODO: Perhaps change to NONE when game is finished.
     roomCode: {
       type: String,
       required: true,
@@ -18,12 +19,6 @@ const GameRoomSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    // maxPlayers: Maximum number of players in lobby.
-    // No need to store this in DB; it's constant.
-    // maxPlayers: {
-    //   type: Number,
-    //   required: true,
-    // },
     // gameStatus: Number representing game status. See GameStatus constant.
     gameStatus: {
       type: Number,
@@ -32,7 +27,7 @@ const GameRoomSchema = new mongoose.Schema(
     // players: Array of players currently in the game. See PlayerSchema.
     // TODO: Possibly represent this as reference by ID.
     players: {
-      type: [String],
+      type: [PlayerSchema],
       require: true,
     },
     // currentAction: Current action being taken in the game. See GameActionSchema.

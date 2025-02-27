@@ -25,5 +25,5 @@ export const addCardToHand = async (playerId, card) => {
     console.error(`Error while updating player: ${error.message}`);
   }
 
-  return player.hand;
+  return player;
 };
