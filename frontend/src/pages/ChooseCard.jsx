@@ -21,18 +21,18 @@ const ChooseCardPage = () => {
       alignItems='center'
       flexDirection='column'
       overflow='hidden'
-      p={[2, 4]}
+      p={['5%', '8%']} // Padding based on viewport size
     >
       {/* Layout Switch: Desktop // Mobile Version */}
       <VStack
-        spacing={6}
+        spacing={['5%', '6%']}
         width={isDesktop ? '80%' : '100%'}
         alignItems='center'
       >
         {/* Phone Screen Box */}
         <Box
-          width={isDesktop ? '600px' : '90%'} // 600px on desktop, 90% on mobile
-          height={isDesktop ? '600px' : '700px'}
+          width={isDesktop ? '60%' : '90%'} // Width based on percentage
+          height={isDesktop ? '60%' : '70%'} // Height based on percentage
           aspectRatio={isDesktop ? 1 : undefined}
           bg='#F4A261'
           border='2px solid #2A9D8F'
@@ -42,26 +42,26 @@ const ChooseCardPage = () => {
           display='flex'
           flexDirection='column'
           alignItems='center'
-          p={6}
+          p='5%' // Padding in percentage
           overflow='hidden'
         >
           <Box
             position='absolute'
-            top='1'
-            left={['-100px', '-200px']}
-            width={['750', '750px']}
+            top='1%'
+            left={isDesktop ? '-20%' : '-30%'} // Adjusted left for positioning
+            width={isDesktop ? '60%' : '80%'}
             height='auto'
             zIndex='-2'
           ></Box>
 
           {/* Title */}
           <Text
-            fontSize={['xl', '2xl', '28px']}
+            fontSize={['5vw', '6vw', '28px']} // Font size in viewport width
             fontWeight='bold'
             textAlign='center'
-            mb={6}
+            mb='5%' // Margin in percentage
             bg='#f4f1de'
-            p={4}
+            p='5%' // Padding in percentage
             borderRadius='md'
             color='#264653'
             width='90%'
@@ -71,11 +71,11 @@ const ChooseCardPage = () => {
 
           {/* Scrollable Cards Section */}
           <Box
-            width={['90%', '250px']}
-            height={['300px', '400px']}
+            width='90%' // Width based on percentage of the parent container
+            height={['40%', '50%']} // Height based on percentage of the container
             overflowY='scroll'
             borderRadius='md'
-            p={3}
+            p='5%' // Padding in percentage
           >
             {/* Stacked Buttons */}
             {Array.from({ length: 8 }).map((_, index) => (
@@ -83,12 +83,12 @@ const ChooseCardPage = () => {
                 as={Link}
                 to='/choosestatement'
                 key={index}
-                width='100%'
-                height='60px'
+                width='100%' // Full width based on container size
+                height='10%' // Height based on percentage of container height
                 bg={index % 2 === 0 ? 'gray.300' : 'gray.400'}
                 borderRadius='md'
-                mb={3}
-                fontSize='lg'
+                mb='3%' // Margin between buttons in percentage
+                fontSize='4vw' // Font size in viewport width units
                 fontWeight='bold'
                 _hover={{ bg: '#2A9D8F' }}
                 onClick={() => alert(`You selected Card ${index + 1}`)}
@@ -98,10 +98,11 @@ const ChooseCardPage = () => {
             ))}
           </Box>
         </Box>
+
         <Box
           position='absolute'
-          bottom={['-20px', '-50px', '-130px']}
-          right={isDesktop ? '350px' : '10px'}
+          bottom={['-10%', '-15%', '-20%']} // Positioned based on percentage
+          right={isDesktop ? '15%' : '5%'} // Adjusted right for positioning
         ></Box>
       </VStack>
     </Box>

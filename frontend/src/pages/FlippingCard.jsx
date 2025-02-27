@@ -7,15 +7,15 @@ const MotionBox = motion(Box);
 const FlippingCard = ({
   frontColor,
   backColor,
-  width = '120px',
-  height = '160px',
+  width = '20%', // Percentage-based width
+  height = '30%', // Percentage-based height
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
   return (
     <MotionBox
-      width='120px'
-      height='160px'
+      width={width} // Use percentage-based width
+      height={height} // Use percentage-based height
       borderRadius='md'
       position='relative'
       cursor='pointer'
@@ -27,8 +27,8 @@ const FlippingCard = ({
       {/* Card Front */}
       <Box
         position='absolute'
-        width='100%'
-        height='100%'
+        width='100%' // Take full width
+        height='100%' // Take full height
         bg={frontColor}
         borderRadius='md'
         display='flex'
@@ -42,8 +42,8 @@ const FlippingCard = ({
       {/* Card Back */}
       <Box
         position='absolute'
-        width='100%'
-        height='100%'
+        width='100%' // Take full width
+        height='100%' // Take full height
         bg={backColor}
         borderRadius='md'
         display='flex'
