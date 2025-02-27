@@ -45,6 +45,9 @@ export const PlayerSchema = new mongoose.Schema({
   //   type: String,
   //   required: true,
   // },
+  socketId: {
+    type: String,
+  },
 });
 
 const Player = mongoose.model('Player', PlayerSchema);
