@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { PlayerSchema } from './player.model';
-import GameAction, { GameActionSchema } from './gameaction.model';
+import { PlayerSchema } from './player.model.js';
+import { GameActionSchema } from './gameaction.model.js';
 
 /*
 * GameRoom Schema *
@@ -12,7 +12,6 @@ const GameRoomSchema = new mongoose.Schema(
     roomCode: {
       type: String,
       required: true,
-      unique: true,
     },
     // numPlayers: Current number of players in lobby.
     numPlayers: {
@@ -20,10 +19,11 @@ const GameRoomSchema = new mongoose.Schema(
       required: true,
     },
     // maxPlayers: Maximum number of players in lobby.
-    maxPlayers: {
-      type: Number,
-      required: true,
-    },
+    // No need to store this in DB; it's constant.
+    // maxPlayers: {
+    //   type: Number,
+    //   required: true,
+    // },
     // gameStatus: Number representing game status. See GameStatus constant.
     gameStatus: {
       type: Number,
@@ -32,7 +32,7 @@ const GameRoomSchema = new mongoose.Schema(
     // players: Array of players currently in the game. See PlayerSchema.
     // TODO: Possibly represent this as reference by ID.
     players: {
-      type: [PlayerSchema],
+      type: [String],
       require: true,
     },
     // currentAction: Current action being taken in the game. See GameActionSchema.

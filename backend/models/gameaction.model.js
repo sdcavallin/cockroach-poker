@@ -12,20 +12,17 @@ TODO: Possibly reference them by UUID or embedded instead.
 export const GameActionSchema = new mongoose.Schema({
   // prevPlayer: The player who handed the card to the current player. If the turn is just starting, prevPlayer == turnPlayer.
   prevPlayer: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Player',
+    type: String,
     required: true,
   },
   // turnPlayer: The player whose turn it is.
   turnPlayer: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Player',
+    type: String,
     required: true,
   },
   // conspiracy: The list of players who have already seen the card.
   conspiracy: {
-    type: [mongoose.Schema.Types.ObjectId],
-    ref: 'Player',
+    type: [String],
     required: true,
   },
   // card: The actual card being passed around.

@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import { CardNumberToString, Cards } from './utilities/constants.js';
 import playerRoutes from './routes/player.route.js';
+import gameRoomRoutes from './routes/gameroom.route.js';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { addCardToHand } from './helpers/player.helper.js';
@@ -26,6 +27,8 @@ const io = new Server(server, {
 app.use(express.json());
 
 app.use('/api/players', playerRoutes);
+
+app.use('/api/gamerooms', gameRoomRoutes);
 
 app.get('/', (req, res) => {
   const card = Math.floor(Math.random() * 9);
