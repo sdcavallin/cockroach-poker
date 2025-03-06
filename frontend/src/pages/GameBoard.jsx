@@ -1,14 +1,17 @@
-import { Box, Image, Text, Grid, Container } from '@chakra-ui/react';
+import { Box, Image, Text, Grid, Container, Button } from '@chakra-ui/react';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
 
+// Initialize socket connection
 const socket = io('http://localhost:5000', { autoConnect: false });
 
 const GameBoard = () => {
   const [message, setMessage] = useState('Connecting socket...');
   const [gameRoom, setGameRoom] = useState(null);
 
+  // Fetch player data from the backend and update the count using Socket.IO
   useEffect(() => {
+    // Connect to the socket when the component mounts
     if (!socket.connected) {
       socket.connect();
     } else {
@@ -21,23 +24,30 @@ const GameBoard = () => {
     };
 
     const handleJoinRoom = (roomCode) => {
-      socket.emit('joinRoom', roomCode);
+      socket.emit('joinRoom', roomCode); // Emit event to join the room
     };
 
     const handleReturnGameRoom = (gameRoom) => {
-      console.log('Received game room:', gameRoom);
-      setGameRoom(gameRoom);
+      console.log(gameRoom); // Log game room data for debugging
+      setGameRoom(gameRoom); // Update state with the game room data
     };
 
     socket.on('connect', handleConnect);
     socket.on('returnGameRoom', handleReturnGameRoom);
 
+    // Cleanup on unmount
     return () => {
       socket.off('connect', handleConnect);
       socket.off('returnGameRoom', handleReturnGameRoom);
     };
   }, []);
 
+  // Request game room data
+  const handleRequestGameRoom = () => {
+    socket.emit('requestGameRoom', '123B'); // Replace with actual room code
+  };
+
+  // Image list based on player count
   const images = [
     { src: 'images/bat_silhouette.png', left: '5%', bottom: '5%' },
     { src: 'images/toad_silhouette.png', right: '5%', top: '5%' },
@@ -50,97 +60,105 @@ const GameBoard = () => {
     },
   ];
 
+  // Adjust the images based on player count (use gameRoom.players.length if available)
   const visibleImages = images.slice(0, gameRoom ? gameRoom.players.length : 0);
 
   return (
-    <Container maxW='100vw' maxH='100vh' p={0}>
-      <Box
-        display='flex'
-        justifyContent='center'
-        alignItems='center'
-        height='100vh'
-        width='100vw'
-        bg='#2A9D8F'
-      >
-        {/* Outer Game Border (Red Game Mat) */}
+    <Container>
+      <Container>Socket state: {message}</Container>
+      <Button onClick={() => handleRequestGameRoom()}>Request Room Info</Button>
+
+      {/* Render the game board once gameRoom data is available */}
+      {gameRoom ? (
         <Box
-          width='90vw' // Use viewport width for scaling
-          height='90vh' // Use viewport height for scaling
-          bg='#E9C46A'
-          p={4}
           display='flex'
-          flexDirection='column'
-          alignItems='center'
           justifyContent='center'
-          position='relative'
+          alignItems='center'
+          height='100vh'
+          bg='#2A9D8F'
+          p={2}
         >
-          {/* Main Game Area */}
           <Box
-            width='100%'
-            height='100%'
-            bg='#F4A261'
-            borderRadius='md'
-            position='relative'
+            width='90%'
+            height='90%'
+            bg='#E9C46A'
+            p={4}
             display='flex'
-            justifyContent='center'
+            flexDirection='column'
             alignItems='center'
+            justifyContent='center'
+            position='relative'
           >
-            <Text
-              position='absolute'
-              top='50%'
-              left='50%'
-              transform='translate(-50%, -50%)'
-              fontSize={['30px', '40px', '50px']}
-              fontWeight='bold'
-              color='#264653'
-              textAlign='center'
-              opacity={0.2}
+            {/* Render game area */}
+            <Box
+              width='90%'
+              height='90%'
+              bg='#F4A261'
+              borderRadius='md'
+              position='relative'
+              display='flex'
+              justifyContent='center'
+              alignItems='center'
             >
-              Cockroach Poker
-            </Text>
-
-            {/* Responsive Player Cards */}
-            {[
-              { left: '10%', top: '10%', highlight: 1 },
-              { left: '10%', bottom: '10%', highlight: 6 },
-              { right: '10%', top: '10%', highlight: 5 },
-              { right: '10%', bottom: '10%', highlight: 4 },
-            ].map((pos, index) => (
-              <Grid
-                key={index}
-                templateColumns='repeat(2, 1fr)'
-                templateRows='repeat(4, 1fr)'
-                gap={1}
-                width='50px'
-                height='120px'
+              <Text
                 position='absolute'
-                {...pos}
+                top='50%'
+                left='50%'
+                transform='translate(-50%, -50%)'
+                fontSize={['30px', '40px', '50px']}
+                fontWeight='bold'
+                color='#264653'
+                textAlign='center'
+                opacity={0.2}
               >
-                {[...Array(8)].map((_, i) => (
-                  <Box
-                    key={i}
-                    width='100%'
-                    height='100%'
-                    bg={i === pos.highlight ? '#5b7553' : 'gray.200'}
-                    borderRadius='md'
-                  />
-                ))}
-              </Grid>
-            ))}
+                Cockroach Poker
+              </Text>
 
-            {/* Render images based on player count */}
-            {visibleImages.map((img, i) => (
-              <Image
-                key={i}
-                position='absolute'
-                src={img.src}
-                width={['50px', '65px', '80px']}
-                {...img}
-              />
-            ))}
+              {/* Responsive Player Cards */}
+              {[
+                { left: '10%', top: '10%', highlight: 1 },
+                { left: '10%', bottom: '10%', highlight: 6 },
+                { right: '10%', top: '10%', highlight: 5 },
+                { right: '10%', bottom: '10%', highlight: 4 },
+              ].map((pos, index) => (
+                <Grid
+                  key={index}
+                  templateColumns='repeat(2, 1fr)'
+                  templateRows='repeat(4, 1fr)'
+                  gap={1}
+                  width='50px'
+                  height='120px'
+                  position='absolute'
+                  {...pos}
+                >
+                  {[...Array(8)].map((_, i) => (
+                    <Box
+                      key={i}
+                      width='100%'
+                      height='100%'
+                      bg={i === pos.highlight ? '#5b7553' : 'gray.200'}
+                      borderRadius='md'
+                    />
+                  ))}
+                </Grid>
+              ))}
+
+              {/* Render images based on player count */}
+              {visibleImages.map((img, i) => (
+                <Image
+                  key={i}
+                  position='absolute'
+                  src={img.src}
+                  width={['50px', '65px', '80px']}
+                  {...img}
+                />
+              ))}
+            </Box>
           </Box>
         </Box>
-      </Box>
+      ) : (
+        ''
+      )}
     </Container>
   );
 };

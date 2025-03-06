@@ -2,42 +2,51 @@ import { useEffect, useState } from 'react';
 import { Box, Text, Grid, Button } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import FlippingCard from './FlippingCard.jsx';
+import { io } from 'socket.io-client';
+
+// Initialize socket connection
+const socket = io('http://localhost:5000', { autoConnect: false });
 
 const StartBoard = () => {
-  const [players, setNumPlayers] = useState([]); // Array of player objects from backend
-  const [loading, setIsLoading] = useState(true); // Loading state for fetching data
-  const [error, setError] = useState(null); // Error state for fetching data
+  const [message, setMessage] = useState('Connecting socket...');
+  const [playerCount, setPlayerCount] = useState(0); // Store the number of players
 
+  // Connect to the socket and get the number of players from the backend
   useEffect(() => {
-    const fetchPlayers = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/players'); // API key here I think
-        const data = await response.json();
+    // Connect to the socket when the component mounts
+    if (!socket.connected) {
+      socket.connect();
+    } else {
+      setMessage(`Connected with id ${socket.id}`);
+    }
 
-        if (data.success) {
-          setNumPlayers(data.players);
-        } else {
-          setError(data.error);
-        }
-      } catch (error) {
-        setError(error);
-      } finally {
-        setIsLoading(false);
-      }
+    const handleConnect = () => {
+      setMessage(`Connected with id ${socket.id}`);
+      socket.emit('getPlayerCount'); // Emit event to get the current player count
     };
 
-    fetchPlayers();
+    const handlePlayerCount = (count) => {
+      setPlayerCount(count); // Update player count with the data received from the server
+    };
 
-    const interval = setInterval(fetchPlayers, 5000);
+    socket.on('connect', handleConnect);
+    socket.on('playerCount', handlePlayerCount); // Listen for the player count update from the server
 
-    return () => clearInterval(interval);
+    // Cleanup on unmount
+    return () => {
+      socket.off('connect', handleConnect);
+      socket.off('playerCount', handlePlayerCount);
+    };
   }, []);
 
-  const playerCount = players.length;
+  // Check if the player count is loaded
+  if (playerCount === null) {
+    return <Text>Loading player count...</Text>; // Return loading message until player count is fetched
+  }
 
   return (
-    <Box // Add Box as a wrapper with background color
-      bg='#2A9D8F' // Set background color here
+    <Box
+      bg='#2A9D8F'
       width='100vw'
       height='100vh'
       display='flex'
@@ -94,7 +103,7 @@ const StartBoard = () => {
         templateColumns={{ base: 'repeat(3, 1fr)', md: 'repeat(5, 1fr)' }}
         gap={{ base: '2%', md: '5%' }}
         width={{ base: '90%', md: '90%' }}
-        justifyItems='center' // Ensure the cards are centered
+        justifyItems='center'
       >
         {[...Array(5)].map((_, index) => (
           <FlippingCard
@@ -111,7 +120,7 @@ const StartBoard = () => {
         templateRows='repeat(4, 1fr)'
         gap={{ base: '2%', md: '3%' }}
         width={{ base: '90%', md: '90%' }}
-        justifyItems='center' // Ensure the cards are centered
+        justifyItems='center'
         height={{ base: '20%', md: '25%' }}
       >
         {[...Array(4)].map((_, index) => (
