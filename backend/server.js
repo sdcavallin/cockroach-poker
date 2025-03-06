@@ -56,10 +56,31 @@ io.on('connection', (socket) => {
 
   let userUUID = socket.handshake.query.uuid;
 
+  // If something connects and it is a player then the gameroom that stores the player must be updated.
   if (!userUUID) {
   } else {
+    //TODO SEND TO GAMEROOM
     players[userUUID] = socket.id;
   }
+
+  // connectToRoom: an individual player connects to a gameroom to input their data. Occurs whenever a player socket is connected
+  socket.on('connectToRoom', async (roomCode) => {
+    socket.join(GAME_ROOM_PREFIX + roomCode);
+    console.log(
+      `Socket ${socket.id} joined room ${GAME_ROOM_PREFIX + roomCode}`
+    );
+
+    const gameRoom = await getGameRoom(roomCode);
+    io.to(GAME_ROOM_PREFIX + roomCode).emit('playerJoined', {
+      uuid: userUUID,
+      socketId: socket.id,
+      gameRoom: gameRoom,
+    });
+
+    // Send updated gameroom to host
+    //const gameRoom = await getGameRoom(roomCode);
+    //socket.to(GAME_ROOM_PREFIX + roomCode).emit('returnGameRoom', gameRoom);
+  });
 
   // sendCard: sends to an individual Player object (deprecated)
   socket.on('sendCard', async (playerId, card) => {

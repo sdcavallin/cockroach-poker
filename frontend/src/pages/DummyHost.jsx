@@ -41,8 +41,16 @@ const DummyHostPage = () => {
       setGameRoom(gameRoom);
     };
 
+    const handlePlayerJoined = (uuid, socketID, gameRoom) => {
+      console.log(gameRoom);
+      //If a player has joined check if gameRoom already has UUID, if so then update the socketid, if not add new player.
+      
+      setGameRoom(gameRoom);
+    };
+
     socket.on('connect', handleConnect);
     socket.on('returnGameRoom', handleReturnGameRoom);
+    socket.on('playerJoined', handlePlayerJoined);
 
     return () => {
       socket.off('connect', handleConnect);

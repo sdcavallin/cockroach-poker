@@ -27,6 +27,8 @@ const DummyPlayerPage = () => {
 
     const handleConnect = () => {
       setMessage(`Connected with id ${socket.id}`);
+      const roomCode = '123B'
+      socket.emit('connectToRoom', roomCode);
     };
     const handleReceiveHand = (hand) => {
       setHand(JSON.stringify(hand));
