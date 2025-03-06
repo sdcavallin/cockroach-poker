@@ -12,6 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 const socket = io('http://localhost:5000', { autoConnect: false });
 

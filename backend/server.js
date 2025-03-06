@@ -48,8 +48,18 @@ app.get('/', (req, res) => {
   //addCardToHand('67ad6bd71b76340c29212842', card);
 });
 
+//TODO BASIC STORAGE OF UUID AND SOCKETID
+const players = {};
+
 io.on('connection', (socket) => {
   console.log(`Socket ${socket.id} connected.`);
+
+  let userUUID = socket.handshake.query.uuid;
+
+  if (!userUUID) {
+  } else {
+    players[userUUID] = socket.id;
+  }
 
   // sendCard: sends to an individual Player object (deprecated)
   socket.on('sendCard', async (playerId, card) => {
