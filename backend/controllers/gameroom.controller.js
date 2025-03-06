@@ -1,6 +1,20 @@
 import mongoose from 'mongoose';
 import GameRoom from '../models/gameroom.model.js';
 
+export const getGameRoom = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const gameRoom = await GameRoom.findById(id);
+    res.status(200).json({ success: true, data: gameRoom });
+  } catch (error) {
+    console.error(`Error in fetching GameRoom: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching GameRoom',
+    });
+  }
+};
+
 export const getGameRooms = async (req, res) => {
   try {
     const gameRooms = await GameRoom.find({});

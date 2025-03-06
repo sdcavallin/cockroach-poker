@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
-import { PlayerSchema } from './player.model';
-import GameAction, { GameActionSchema } from './gameaction.model';
+import { PlayerSchema } from './player.model.js';
+import { GameActionSchema } from './gameaction.model.js';
 
 /*
 * GameRoom Schema *
@@ -9,18 +9,13 @@ Represents the entire state of a game.
 const GameRoomSchema = new mongoose.Schema(
   {
     // roomCode: Room code used by players to join the room.
+    // TODO: Perhaps change to NONE when game is finished.
     roomCode: {
       type: String,
       required: true,
-      unique: true,
     },
     // numPlayers: Current number of players in lobby.
     numPlayers: {
-      type: Number,
-      required: true,
-    },
-    // maxPlayers: Maximum number of players in lobby.
-    maxPlayers: {
       type: Number,
       required: true,
     },

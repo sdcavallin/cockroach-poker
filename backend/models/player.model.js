@@ -40,6 +40,11 @@ export const PlayerSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  // roomCode: Room this player is in.
+  // roomCode: {
+  //   type: String,
+  //   required: true,
+  // },
 });
 
 const Player = mongoose.model('Player', PlayerSchema);

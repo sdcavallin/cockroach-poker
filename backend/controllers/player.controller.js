@@ -1,6 +1,20 @@
 import mongoose from 'mongoose';
 import Player from '../models/player.model.js';
 
+export const getPlayer = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const player = await Player.findById(id);
+    res.status(200).json({ success: true, data: player });
+  } catch (error) {
+    console.error(`Error in fetching player: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: 'Server error while fetching player',
+    });
+  }
+};
+
 export const getPlayers = async (req, res) => {
   try {
     const players = await Player.find({});

@@ -53,3 +53,9 @@ export const CardNumberToString = {
   7: 'Spider',
   8: 'Stinkbug',
 };
+
+/*
+GAME_ROOM_PREFIX 
+Prefix for socket.io rooms. For example, game:123B
+*/
+export const GAME_ROOM_PREFIX = 'game:';

@@ -7,22 +7,23 @@ import GameBoard from './pages/GameBoard.jsx';
 import ChooseCardPage from './pages/ChooseCard.jsx';
 import ChoosePlayerPage from './pages/ChoosePlayer.jsx';
 import ChooseStatementPage from './pages/ChooseStatement.jsx';
-
+import DummyPlayerPage from './pages/DummyPlayer.jsx';
+import DummyHostPage from './pages/DummyHost.jsx';
 
 function App() {
-  console.log("App is rendering"); 
   return (
     <Box>
       <Navbar />
       <Routes>
-        <Route path="/" element={<h1>Welcome! Select a page.</h1>} />
-        <Route path="/host" element={<Host_HomePage />} />
-        <Route path="/player" element={<Player_HomePage />} />
-        <Route path="/gameboard" element={<GameBoard/>} />
-        <Route path="/choosecard" element={<ChooseCardPage/>} />
-        <Route path="/chooseplayer" element={<ChoosePlayerPage/>} />
-        <Route path="/choosestatement" element={<ChooseStatementPage/>} />
-
+        <Route path='/' element={<h1>Welcome! Select a page.</h1>} />
+        <Route path='/host' element={<Host_HomePage />} />
+        <Route path='/player' element={<Player_HomePage />} />
+        <Route path='/gameboard' element={<GameBoard />} />
+        <Route path='/choosecard' element={<ChooseCardPage />} />
+        <Route path='/chooseplayer' element={<ChoosePlayerPage />} />
+        <Route path='/choosestatement' element={<ChooseStatementPage />} />
+        <Route path='/dummyplayer' element={<DummyPlayerPage />} />
+        <Route path='/dummyhost' element={<DummyHostPage />} />
       </Routes>
     </Box>
   );
