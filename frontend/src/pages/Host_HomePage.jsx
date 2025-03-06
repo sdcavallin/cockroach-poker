@@ -81,7 +81,6 @@ const StartBoard = () => {
         <Text
           position='relative'
           top={{ base: '2%', md: '1%' }}
-          left={{ base: '3%', md: '5%' }}
           fontSize={{ base: '6vw', md: '4vw' }}
           color='#264653'
           fontWeight='bold'
@@ -89,31 +88,32 @@ const StartBoard = () => {
         >
           Cockroach Poker
         </Text>
-
-        {/* Start Game Button */}
-        <Button
-          onClick={handleStartGame} // This will start the game and navigate to the GameBoard
-          width={{ base: '70%', md: '20%' }}
-          height={{ base: '10%', md: '12%' }}
-          bg='#E9C46A'
-          color='#264653'
-          fontSize={{ base: '4vw', md: '3vw' }}
+        <Box
+          display='flex'
+          justifyContent='center'
+          alignItems='center'
+          width='40%' // Ensures it takes up the full width of the screen
+          height='40%' // Adjust this based on the space you want for the button
           position='relative'
-          bottom='10%'
-          left='50%'
-          transform='translateX(-50%)'
-          _hover={{ bg: '#E76F51' }}
-          zIndex={10}
+          zIndex={10} // Ensure it stays above the other elements
         >
-          Start Game
-        </Button>
-
+          <Button
+            onClick={handleStartGame} // This will start the game and navigate to the GameBoard
+            width={{ base: '30%', md: '20%', large: '15%' }}
+            height={{ base: '20%', md: '12%', large: '10%' }}
+            bg='#E9C46A'
+            color='#264653'
+            fontSize={{ base: '4vw', md: '3vw' }}
+            _hover={{ bg: '#E76F51' }}
+          >
+            Start Game
+          </Button>
+        </Box>
         {/* Room Code */}
         <Text
           position='relative'
-          top={{ base: '30%', md: '30%' }}
-          left={{ base: '5%', md: '20%' }}
           fontSize={{ base: '7vw', md: '5vw' }}
+          bottom='-20%'
           color='#264653'
           fontWeight='bold'
           mt={4}
