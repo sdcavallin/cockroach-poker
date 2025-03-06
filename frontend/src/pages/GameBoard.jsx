@@ -1,4 +1,4 @@
-import { Box, Image, Text, Grid, Container, Button } from '@chakra-ui/react';
+import { Box, Text, Button, Container, Image } from '@chakra-ui/react';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
 
@@ -8,10 +8,10 @@ const socket = io('http://localhost:5000', { autoConnect: false });
 const GameBoard = () => {
   const [message, setMessage] = useState('Connecting socket...');
   const [gameRoom, setGameRoom] = useState(null);
+  const [isGameStarted, setIsGameStarted] = useState(false); // Track if game has started
 
   // Fetch player data from the backend and update the count using Socket.IO
   useEffect(() => {
-    // Connect to the socket when the component mounts
     if (!socket.connected) {
       socket.connect();
     } else {
@@ -20,11 +20,6 @@ const GameBoard = () => {
 
     const handleConnect = () => {
       setMessage(`Connected with id ${socket.id}`);
-      handleJoinRoom('123B'); // Join with room code (use the actual room code)
-    };
-
-    const handleJoinRoom = (roomCode) => {
-      socket.emit('joinRoom', roomCode); // Emit event to join the room
     };
 
     const handleReturnGameRoom = (gameRoom) => {
@@ -45,6 +40,7 @@ const GameBoard = () => {
   // Request game room data
   const handleRequestGameRoom = () => {
     socket.emit('requestGameRoom', '123B'); // Replace with actual room code
+    setIsGameStarted(true); // Game has started, show game board
   };
 
   // Image list based on player count
@@ -64,100 +60,90 @@ const GameBoard = () => {
   const visibleImages = images.slice(0, gameRoom ? gameRoom.players.length : 0);
 
   return (
-    <Container>
-      <Container>Socket state: {message}</Container>
-      <Button onClick={() => handleRequestGameRoom()}>Request Room Info</Button>
+    <Container
+      maxW='100vw'
+      maxH='100vh'
+      display='flex'
+      justifyContent='center'
+      alignItems='center'
+      bg='#2A9D8F'
+      p={0}
+      flexDirection='column'
+    >
+      {!isGameStarted && (
+        <>
+          {/* Request Room Info Button */}
+          <Button
+            onClick={handleRequestGameRoom}
+            width={{ base: '80%', md: '40%' }}
+            height={{ base: '10%', md: '12%' }}
+            bg='#E9C46A'
+            color='#264653'
+            fontSize={{ base: '5vw', md: '3vw' }}
+            position='absolute'
+            bottom='10%'
+            left='50%'
+            transform='translateX(-50%)'
+            _hover={{ bg: '#E76F51' }}
+            zIndex={10}
+          >
+            Request Room Info
+          </Button>
+        </>
+      )}
 
       {/* Render the game board once gameRoom data is available */}
-      {gameRoom ? (
+      {isGameStarted && gameRoom ? (
         <Box
           display='flex'
           justifyContent='center'
           alignItems='center'
           height='100vh'
-          bg='#2A9D8F'
-          p={2}
+          bg='#E9C46A'
+          p={4}
+          position='relative'
+          width='100%'
         >
           <Box
             width='90%'
             height='90%'
-            bg='#E9C46A'
+            bg='#F4A261'
             p={4}
             display='flex'
             flexDirection='column'
             alignItems='center'
             justifyContent='center'
             position='relative'
+            borderRadius='md'
           >
-            {/* Render game area */}
-            <Box
-              width='90%'
-              height='90%'
-              bg='#F4A261'
-              borderRadius='md'
-              position='relative'
-              display='flex'
-              justifyContent='center'
-              alignItems='center'
+            <Text
+              position='absolute'
+              top='50%'
+              left='50%'
+              transform='translate(-50%, -50%)'
+              fontSize={['30px', '40px', '50px']}
+              fontWeight='bold'
+              color='#264653'
+              textAlign='center'
+              opacity={0.2}
             >
-              <Text
+              Cockroach Poker
+            </Text>
+
+            {/* Render images based on player count */}
+            {visibleImages.map((img, i) => (
+              <Image
+                key={i}
                 position='absolute'
-                top='50%'
-                left='50%'
-                transform='translate(-50%, -50%)'
-                fontSize={['30px', '40px', '50px']}
-                fontWeight='bold'
-                color='#264653'
-                textAlign='center'
-                opacity={0.2}
-              >
-                Cockroach Poker
-              </Text>
-
-              {/* Responsive Player Cards */}
-              {[
-                { left: '10%', top: '10%', highlight: 1 },
-                { left: '10%', bottom: '10%', highlight: 6 },
-                { right: '10%', top: '10%', highlight: 5 },
-                { right: '10%', bottom: '10%', highlight: 4 },
-              ].map((pos, index) => (
-                <Grid
-                  key={index}
-                  templateColumns='repeat(2, 1fr)'
-                  templateRows='repeat(4, 1fr)'
-                  gap={1}
-                  width='50px'
-                  height='120px'
-                  position='absolute'
-                  {...pos}
-                >
-                  {[...Array(8)].map((_, i) => (
-                    <Box
-                      key={i}
-                      width='100%'
-                      height='100%'
-                      bg={i === pos.highlight ? '#5b7553' : 'gray.200'}
-                      borderRadius='md'
-                    />
-                  ))}
-                </Grid>
-              ))}
-
-              {/* Render images based on player count */}
-              {visibleImages.map((img, i) => (
-                <Image
-                  key={i}
-                  position='absolute'
-                  src={img.src}
-                  width={['50px', '65px', '80px']}
-                  {...img}
-                />
-              ))}
-            </Box>
+                src={img.src}
+                width={['50px', '65px', '80px']}
+                {...img}
+              />
+            ))}
           </Box>
         </Box>
       ) : (
-        ''
+        <Text>Loading Game...</Text>
       )}
     </Container>
   );
