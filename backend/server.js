@@ -60,6 +60,7 @@ io.on('connection', (socket) => {
   if (!userUUID) {
   } else {
     //TODO SEND TO GAMEROOM
+    console.log(`Socket ${socket.id} connected with UUID ${userUUID}`);
     players[userUUID] = socket.id;
   }
 

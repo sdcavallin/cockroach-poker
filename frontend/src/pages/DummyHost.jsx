@@ -13,6 +13,7 @@ import {
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { PlayerSchema } from '../../../backend/models/player.model';
 
 const socket = io('http://localhost:5000', { autoConnect: false });
 
@@ -44,9 +45,27 @@ const DummyHostPage = () => {
     const handlePlayerJoined = (uuid, socketID, gameRoom) => {
       console.log(gameRoom);
       //If a player has joined check if gameRoom already has UUID, if so then update the socketid, if not add new player.
-      
+      if (gameRoom.players.length == 0) {
+        //if gameRoom is empty then the player must be new
+      }
+      const iterator = gameRoom.players[Symbol.iterator]();
+      let i = 0;
+      let checkplayer = iterator.next();
+      while (!checkplayer.done) {
+        console.log(`Player Name ${checkplayer.nickname} Checked`);
+        if (checkplayer.uuid === uuid) {
+          //socketId is the PlayerSchema verson, socketID is the parameter of the function.
+          checkplayer.value.socketId = socketID;
+        }
+        i++;
+        checkplayer = iterator.next();
+      }
+
+      //do not touch
       setGameRoom(gameRoom);
     };
+
+    const addPlayer = () => {};
 
     socket.on('connect', handleConnect);
     socket.on('returnGameRoom', handleReturnGameRoom);
