@@ -16,6 +16,7 @@ import {
   getGameRoom,
 } from './helpers/gameroom.helper.js';
 import Player from './models/player.model.js';
+import cookie from 'cookie';
 import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
@@ -50,20 +51,18 @@ app.get('/', (req, res) => {
   //addCardToHand('67ad6bd71b76340c29212842', card);
 });
 
+const getUserUUID = (req) => {
+  const cookies = cookie.parse(req.headers.cookie || ''); // Parse cookies
+  return cookies.userUUID || uuidv4();
+};
+
 io.on('connection', (socket) => {
   console.log(`Socket ${socket.id} connected.`);
 
   // connectToRoom: an individual player connects to a gameroom to input their data. Occurs whenever a player socket is connected
   socket.on('connectToRoom', async (roomCode, name) => {
-    /* Uncomment to test actual UUID which works
-    let userUUID = Cookies.get('userUUID');
-    if (!userUUID) {
-      userUUID = uuidv4();
-      Cookies.set('userUUID', userUUID, { expires: 1 });
-    }
-    */
-
-    let userUUID = '12345';
+    const userUUID = getUserUUID(socket.handshake);
+    //let userUUID = '12345';
 
     socket.join(GAME_ROOM_PREFIX + roomCode);
     console.log(

@@ -2,7 +2,6 @@ import { Button, Container } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
-import Cookies from 'js-cookie';
 
 const socket = io('http://localhost:5000', {
   autoConnect: false,
