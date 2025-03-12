@@ -16,6 +16,7 @@ import {
   getGameRoom,
 } from './helpers/gameroom.helper.js';
 import Player from './models/player.model.js';
+import { v4 as uuidv4 } from 'uuid';
 
 dotenv.config();
 
@@ -49,24 +50,21 @@ app.get('/', (req, res) => {
   //addCardToHand('67ad6bd71b76340c29212842', card);
 });
 
-//TODO BASIC STORAGE OF UUID AND SOCKETID
-const players = {};
-
 io.on('connection', (socket) => {
   console.log(`Socket ${socket.id} connected.`);
 
-  let userUUID = socket.handshake.query.uuid;
-
-  // If something connects and it is a player then the gameroom that stores the player must be updated.
-  if (!userUUID) {
-  } else {
-    //TODO SEND TO GAMEROOM
-    console.log(`Socket ${socket.id} connected with UUID ${userUUID}`);
-    players[userUUID] = socket.id;
-  }
-
   // connectToRoom: an individual player connects to a gameroom to input their data. Occurs whenever a player socket is connected
   socket.on('connectToRoom', async (roomCode, name) => {
+    /* Uncomment to test actual UUID which works
+    let userUUID = Cookies.get('userUUID');
+    if (!userUUID) {
+      userUUID = uuidv4();
+      Cookies.set('userUUID', userUUID, { expires: 1 });
+    }
+    */
+
+    let userUUID = '12345';
+
     socket.join(GAME_ROOM_PREFIX + roomCode);
     console.log(
       `Socket ${socket.id} name ${name} with UUID of ${userUUID} joined room ${
@@ -74,8 +72,6 @@ io.on('connection', (socket) => {
       }`
     );
 
-    const gameRoomMew = await getGameRoom(roomCode);
-    socket.to(GAME_ROOM_PREFIX + roomCode).emit('returnGameRoom', gameRoomMew);
     io.to(GAME_ROOM_PREFIX + roomCode).emit('playerJoined', {
       uuid: String(userUUID),
       storedSocketId: String(socket.id),

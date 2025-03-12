@@ -3,21 +3,9 @@ import { Link } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
-import { v4 as uuidv4 } from 'uuid';
-
-/* Uncomment to test actual UUID which works
-let userUUID = Cookies.get('userUUID');
-if (!userUUID) {
-  userUUID = uuidv4();
-  Cookies.set('userUUID', userUUID, { expires: 1 });
-}
-*/
-
-let userUUID = '12345';
 
 const socket = io('http://localhost:5000', {
   autoConnect: false,
-  query: { uuid: userUUID },
 });
 
 const DummyPlayerPage = () => {
@@ -35,9 +23,9 @@ const DummyPlayerPage = () => {
     const handleConnect = () => {
       setMessage(`Connected with id ${socket.id}`);
       //TODO roomCode should be inputted by the player.
+      console.log('MEOW COUNTERS');
       let roomCode = '123B';
       socket.emit('connectToRoom', roomCode, name);
-      socket.hasJoinedRoom = true;
     };
 
     const handleReceiveHand = (hand) => {

@@ -44,10 +44,12 @@ const DummyHostPage = () => {
 
     const handlePlayerJoined = ({ uuid, storedSocketId, name }) => {
       console.log('Player Joined2:', uuid, storedSocketId, name);
+      let inElegantRunOnce = true;
       setGameRoom((prevGameRoom) => {
+        if (!prevGameRoom || !inElegantRunOnce) return prevGameRoom;
         console.log('Player Joined', prevGameRoom);
+        inElegantRunOnce = false;
         //If a player has joined check if gameRoom already has UUID, if so then update the socketid, if not add new player.
-        // Modify the gameRoom state safely with the latest data
         const updatedGameRoom = { ...prevGameRoom }; // Copy previous game room data
         if (updatedGameRoom.players.length === 0) {
           //addPlayer(uuid, socketID, updatedGameRoom, name);
@@ -105,7 +107,7 @@ const DummyHostPage = () => {
     return () => {
       socket.off('connect', handleConnect);
       socket.off('returnGameRoom', handleReturnGameRoom);
-      socket.off('playerJoined', handleReturnGameRoom);
+      socket.off('playerJoined', handlePlayerJoined);
     };
   }, []);
   /*
