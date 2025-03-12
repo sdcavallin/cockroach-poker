@@ -61,8 +61,8 @@ io.on('connection', (socket) => {
 
   // connectToRoom: an individual player connects to a gameroom to input their data. Occurs whenever a player socket is connected
   socket.on('connectToRoom', async (roomCode, name) => {
-    const userUUID = getUserUUID(socket.handshake);
-    //let userUUID = '12345';
+    //const userUUID = getUserUUID(socket.handshake);
+    let userUUID = '12345';
 
     socket.join(GAME_ROOM_PREFIX + roomCode);
     console.log(
