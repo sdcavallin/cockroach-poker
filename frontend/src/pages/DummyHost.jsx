@@ -13,7 +13,7 @@ import {
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { PlayerSchema } from '../../../backend/models/player.model';
+import { updateGameRoom } from '../../../backend/controllers/gameroom.controller';
 
 const socket = io('http://localhost:5000', { autoConnect: false });
 
@@ -37,35 +37,66 @@ const DummyHostPage = () => {
       socket.emit('joinRoom', roomCode);
     };
 
-    const handleReturnGameRoom = (gameRoom) => {
-      console.log(gameRoom);
-      setGameRoom(gameRoom);
+    const handleReturnGameRoom = (gameRoomMew) => {
+      console.log('Before Game Room ', gameRoomMew);
+      setGameRoom(gameRoomMew);
     };
 
-    const handlePlayerJoined = (uuid, socketID, gameRoom) => {
-      console.log(gameRoom);
-      //If a player has joined check if gameRoom already has UUID, if so then update the socketid, if not add new player.
-      if (gameRoom.players.length == 0) {
-        //if gameRoom is empty then the player must be new
-      }
-      const iterator = gameRoom.players[Symbol.iterator]();
-      let i = 0;
-      let checkplayer = iterator.next();
-      while (!checkplayer.done) {
-        console.log(`Player Name ${checkplayer.nickname} Checked`);
-        if (checkplayer.uuid === uuid) {
-          //socketId is the PlayerSchema verson, socketID is the parameter of the function.
-          checkplayer.value.socketId = socketID;
+    const handlePlayerJoined = ({ uuid, storedSocketId, name }) => {
+      console.log('Player Joined2:', uuid, storedSocketId, name);
+      setGameRoom((prevGameRoom) => {
+        console.log('Player Joined', prevGameRoom);
+        //If a player has joined check if gameRoom already has UUID, if so then update the socketid, if not add new player.
+        // Modify the gameRoom state safely with the latest data
+        const updatedGameRoom = { ...prevGameRoom }; // Copy previous game room data
+        if (updatedGameRoom.players.length === 0) {
+          //addPlayer(uuid, socketID, updatedGameRoom, name);
+        } else {
+          let newPlayer = true;
+          updatedGameRoom.players = updatedGameRoom.players.map((player) => {
+            if (String(player.uuid) === String(uuid)) {
+              console.log(
+                `Updating socketId for ${player.nickname}, with socket ${storedSocketId}`
+              );
+              newPlayer = false;
+              player.socketId = storedSocketId;
+              console.log(`Player Socket ${player.socketId}`);
+              return { ...player, socketId: storedSocketId };
+            }
+            return player; // Return unchanged player if no match
+          });
+          if (newPlayer) {
+            console.log('Mew');
+            //addPlayer(uuid, socketID, prevGameRoom, name);
+          }
         }
-        i++;
-        checkplayer = iterator.next();
-      }
-
-      //do not touch
-      setGameRoom(gameRoom);
+        console.log('Updated Game Room:', updatedGameRoom);
+        return updatedGameRoom;
+      });
     };
 
-    const addPlayer = () => {};
+    const addPlayer = (uuid, socketID, prevGameRoom, name) => {
+      //NEEDS TO CALL THE BACKEND TO CREATE A PLAYER OBJECT AND THEN ADD IT TO THE HOST'S GAME
+      const newPlayer = {
+        uuid: uuid,
+        nickname: name,
+        playerIcon: '.png', // Default icon (or could be dynamically set)
+        hand: [],
+        handSize: 0,
+        pile: [],
+        pileSize: 0,
+        socketId: socketID,
+      };
+
+      //Idk this was kinda confusing implementation
+      const updatedGameRoom = {
+        ...prevGameRoom, // This copies the previous game room
+        players: [...prevGameRoom.players, newPlayer], // this adds the new player to the array
+      };
+
+      // Respect immutability by returning a new room instead of trying to alter the previous one.
+      return updatedGameRoom;
+    };
 
     socket.on('connect', handleConnect);
     socket.on('returnGameRoom', handleReturnGameRoom);
@@ -74,9 +105,17 @@ const DummyHostPage = () => {
     return () => {
       socket.off('connect', handleConnect);
       socket.off('returnGameRoom', handleReturnGameRoom);
+      socket.off('playerJoined', handleReturnGameRoom);
     };
   }, []);
-
+  /*
+  useEffect(() => {
+    // This effect runs whenever `gameRoom` changes
+    if (gameRoom) {
+      console.log('Updated gameRoom:', gameRoom);
+    }
+  }, [gameRoom]); // Runs when `gameRoom` changes
+*/
   const handleRequestGameRoom = () => {
     socket.emit('requestGameRoom', '123B');
   };

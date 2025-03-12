@@ -15,6 +15,7 @@ import {
   gameRoomAddCardToHand,
   getGameRoom,
 } from './helpers/gameroom.helper.js';
+import Player from './models/player.model.js';
 
 dotenv.config();
 
@@ -65,17 +66,20 @@ io.on('connection', (socket) => {
   }
 
   // connectToRoom: an individual player connects to a gameroom to input their data. Occurs whenever a player socket is connected
-  socket.on('connectToRoom', async (roomCode) => {
+  socket.on('connectToRoom', async (roomCode, name) => {
     socket.join(GAME_ROOM_PREFIX + roomCode);
     console.log(
-      `Socket ${socket.id} joined room ${GAME_ROOM_PREFIX + roomCode}`
+      `Socket ${socket.id} name ${name} with UUID of ${userUUID} joined room ${
+        GAME_ROOM_PREFIX + roomCode
+      }`
     );
 
-    const gameRoom = await getGameRoom(roomCode);
+    const gameRoomMew = await getGameRoom(roomCode);
+    socket.to(GAME_ROOM_PREFIX + roomCode).emit('returnGameRoom', gameRoomMew);
     io.to(GAME_ROOM_PREFIX + roomCode).emit('playerJoined', {
-      uuid: userUUID,
-      socketId: socket.id,
-      gameRoom: gameRoom,
+      uuid: String(userUUID),
+      storedSocketId: String(socket.id),
+      name: String(name),
     });
 
     // Send updated gameroom to host
@@ -123,11 +127,13 @@ io.on('connection', (socket) => {
   });
 
   // joinRoom: room join; only used by hosts as of now
-  socket.on('joinRoom', (roomCode) => {
+  socket.on('joinRoom', async (roomCode) => {
     socket.join(GAME_ROOM_PREFIX + roomCode);
     console.log(
       `Socket ${socket.id} joined room ${GAME_ROOM_PREFIX + roomCode}`
     );
+    const gameRoom = await getGameRoom(roomCode);
+    socket.emit('returnGameRoom', gameRoom);
   });
 });
 
