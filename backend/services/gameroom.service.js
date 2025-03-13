@@ -17,8 +17,7 @@ export class GameRoomService {
       this.gameRoomMap.set(gameRoom.roomCode, gameRoom);
     }
 
-    console.log('gameRoomMap initialized:');
-    console.log(this.gameRoomMap);
+    //console.log('gameRoomMap initialized:', this.gameRoomMap);
   }
 
   // Get GameRoom by roomCode.
@@ -34,14 +33,14 @@ export class GameRoomService {
   }
 
   // Update GameRoom contents and save to database (expensive).
-  updateGameRoomAndSave(roomCode, gameRoom) {
+  async updateGameRoomAndSave(roomCode, gameRoom) {
     this.gameRoomMap.set(roomCode, gameRoom);
     gameRoom.save();
   }
 
-  // Create an empty GameRoom and save to database.
+  // Create an empty GameRoom.
   // Returns the generated roomCode.
-  createEmptyGameRoom() {
+  async createEmptyGameRoom() {
     const roomCode = this.generateValidRoomCode();
 
     const gameRoomBody = {
@@ -62,11 +61,12 @@ export class GameRoomService {
   }
 
   // Create an empty GameRoom with a specific code and save to database.
-  createEmptyGameRoom(roomCode) {
+  async createEmptyGameRoom(roomCode) {
     if (this.gameRoomMap.has(roomCode)) {
       throw new Error(
         `createEmptyGameRoom(): An active room with code ${roomCode} already exists.`
       );
+      return roomCode;
     }
 
     const gameRoomBody = {
@@ -87,13 +87,13 @@ export class GameRoomService {
   }
 
   // Save GameRoom contents to database.
-  saveGameRoom(roomCode) {
+  async saveGameRoom(roomCode) {
     const gameRoom = this.gameRoomMap.get(roomCode);
     gameRoom.save();
   }
 
   // Saves all GameRooms to the database. (EXPENSIVE, likely will not be used)
-  saveAll() {
+  async saveAll() {
     this.gameRoomMap.forEach((roomCode, gameRoom) => {
       gameRoom.save();
     });
@@ -101,7 +101,7 @@ export class GameRoomService {
 
   // Used to end a game.
   // Will update the game status and remove it from the map.
-  terminateGameRoom(roomCode) {
+  async terminateGameRoom(roomCode) {
     const gameRoom = this.gameRoomMap.get(roomCode);
 
     gameRoom.gameStatus = GameStatus.ENDED;

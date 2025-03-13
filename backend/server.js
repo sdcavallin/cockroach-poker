@@ -58,7 +58,27 @@ const getUserUUID = (req) => {
 };
 
 const gameRoomService = new GameRoomService();
-gameRoomService.initializeGameRoomMap();
+
+// Initialize GameRoomService
+(async () => {
+  await gameRoomService.initializeGameRoomMap();
+})();
+
+// Code to be executed after 1 second. Use only for testing GameRoomService.
+setTimeout(() => {
+  // Set to true if you want to run this. Otherwise leave as false to not do a bunch of arbitrary stuff every server startup.
+  const shouldIRunThisFunction = false;
+  if (!shouldIRunThisFunction) return;
+  // Get GameRoom 123B
+  let gameRoom123B = gameRoomService.getGameRoom('123B');
+  // Add Scorpion to Adithi's hand
+  gameRoom123B.players[1].hand.push(Cards.SCORPION);
+  // Print Adithi
+  console.log(gameRoom123B.players[1]);
+  // Save GameRoom state (async)
+  gameRoomService.saveGameRoom('123B');
+}, 1000);
+// Sockets making requests to the server should not need to wait 1 second for server startup. You can just put them in socket.on(...)
 
 io.on('connection', (socket) => {
   console.log(`Socket ${socket.id} connected.`);
