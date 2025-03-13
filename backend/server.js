@@ -98,7 +98,7 @@ io.on('connection', (socket) => {
       }`
     );
 
-    const gameRoom = getGameRoom(roomCode);
+    const gameRoom = gameRoomService.getGameRoom(roomCode);
     //Checks if the Gameroom already has the player
     let newPlayer = true;
     for (let i = 0; i < gameRoom.players.length; i++) {
