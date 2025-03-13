@@ -18,7 +18,6 @@ import {
 import Player from './models/player.model.js';
 import cookie from 'cookie';
 import { v4 as uuidv4 } from 'uuid';
-import { GameRoomService } from './services/gameroom.service.js';
 
 dotenv.config();
 
@@ -87,6 +86,9 @@ io.on('connection', (socket) => {
   socket.on('connectToRoom', async (roomCode, name) => {
     //const userUUID = getUserUUID(socket.handshake);
     let userUUID = '12345';
+    //emit to socket the UUID so the client can save it on their side.
+
+    socket.emit('setUUID', userUUID);
 
     socket.join(GAME_ROOM_PREFIX + roomCode);
     console.log(
@@ -95,18 +97,29 @@ io.on('connection', (socket) => {
       }`
     );
 
-    io.to(GAME_ROOM_PREFIX + roomCode).emit('playerJoined', {
-      uuid: String(userUUID),
-      storedSocketId: String(socket.id),
-      name: String(name),
-    });
+    const gameRoom = getGameRoom(roomCode);
+    //Checks if the Gameroom already has the player
+    let newPlayer = true;
+    for (let i = 0; i < gameRoom.players.length; i++) {
+      if (gameRoom.players[i].uuid == userUUID) {
+        console.log(
+          `Updating socketId for ${gameRoom.players[i].nickname}, with socket ${socket.id}`
+        );
+        gameRoom.players[i].socketId = socket.id;
+        newPlayer = false;
+        break;
+      }
+    }
+    //If player doesn't exist in the gameroom then it has to create a new player
+    if (!newPlayer) {
+      console.log(`Adding a new player to ${GAME_ROOM_PREFIX + roomCode}`);
+    }
 
-    // Send updated gameroom to host
-    //const gameRoom = await getGameRoom(roomCode);
-    //socket.to(GAME_ROOM_PREFIX + roomCode).emit('returnGameRoom', gameRoom);
+    //NOTE THIS FUNCTION DOESN'T SAVE TO THE DATABASE JUST LOCALLY
+    socket.to(GAME_ROOM_PREFIX + roomCode).emit('returnGameRoom', gameRoom);
   });
 
-  // sendCard (DEPRECATED): sends to an individual Player object
+  // sendCard: sends to an individual Player object (deprecated)
   socket.on('sendCard', async (playerId, card) => {
     console.log(
       `Socket ${socket.id} sent card ${CardNumberToString[card]} to player ${playerId}`
@@ -123,7 +136,7 @@ io.on('connection', (socket) => {
       .emit('returnGameRoom', gameRoom);
   });
 
-  // gameRoomSendCard: sends card to a Player object inside a GameRoom object
+  // gameRoomSendCard: sends to a Player object inside a GameRoom object
   socket.on('gameRoomSendCard', async (roomCode, playerId, card) => {
     console.log(
       `[Room ${roomCode}]: Socket ${socket.id} sent card ${CardNumberToString[card]} to player ${playerId}`
