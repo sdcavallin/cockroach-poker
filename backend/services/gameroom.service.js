@@ -113,11 +113,11 @@ export class GameRoomService {
 
   // Generates a roomCode that is not used by any other room.
   generateValidRoomCode() {
-    const characters = 'ABCDEFGHIJKLMNPQRSTUVWXYZ123456789';
+    const characters = 'ABDEFGHIJKLMNPQRSTUVWXY123456789';
     do {
       let roomCode = '';
-      for (let i = 0; i < 6; i++) {
-        roomCode += characters.charAt(Math.floor(Math.random() * 34));
+      for (let i = 0; i < 4; i++) {
+        roomCode += characters.charAt(Math.floor(Math.random() * 32));
       }
     } while (this.gameRoomMap.has(roomCode));
 
