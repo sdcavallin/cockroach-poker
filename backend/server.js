@@ -15,9 +15,13 @@ import {
   gameRoomAddCardToHand,
   getGameRoom,
 } from './helpers/gameroom.helper.js';
+<<<<<<< HEAD
 import Player from './models/player.model.js';
 import cookie from 'cookie';
 import { v4 as uuidv4 } from 'uuid';
+=======
+import { GameRoomService } from './services/gameroom.service.js';
+>>>>>>> 067af08 (Create GameRoomService to manage gameRooms in memory)
 
 dotenv.config();
 
@@ -56,6 +60,9 @@ const getUserUUID = (req) => {
   return cookies.userUUID || uuidv4();
 };
 
+const gameRoomService = new GameRoomService();
+gameRoomService.initializeGameRoomMap();
+
 io.on('connection', (socket) => {
   console.log(`Socket ${socket.id} connected.`);
 
@@ -82,7 +89,7 @@ io.on('connection', (socket) => {
     //socket.to(GAME_ROOM_PREFIX + roomCode).emit('returnGameRoom', gameRoom);
   });
 
-  // sendCard: sends to an individual Player object (deprecated)
+  // sendCard (DEPRECATED): sends to an individual Player object
   socket.on('sendCard', async (playerId, card) => {
     console.log(
       `Socket ${socket.id} sent card ${CardNumberToString[card]} to player ${playerId}`
@@ -99,7 +106,7 @@ io.on('connection', (socket) => {
       .emit('returnGameRoom', gameRoom);
   });
 
-  // gameRoomSendCard: sends to a Player object inside a GameRoom object
+  // gameRoomSendCard: sends card to a Player object inside a GameRoom object
   socket.on('gameRoomSendCard', async (roomCode, playerId, card) => {
     console.log(
       `[Room ${roomCode}]: Socket ${socket.id} sent card ${CardNumberToString[card]} to player ${playerId}`

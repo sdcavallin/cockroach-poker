@@ -13,7 +13,10 @@ import {
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+<<<<<<< HEAD
 import { updateGameRoom } from '../../../backend/controllers/gameroom.controller';
+=======
+>>>>>>> 067af08 (Create GameRoomService to manage gameRooms in memory)
 
 const socket = io('http://localhost:5000', { autoConnect: false });
 

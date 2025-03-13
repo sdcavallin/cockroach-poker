@@ -33,7 +33,14 @@ const GameRoomSchema = new mongoose.Schema(
     // currentAction: Current action being taken in the game. See GameActionSchema.
     currentAction: {
       type: GameActionSchema,
-      require: true,
+    },
+    // deck: Remaining cards in deck.
+    deck: {
+      type: [Number],
+    },
+    // deckSize: Deck size.
+    deckSize: {
+      type: Number,
     },
   },
   {
