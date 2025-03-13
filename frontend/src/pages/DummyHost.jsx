@@ -36,9 +36,9 @@ const DummyHostPage = () => {
       socket.emit('joinRoom', roomCode);
     };
 
-    const handleReturnGameRoom = (gameRoomMew) => {
-      console.log('Before Game Room ', gameRoomMew);
-      setGameRoom(gameRoomMew);
+    const handleReturnGameRoom = (gameRoom) => {
+      console.log('Before Game Room ', gameRoom);
+      setGameRoom(gameRoom);
     };
 
     const handlePlayerJoined = ({ uuid, storedSocketId, name }) => {
