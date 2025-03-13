@@ -18,6 +18,7 @@ import {
 import Player from './models/player.model.js';
 import cookie from 'cookie';
 import { v4 as uuidv4 } from 'uuid';
+import { GameRoomService } from './services/gameroom.service.js';
 
 dotenv.config();
 
