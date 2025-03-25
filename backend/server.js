@@ -157,6 +157,23 @@ io.on('connection', (socket) => {
     socket.emit('returnGameRoom', gameRoom);
   });
 
+  // checkJoinCode: checks if the room exists for a roomCode, from player
+  socket.on('checkJoinCode', async (roomCode) => {
+    console.log(`Socket ${socket.id} requested GameRoom info for ${roomCode}`);
+    //roomExists is a boolean
+    let roomExists = false;
+
+    const gameRoom = gameRoomService.getGameRoom(roomCode);
+
+    if (gameRoom == undefined) {
+      roomExists = false;
+    } else {
+      roomExists = true;
+    }
+
+    socket.emit('recieveJoinCode', roomExists);
+  });
+
   // joinRoom: room join; only used by hosts as of now
   socket.on('joinRoom', async (roomCode) => {
     socket.join(GAME_ROOM_PREFIX + roomCode);

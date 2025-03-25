@@ -9,6 +9,7 @@ import ChoosePlayerPage from './pages/ChoosePlayer.jsx';
 import ChooseStatementPage from './pages/ChooseStatement.jsx';
 import DummyPlayerPage from './pages/DummyPlayer.jsx';
 import DummyHostPage from './pages/DummyHost.jsx';
+import DummyPlayerJoinPage from './pages/DummyPlayerJoin.jsx';
 import ChooseAvatarPage from './pages/ChooseAvatar.jsx';
 import ChooseUName from './pages/ChooseUName.jsx';
 import JoinRoom from './pages/JoinRoom.jsx';
@@ -29,6 +30,7 @@ function App() {
         <Route path='/choosestatement' element={<ChooseStatementPage />} />
         <Route path='/dummyplayer' element={<DummyPlayerPage />} />
         <Route path='/dummyhost' element={<DummyHostPage />} />
+        <Route path='/dummyplayerjoin' element={<DummyPlayerJoinPage />} />
         <Route path='/dummyjoin' element={<DummyJoinPage />} />
         <Route path='/dummyplay' element={<DummyPlayPage />} />
         <Route path='/chooseavatar' element={<ChooseAvatarPage />} />
