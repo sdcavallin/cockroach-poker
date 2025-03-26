@@ -57,6 +57,9 @@ function Navbar() {
         <Button as={Link} to='/dummyhost' colorScheme='teal' variant='solid'>
           DummyHost
         </Button>
+        <Button as={Link} to='/dummyjoin' colorScheme='teal' variant='solid'>
+          DummyJoin
+        </Button>
       </HStack>
     </Box>
   );
