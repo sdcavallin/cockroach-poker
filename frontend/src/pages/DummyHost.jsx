@@ -75,11 +75,10 @@ const DummyHostPage = () => {
               {gameRoom.players.map((player, index) => (
                 <Box key={index}>
                   <Heading size='md'>Player: {player.nickname}</Heading>
+                  <Text size='sm'>UUID: {player.uuid}</Text>
                   <Text size='sm'>Hand: {JSON.stringify(player.hand)}</Text>
                   <Text size='sm'>Pile: {JSON.stringify(player.pile)}</Text>
-                  <Text size='sm'>
-                    Socket: {JSON.stringify(player.socketId)}
-                  </Text>
+                  <Text size='sm'>Socket: {player.socketId}</Text>
                 </Box>
               ))}
             </Stack>

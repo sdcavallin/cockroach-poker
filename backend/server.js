@@ -52,11 +52,6 @@ app.get('/', (req, res) => {
   //addCardToHand('67ad6bd71b76340c29212842', card);
 });
 
-const getUserUUID = (req) => {
-  const cookies = cookie.parse(req.headers.cookie || ''); // Parse cookies
-  return cookies.userUUID || uuidv4();
-};
-
 const gameRoomService = new GameRoomService();
 
 // Initialize GameRoomService
@@ -66,7 +61,7 @@ const gameRoomService = new GameRoomService();
 
 // Code to be executed after 1 second. Use only for testing GameRoomService.
 setTimeout(() => {
-  // Set to true if you want to run this. Otherwise leave as false to not do a bunch of arbitrary stuff every server startup.
+  // Set to true if you want to run this. Otherwise leave as false.
   const shouldIRunThisFunction = false;
   if (!shouldIRunThisFunction) return;
   // Get GameRoom 123B
@@ -120,7 +115,7 @@ io.on('connection', (socket) => {
     socket.to(GAME_ROOM_PREFIX + roomCode).emit('returnGameRoom', gameRoom);
   });
 
-  // sendCard: sends to an individual Player object (deprecated)
+  // sendCard: sends to an individual Player object (DEPRECATED)
   socket.on('sendCard', async (playerId, card) => {
     console.log(
       `Socket ${socket.id} sent card ${CardNumberToString[card]} to player ${playerId}`
@@ -169,22 +164,24 @@ io.on('connection', (socket) => {
     socket.emit('returnGameRoom', gameRoom);
   });
 
-  // selectavatar: pushes selected avatar to backend code based on player id/ uuid
+  // selectAvatar: pushes selected avatar to backend code based on player id/ uuid
   socket.on('selectAvatar', async ({ playerId, avatar }) => {
     try {
-      const player = await Player.findOne({ uuid: playerId }); 
+      const player = await Player.findOne({ uuid: playerId });
       if (player) {
-        player.playerIcon = avatar; 
-        await player.save(); 
+        player.playerIcon = avatar;
+        await player.save();
         console.log(`Player ${playerId} selected avatar: ${avatar}`);
-        socket.emit('avatarUpdated', { success: true, avatar }); 
+        socket.emit('avatarUpdated', { success: true, avatar });
       }
     } catch (error) {
       console.error('Error updating avatar:', error);
-      socket.emit('avatarUpdated', { success: false, message: 'Failed to update avatar' });
+      socket.emit('avatarUpdated', {
+        success: false,
+        message: 'Failed to update avatar',
+      });
     }
   });
-
 });
 
 server.listen(PORT, () => {

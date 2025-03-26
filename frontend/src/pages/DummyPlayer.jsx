@@ -1,4 +1,4 @@
-import { Button, Container } from '@chakra-ui/react';
+import { Button, Container, Divider, Input } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
@@ -49,11 +49,6 @@ const DummyPlayerPage = () => {
     };
   }, []);
 
-  // Old function using sendCard
-  //   const handleSendCockroach = () => {
-  //     socket.emit('sendCard', '67ad6bd71b76340c29212842', 4);
-  //   };
-
   // Uses gameRoomSendCard to target Players inside GameRoom objects
   const handleSendCockroach = () => {
     socket.emit('gameRoomSendCard', '123B', '12345', 3);
@@ -64,8 +59,8 @@ const DummyPlayerPage = () => {
   };
 
   const handleConnectToRoom = (event) => {
-    //TODO roomCode should be inputted by the player.
-    let roomCode = '123B';
+    // TODO roomCode should be inputted by the player.
+    const roomCode = '123B';
     socket.emit('connectToRoom', roomCode, name);
   };
 
@@ -76,9 +71,11 @@ const DummyPlayerPage = () => {
         Add Cockroach to Sebastian's Hand
       </Button>
       <Container>Sebastian Hand: {hand}</Container>
+      <Divider />
+      Join a Room
       <Container>
-        Enter Name:
-        <input type='text' value={name} onChange={handleNameChange} />
+        Enter Nickname:
+        <Input placeholder={name} onChange={handleNameChange} size='sm' />
       </Container>
       <Container>
         {name} UUID: {UUID}
