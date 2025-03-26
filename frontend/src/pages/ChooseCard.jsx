@@ -1,110 +1,97 @@
-import {
-  Box,
-  Button,
-  Text,
-  Image,
-  VStack,
-  useMediaQuery,
-} from '@chakra-ui/react';
+import { Box, Button, Text, VStack, useMediaQuery } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const ChooseCardPage = () => {
-  const [isDesktop] = useMediaQuery('(min-width: 768px)'); // Detect desktop
+  const [isDesktop] = useMediaQuery('(min-width: 1024px)'); // Detect desktop screens
+  const [cards, setCards] = useState([]); // Store player's hand (cards)
+
+  useEffect(() => {
+    const fetchPlayerHand = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/players'); // Replace with actual player ID later
+        if (response.data.success) {
+          setCards(response.data.data.hand); // Only use hand data
+        }
+      } catch (error) {
+        console.error('Error fetching player hand:', error);
+      }
+    };
+
+    fetchPlayerHand();
+  }, []);
 
   return (
     <Box
       width='100vw'
       height='100vh'
-      bg='#E9C46A' // Light red-orange background
+      bg='#E9C46A'
       display='flex'
       justifyContent='center'
       alignItems='center'
       flexDirection='column'
       overflow='hidden'
-      p={['5%', '8%']} // Padding based on viewport size
+      p={{ base: '5%', md: '3%' }}
     >
-      {/* Layout Switch: Desktop // Mobile Version */}
-      <VStack
-        spacing={['5%', '6%']}
-        width={isDesktop ? '80%' : '100%'}
+      {/* Main Content Box */}
+      <Box
+        width={{ base: '90%', md: '70%', lg: '50%', xl: '40%' }}
+        height={{ base: '80%', md: '75%', lg: '70%' }}
+        bg='#F4A261'
+        border='2px solid #2A9D8F'
+        borderRadius='md'
+        boxShadow='xl'
+        display='flex'
+        flexDirection='column'
         alignItems='center'
+        justifyContent='space-between'
+        p='5%'
+        maxW='500px'
       >
-        {/* Phone Screen Box */}
-        <Box
-          width={isDesktop ? '60%' : '90%'} // Width based on percentage
-          height={isDesktop ? '60%' : '70%'} // Height based on percentage
-          aspectRatio={isDesktop ? 1 : undefined}
-          bg='#F4A261'
-          border='2px solid #2A9D8F'
+        {/* Title */}
+        <Text
+          fontSize={{ base: '6vw', md: '4vw', lg: '28px' }}
+          fontWeight='bold'
+          textAlign='center'
+          bg='#f4f1de'
+          p='3%'
           borderRadius='md'
-          boxShadow='lg'
-          position='relative'
-          display='flex'
-          flexDirection='column'
-          alignItems='center'
-          p='5%' // Padding in percentage
-          overflow='hidden'
+          boxShadow='md'
+          color='#264653'
+          width='80%'
         >
-          <Box
-            position='absolute'
-            top='1%'
-            left={isDesktop ? '-20%' : '-30%'} // Adjusted left for positioning
-            width={isDesktop ? '60%' : '80%'}
-            height='auto'
-            zIndex='-2'
-          ></Box>
+          Choose a Card
+        </Text>
 
-          {/* Title */}
-          <Text
-            fontSize={['5vw', '6vw', '28px']} // Font size in viewport width
-            fontWeight='bold'
-            textAlign='center'
-            mb='5%' // Margin in percentage
-            bg='#f4f1de'
-            p='5%' // Padding in percentage
-            borderRadius='md'
-            color='#264653'
-            width='90%'
-          >
-            Choose a Card
-          </Text>
-
-          {/* Scrollable Cards Section */}
-          <Box
-            width='90%' // Width based on percentage of the parent container
-            height={['40%', '50%']} // Height based on percentage of the container
-            overflowY='scroll'
-            borderRadius='md'
-            p='5%' // Padding in percentage
-          >
-            {/* Stacked Buttons */}
-            {Array.from({ length: 8 }).map((_, index) => (
+        {/* Scrollable Cards Section */}
+        <Box width='100%' height='50%' overflowY='auto' p='5%'>
+          {cards.length > 0 ? (
+            cards.map((card, index) => (
               <Button
                 as={Link}
                 to='/choosestatement'
                 key={index}
-                width='100%' // Full width based on container size
-                height='10%' // Height based on percentage of container height
+                width='100%'
+                height='12%'
                 bg={index % 2 === 0 ? 'gray.300' : 'gray.400'}
                 borderRadius='md'
-                mb='3%' // Margin between buttons in percentage
-                fontSize='4vw' // Font size in viewport width units
+                mb='3%'
+                fontSize={{ base: '4vw', md: '3vw', lg: '20px' }}
                 fontWeight='bold'
                 _hover={{ bg: '#2A9D8F' }}
-                onClick={() => alert(`You selected Card ${index + 1}`)}
+                onClick={() => alert(`You selected Card ${card}`)}
               >
-                Card {index + 1}
+                Card {card}
               </Button>
-            ))}
-          </Box>
+            ))
+          ) : (
+            <Text fontSize='xl' fontWeight='bold' color='gray.700'>
+              Loading cards...
+            </Text>
+          )}
         </Box>
-
-        <Box
-          position='absolute'
-          bottom={['-10%', '-15%', '-20%']} // Positioned based on percentage
-          right={isDesktop ? '15%' : '5%'} // Adjusted right for positioning
-        ></Box>
-      </VStack>
+      </Box>
     </Box>
   );
 };

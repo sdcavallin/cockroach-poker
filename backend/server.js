@@ -168,6 +168,23 @@ io.on('connection', (socket) => {
     const gameRoom = await getGameRoom(roomCode);
     socket.emit('returnGameRoom', gameRoom);
   });
+
+  // selectavatar: pushes selected avatar to backend code based on player id/ uuid
+  socket.on('selectAvatar', async ({ playerId, avatar }) => {
+    try {
+      const player = await Player.findOne({ uuid: playerId }); 
+      if (player) {
+        player.playerIcon = avatar; 
+        await player.save(); 
+        console.log(`Player ${playerId} selected avatar: ${avatar}`);
+        socket.emit('avatarUpdated', { success: true, avatar }); 
+      }
+    } catch (error) {
+      console.error('Error updating avatar:', error);
+      socket.emit('avatarUpdated', { success: false, message: 'Failed to update avatar' });
+    }
+  });
+
 });
 
 server.listen(PORT, () => {

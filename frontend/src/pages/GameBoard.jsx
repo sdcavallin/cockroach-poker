@@ -43,6 +43,8 @@ const GameBoard = () => {
     setIsGameStarted(true); // Game has started, show game board
   };
 
+  // chakra ui breakpoints for screen sizes : base = default for all screens, sm = mobile , md = tablet, lg = laptop, xl = desktop
+
   // Image list based on player count
   const images = [
     { src: 'images/bat_silhouette.png', left: '5%', bottom: '5%' },
@@ -75,19 +77,23 @@ const GameBoard = () => {
           {/* Request Room Info Button */}
           <Button
             onClick={handleRequestGameRoom}
-            width={{ base: '80%', md: '40%' }}
-            height={{ base: '10%', md: '12%' }}
+            width={{ base: '100%', md: '100%', lg: '100%', xl: '100%' }} // Square shape
+            height={{ base: '100%', md: '100%', lg: '100%', xl: '100%' }}
             bg='#E9C46A'
             color='#264653'
-            fontSize={{ base: '5vw', md: '3vw' }}
-            position='absolute'
-            bottom='10%'
+            fontSize={{ base: '7vw', md: '7vw', lg: '7vw', xl: '7vw' }} // Larger font size
+            position='fixed' // Ensures the button is centered relative to the viewport
+            top='50%'
             left='50%'
-            transform='translateX(-50%)'
+            transform='translate(-50%, -50%)' // Proper centering
+            display='flex'
+            alignItems='center'
+            justifyContent='center'
+            borderRadius='md'
             _hover={{ bg: '#E76F51' }}
-            zIndex={10}
+            zIndex={1000} // Ensures it appears on top
           >
-            Request Room Info
+            Enter Game
           </Button>
         </>
       )}
@@ -142,9 +148,8 @@ const GameBoard = () => {
             ))}
           </Box>
         </Box>
-      ) : (
-        <Text>Loading Game...</Text>
-      )}
+      ) : // <Text>Loading Game...</Text>
+      null}
     </Container>
   );
 };
