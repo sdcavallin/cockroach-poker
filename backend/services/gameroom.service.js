@@ -27,6 +27,16 @@ export class GameRoomService {
     return this.gameRoomMap.get(roomCode);
   }
 
+  // Returns a player by UUID.
+  getPlayerByUUID(roomCode, uuid) {
+    const gameRoom = this.gameRoomMap.get(roomCode);
+    if (!gameRoom) return null;
+    for (let player of gameRoom.players) {
+      if (player.uuid == uuid) return player;
+    }
+    return null;
+  }
+
   // Update GameRoom contents.
   updateGameRoom(roomCode, gameRoom) {
     this.gameRoomMap.set(roomCode, gameRoom);

@@ -68,6 +68,7 @@ setTimeout(() => {
   let gameRoom123B = gameRoomService.getGameRoom('123B');
   // Add Scorpion to Adithi's hand
   gameRoom123B.players[1].hand.push(Cards.SCORPION);
+  gameRoom123B.players[1].handSize++;
   // Print Adithi
   console.log(gameRoom123B.players[1]);
   // Save GameRoom state (async)
@@ -181,6 +182,11 @@ io.on('connection', (socket) => {
         message: 'Failed to update avatar',
       });
     }
+  });
+
+  socket.on('getPlayer', async (roomCode, uuid) => {
+    const player = gameRoomService.getPlayerByUUID(roomCode, uuid);
+    socket.emit('returnPlayer', player);
   });
 });
 

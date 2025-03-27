@@ -19,46 +19,49 @@ function Navbar() {
         <Button as={Link} to='/' colorScheme='teal' variant='solid'>
           Home
         </Button>
-        <Button as={Link} to='/host' colorScheme='teal' variant='solid'>
+        <Button as={Link} to='/Host' colorScheme='teal' variant='solid'>
           Host
         </Button>
-        <Button as={Link} to='/player' colorScheme='teal' variant='solid'>
+        <Button as={Link} to='/Player' colorScheme='teal' variant='solid'>
           Player
         </Button>
-        <Button as={Link} to='/gameboard' colorScheme='teal' variant='solid'>
+        <Button as={Link} to='/Gameboard' colorScheme='teal' variant='solid'>
           Gameboard
         </Button>
-        <Button as={Link} to='/chooseplayer' colorScheme='teal' variant='solid'>
+        <Button as={Link} to='/ChoosePlayer' colorScheme='teal' variant='solid'>
           ChoosePlayer
         </Button>
-        <Button as={Link} to='/chooseavatar' colorScheme='teal' variant='solid'>
+        <Button as={Link} to='/ChooseAvatar' colorScheme='teal' variant='solid'>
           ChooseAvatar
         </Button>
-        <Button as={Link} to='/chooseuname' colorScheme='teal' variant='solid'>
+        <Button as={Link} to='/ChooseUName' colorScheme='teal' variant='solid'>
           ChooseUName
         </Button>
-        <Button as={Link} to='/choosecard' colorScheme='teal' variant='solid'>
+        <Button as={Link} to='/ChooseCard' colorScheme='teal' variant='solid'>
           ChooseCard
         </Button>
-        <Button as={Link} to='/joinroom' colorScheme='teal' variant='solid'>
+        <Button as={Link} to='/JoinRoom' colorScheme='teal' variant='solid'>
           ChooseCard
         </Button>
         <Button
           as={Link}
-          to='/choosestatement'
+          to='/ChooseStatement'
           colorScheme='teal'
           variant='solid'
         >
           ChooseStatement
         </Button>
-        <Button as={Link} to='/dummyplayer' colorScheme='teal' variant='solid'>
+        <Button as={Link} to='/DummyPlayer' colorScheme='teal' variant='solid'>
           DummyPlayer
         </Button>
-        <Button as={Link} to='/dummyhost' colorScheme='teal' variant='solid'>
+        <Button as={Link} to='/DummyHost' colorScheme='teal' variant='solid'>
           DummyHost
         </Button>
-        <Button as={Link} to='/dummyjoin' colorScheme='teal' variant='solid'>
+        <Button as={Link} to='/DummyJoin' colorScheme='teal' variant='solid'>
           DummyJoin
+        </Button>
+        <Button as={Link} to='/DummyPlay' colorScheme='teal' variant='solid'>
+          DummyPlay
         </Button>
       </HStack>
     </Box>
