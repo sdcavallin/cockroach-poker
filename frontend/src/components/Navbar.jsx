@@ -30,6 +30,8 @@ function Navbar() {
     { to: '/choosestatement', label: 'ChooseStatement' },
     { to: '/dummyplayer', label: 'DummyPlayer' },
     { to: '/dummyhost', label: 'DummyHost' },
+    { to: '/dummyjoin', label: 'DummyJoin' },
+    { to: '/dummyplay', label: 'DummyPlay' },
   ];
 
   return (
