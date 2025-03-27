@@ -11,25 +11,30 @@ const ChooseCardPage = () => {
   const [roomCode, setRoomCode] = useState(null);
   const location = useLocation();
   const state = location.state || {};
+  const uuidFromState = state.uuid;
+  const uuidFromCookie = Cookies.get('player_uuid');
+  const finalUUID = uuidFromState || uuidFromCookie;
+
+  const roomCodeFromState = state.roomCode;
+  const roomCodeFromCookie = Cookies.get('room_code');
+  const finalRoomCode = roomCodeFromState || roomCodeFromCookie || '123B';
+
+  console.log('Arrived at ChooseCardPage');
+  console.log('Cookies.get("player_uuid"):', Cookies.get('player_uuid'));
+  console.log('Cookies.get("room_code"):', Cookies.get('room_code'));
+  console.log('state:', state);
+  console.log('finalUUID:', finalUUID);
 
   useEffect(() => {
-    // Connect socket
-    if (!socket.connected) {
-      socket.connect();
-    }
+    if (!finalUUID || !finalRoomCode) return;
 
-    // Determine UUID from location or cookie
-    const uuidFromState = state.uuid;
-    const uuidFromCookie = Cookies.get('player_uuid');
-    const finalUUID = uuidFromState || uuidFromCookie;
-
-    if (!finalUUID) return;
+    Cookies.set('player_uuid', finalUUID, { expires: 2 });
+    Cookies.set('room_code', finalRoomCode, { expires: 2 });
 
     setPlayerUUID(finalUUID);
-    setRoomCode(state.roomCode || '123B'); // default roomCode or pass from state
+    setRoomCode(finalRoomCode);
 
-    // Request player info
-    socket.emit('getPlayer', state.roomCode || '123B', finalUUID);
+    socket.emit('getPlayer', finalRoomCode, finalUUID);
 
     const handleReturnPlayer = (player) => {
       setCards(player.hand);
@@ -40,10 +45,15 @@ const ChooseCardPage = () => {
     return () => {
       socket.off('returnPlayer', handleReturnPlayer);
     };
-  }, [state]);
+  }, [finalUUID, finalRoomCode]);
 
   // If we don't have a UUID, redirect to join
-  if (!playerUUID) return <Navigate to='/DummyJoin' replace />;
+  if (playerUUID === null) {
+    return <Text>Loading...</Text>; // wait for effect to populate
+  }
+  if (!playerUUID) {
+    return <Navigate to='/dummyjoin' replace />;
+  }
 
   return (
     <Box
