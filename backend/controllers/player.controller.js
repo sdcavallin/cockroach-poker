@@ -96,3 +96,37 @@ export const deletePlayer = async (req, res) => {
       .json({ success: false, message: 'Server error while deleting player' });
   }
 };
+
+
+export const getPlayerUUIDByUsername = async (req, res) => {
+  const { username } = req.query;
+
+  if (!username) {
+    return res.status(400).json({
+      success: false,
+      message: 'missing username',
+    });
+  }
+
+  try {
+    const player = await Player.findOne({ nickname: username });
+
+    if (!player) {
+      return res.status(404).json({
+        success: false,
+        message: 'player not found',
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      uuid: player.uuid,
+    });
+  } catch (error) {
+    console.error(`error finding UUID by username: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: 'server error while finding player UUID',
+    });
+  }
+};

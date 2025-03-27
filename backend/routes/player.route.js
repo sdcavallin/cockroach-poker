@@ -5,9 +5,12 @@ import {
   getPlayers,
   getPlayer,
   updatePlayer,
+  getPlayerUUIDByUsername,
 } from '../controllers/player.controller.js';
 
 const router = express.Router();
+
+router.get('/uuid/lookup', getPlayerUUIDByUsername);
 
 router.get('/', getPlayers);
 

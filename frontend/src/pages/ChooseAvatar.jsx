@@ -1,11 +1,11 @@
-import { Box, Text, Image, useMediaQuery } from '@chakra-ui/react';
+import { Box, Text, Image, useMediaQuery, Button } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
+import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
 
-// Connect to the backend socket
 const socket = io('http://localhost:5000', { autoConnect: false });
 
-// Avatar data
 const avatars = [
   { name: 'bird', src: '/avatars/bird.png' },
   { name: 'black cat', src: '/avatars/black_cat.png' },
@@ -16,9 +16,10 @@ const avatars = [
 ];
 
 const ChooseAvatarPage = () => {
-  const [isDesktop] = useMediaQuery('(min-width: 768px)'); // Detect desktop
-  const [selectedAvatar, setSelectedAvatar] = useState(null); // Track selected avatar
-  const playerId = 'PLAYER_UUID_HERE'; // Replace with player ID when that part is done
+  const [isDesktop] = useMediaQuery('(min-width: 768px)');
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
+  const playerId = Cookies.get('player_uuid');
+  const navigate = useNavigate(); // 👈 Add navigation hook
 
   useEffect(() => {
     if (!socket.connected) {
@@ -30,13 +31,24 @@ const ChooseAvatarPage = () => {
     };
   }, []);
 
-  // Handle avatar click & send to backend
   const handleAvatarClick = (avatarName) => {
     setSelectedAvatar(avatarName);
     console.log(`Selected Avatar: ${avatarName}`);
 
-    // Send selected avatar to the backend socket
-    socket.emit('selectAvatar', { playerId, avatar: avatarName });
+    if (playerId) {
+      socket.emit('selectAvatar', { playerId, avatar: avatarName });
+    } else {
+      console.warn('Player UUID not found in cookies!');
+    }
+  };
+
+  const handleNext = () => {
+    if (!selectedAvatar) {
+      alert('Please select an avatar first!');
+      return;
+    }
+
+    navigate('/choosecard');
   };
 
   return (
@@ -51,10 +63,9 @@ const ChooseAvatarPage = () => {
       overflow='hidden'
       p={{ base: '5%', md: '3%' }}
     >
-      {/* Main Content Box */}
       <Box
         width={{ base: '70%', md: '60%', lg: '70%', xl: '70%' }}
-        height={{ base: '80%', md: '75%', lg: '80%', xl: '90%' }}
+        height='auto'
         borderRadius='md'
         display='flex'
         flexDirection='column'
@@ -62,7 +73,6 @@ const ChooseAvatarPage = () => {
         justifyContent='center'
         p='5%'
       >
-        {/* Title */}
         <Text
           fontSize={{ base: '6vw', md: '4vw', lg: '28px' }}
           fontWeight='bold'
@@ -77,10 +87,9 @@ const ChooseAvatarPage = () => {
           Choose an Avatar
         </Text>
 
-        {/* Avatar Selection Grid */}
         <Box
           display='grid'
-          gridTemplateColumns={{ base: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }} // 3 columns on larger screens
+          gridTemplateColumns={{ base: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }}
           gap='5%'
           mt='5%'
         >
@@ -104,12 +113,22 @@ const ChooseAvatarPage = () => {
           ))}
         </Box>
 
-        {/* Display Selected Avatar */}
         {selectedAvatar && (
           <Text fontSize='xl' fontWeight='bold' color='gray.700' mt='5%'>
             Selected: {selectedAvatar}
           </Text>
         )}
+        <Button
+          mt='6%'
+          bg='#2A9D8F'
+          color='white'
+          fontSize='lg'
+          width='60%'
+          _hover={{ bg: '#21867a' }}
+          onClick={handleNext}
+        >
+          Next
+        </Button>
       </Box>
     </Box>
   );

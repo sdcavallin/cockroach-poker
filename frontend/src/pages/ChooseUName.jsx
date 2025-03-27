@@ -1,27 +1,43 @@
-import {
-  Box,
-  Button,
-  Text,
-  Input,
-  VStack,
-  useMediaQuery,
-} from '@chakra-ui/react';
+import { Box, Button, Text, Input, useMediaQuery } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Cookies from 'js-cookie'; // Optional: to store UUID
 
 const ChooseUName = () => {
-  const [isDesktop] = useMediaQuery('(min-width: 1024px)'); // Detect desktop screens
-  const [username, setUsername] = useState(''); // Track username input
-  const navigate = useNavigate(); // Navigation for next step
+  const [isDesktop] = useMediaQuery('(min-width: 1024px)');
+  const [username, setUsername] = useState('');
+  const navigate = useNavigate();
 
-  // Handle Next Button Click
-  const handleNext = () => {
+  const handleNext = async () => {
     if (username.trim() === '') {
       alert('Please enter a username!');
       return;
     }
-    console.log(`Username selected: ${username}`);
-    navigate('/chooseavatar'); // Redirect to the next page
+
+    try {
+      console.log('Sending request with username:', username.trim());
+
+      const response = await axios.get(
+        'http://localhost:5000/api/players/uuid/lookup',
+        {
+          params: { username: username.trim() },
+        }
+      );
+
+      console.log('Received response:', response.data);
+
+      if (response.data.success && response.data.uuid) {
+        Cookies.set('player_uuid', response.data.uuid, { expires: 2 });
+        navigate('/chooseavatar');
+      } else {
+        alert('Username not found!');
+      }
+    } catch (error) {
+      console.error('Caught error:', error);
+      console.error('Error response:', error.response); // 👈 this is KEY
+      alert('Server error while looking up username.');
+    }
   };
 
   return (
@@ -36,7 +52,6 @@ const ChooseUName = () => {
       overflow='hidden'
       p={{ base: '5%', md: '3%' }}
     >
-      {/* Main Content Box */}
       <Box
         width={{ base: '90%', md: '70%', lg: '50%', xl: '40%' }}
         height={{ base: '50%', md: '45%', lg: '40%' }}
@@ -50,7 +65,6 @@ const ChooseUName = () => {
         justifyContent='center'
         p='5%'
       >
-        {/* Title */}
         <Text
           fontSize={{ base: '6vw', md: '4vw', lg: '28px' }}
           fontWeight='bold'
@@ -61,7 +75,6 @@ const ChooseUName = () => {
           Enter Your Username
         </Text>
 
-        {/* Username Input Field */}
         <Input
           placeholder='Type your username...'
           value={username}
@@ -75,7 +88,6 @@ const ChooseUName = () => {
           mb='5%'
         />
 
-        {/* Next Button */}
         <Button
           width='80%'
           bg='#E76F51'

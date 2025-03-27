@@ -19,10 +19,12 @@ import Player from './models/player.model.js';
 import cookie from 'cookie';
 import { v4 as uuidv4 } from 'uuid';
 import { GameRoomService } from './services/gameroom.service.js';
-
+import cors from 'cors';
 dotenv.config();
 
 const app = express();
+app.use(cors()); 
+
 const PORT = process.env.PORT || 5000;
 
 // Create an HTTP server and attach Express
