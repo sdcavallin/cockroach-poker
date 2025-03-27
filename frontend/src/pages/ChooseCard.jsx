@@ -1,7 +1,7 @@
-import { Box, Button, Text, VStack, useMediaQuery } from '@chakra-ui/react';
+import { Box, Button, Text, useMediaQuery, Grid } from '@chakra-ui/react';
 import { Link, useLocation, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import socket from '../socket'; // import your shared socket instance
+import socket from '../socket';
 import Cookies from 'js-cookie';
 
 const ChooseCardPage = () => {
@@ -11,19 +11,9 @@ const ChooseCardPage = () => {
   const [roomCode, setRoomCode] = useState(null);
   const location = useLocation();
   const state = location.state || {};
-  const uuidFromState = state.uuid;
-  const uuidFromCookie = Cookies.get('player_uuid');
-  const finalUUID = uuidFromState || uuidFromCookie;
 
-  const roomCodeFromState = state.roomCode;
-  const roomCodeFromCookie = Cookies.get('room_code');
-  const finalRoomCode = roomCodeFromState || roomCodeFromCookie || '123B';
-
-  console.log('Arrived at ChooseCardPage');
-  console.log('Cookies.get("player_uuid"):', Cookies.get('player_uuid'));
-  console.log('Cookies.get("room_code"):', Cookies.get('room_code'));
-  console.log('state:', state);
-  console.log('finalUUID:', finalUUID);
+  const finalUUID = state.uuid || Cookies.get('player_uuid');
+  const finalRoomCode = state.roomCode || Cookies.get('room_code') || '123B';
 
   useEffect(() => {
     if (!finalUUID || !finalRoomCode) return;
@@ -45,17 +35,30 @@ const ChooseCardPage = () => {
     return () => {
       socket.off('returnPlayer', handleReturnPlayer);
     };
-  }, [finalUUID, finalRoomCode]);
+  }, [state]);
 
-  // If we don't have a UUID, redirect to join
-  if (playerUUID === null) {
-    return <Text>Loading...</Text>; // wait for effect to populate
-  }
-  if (!playerUUID) {
-    return <Navigate to='/dummyjoin' replace />;
-  }
+  if (playerUUID === null) return <Text>Loading...</Text>;
+  if (!playerUUID) return <Navigate to='/dummyjoin' replace />;
 
-  return (
+  const renderCardButton = (card, index) => (
+    <Button
+      as={Link}
+      to='/choosestatement'
+      state={{ selectedCard: card, uuid: playerUUID, roomCode }}
+      key={index}
+      width='100%'
+      height='100%'
+      bg={index % 2 === 0 ? 'gray.300' : 'gray.400'}
+      borderRadius='md'
+      fontSize={{ base: '4vw', md: '3vw', lg: '20px' }}
+      fontWeight='bold'
+      _hover={{ bg: '#2A9D8F' }}
+    >
+      Card {card}
+    </Button>
+  );
+
+  const MobileLayout = () => (
     <Box
       width='100vw'
       height='100vh'
@@ -81,40 +84,12 @@ const ChooseCardPage = () => {
         p='5%'
         maxW='500px'
       >
-        <Text
-          fontSize={{ base: '6vw', md: '4vw', lg: '28px' }}
-          fontWeight='bold'
-          textAlign='center'
-          bg='#f4f1de'
-          p='3%'
-          borderRadius='md'
-          boxShadow='md'
-          color='#264653'
-          width='80%'
-        >
+        <Text fontSize='2xl' fontWeight='bold' color='#264653'>
           Choose a Card
         </Text>
-
         <Box width='100%' height='50%' overflowY='auto' p='5%'>
           {cards.length > 0 ? (
-            cards.map((card, index) => (
-              <Button
-                as={Link}
-                to='/choosestatement'
-                state={{ selectedCard: card, uuid: playerUUID, roomCode }}
-                key={index}
-                width='100%'
-                height='12%'
-                bg={index % 2 === 0 ? 'gray.300' : 'gray.400'}
-                borderRadius='md'
-                mb='3%'
-                fontSize={{ base: '4vw', md: '3vw', lg: '20px' }}
-                fontWeight='bold'
-                _hover={{ bg: '#2A9D8F' }}
-              >
-                Card {card}
-              </Button>
-            ))
+            cards.map(renderCardButton)
           ) : (
             <Text fontSize='xl' fontWeight='bold' color='gray.700'>
               Loading cards...
@@ -124,6 +99,34 @@ const ChooseCardPage = () => {
       </Box>
     </Box>
   );
+
+  const DesktopLayout = () => (
+    <Box
+      width='100vw'
+      height='100vh'
+      bg='#E9C46A'
+      display='flex'
+      justifyContent='center'
+      alignItems='center'
+      flexDirection='column'
+      p={10}
+    >
+      <Text fontSize='4xl' fontWeight='bold' color='#264653' mb={8}>
+        Choose a Card
+      </Text>
+      <Grid templateColumns='repeat(3, 1fr)' gap={6} width='60%' maxW='800px'>
+        {cards.length > 0 ? (
+          cards.map(renderCardButton)
+        ) : (
+          <Text fontSize='xl' fontWeight='bold' color='gray.700'>
+            Loading cards...
+          </Text>
+        )}
+      </Grid>
+    </Box>
+  );
+
+  return isDesktop ? <DesktopLayout /> : <MobileLayout />;
 };
 
 export default ChooseCardPage;
