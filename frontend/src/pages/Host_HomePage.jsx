@@ -120,7 +120,7 @@ const StartBoard = () => {
           color='#264653'
           fontWeight='bold'
         >
-          Room Code: SKD33
+          Room Code: 123B
         </Text>
       </Box>
 

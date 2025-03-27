@@ -1,5 +1,6 @@
 import { Box, Button, Text, Image, useMediaQuery } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
+import { Link } from '@chakra-ui/react'; // this wraps the image safely
 
 const ChoosePlayerPage = () => {
   const [isDesktop] = useMediaQuery('(min-width: 768px)'); // Detect desktop & when to switch
@@ -56,11 +57,12 @@ const ChoosePlayerPage = () => {
         </Text>
 
         {/* Clickable Image Link */}
-        <Link to='/choosestatement'>
+        <Link as={RouterLink} to='/choosecard'>
           <Image
             src='/images/rat_silhouette.png'
-            width={isDesktop ? '50%' : '70%'} // Width based on screen size
-            mt={['5%', '8%']} // Margin in percentage
+            alt='Rat silhouette'
+            width={isDesktop ? '50%' : '70%'}
+            mt={['5%', '8%']}
             cursor='pointer'
             _hover={{
               transform: 'scale(1.1)',

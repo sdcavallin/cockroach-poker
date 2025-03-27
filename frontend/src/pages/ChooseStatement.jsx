@@ -70,7 +70,7 @@ const ChooseStatementPage = () => {
           {Array.from({ length: 8 }).map((_, index) => (
             <Button
               as={Link}
-              to='/choosecard'
+              to='/chooseplayer'
               key={index}
               width='100%' // Full width
               height='12%' // Increase button height for better visibility
