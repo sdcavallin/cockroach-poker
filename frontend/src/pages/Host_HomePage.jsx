@@ -56,87 +56,88 @@ const StartBoard = () => {
     <Container
       maxW='100vw'
       maxH='100vh'
-      display='flex'
-      justifyContent='center'
-      alignItems='center'
-      bg='#2A9D8F'
       p={0}
+      bg='#2A9D8F'
+      display='flex'
       flexDirection='column'
-      height='100vh' // Ensure the container takes full height
+      justifyContent='space-between'
+      alignItems='center'
+      height='100vh'
     >
-      {/* Full blue header area */}
-      <Box
-        bg='#2A9D8F'
-        width='100vw'
-        height='100vh' // Ensure the blue box takes full screen height
-        display='flex'
-        justifyContent='center'
-        alignItems='center'
-        flexDirection='column'
-        position='absolute' // Make the header area take up the full screen
-        top='0'
-        left='0'
-      >
-        {/* Cockroach Poker Title */}
-        <Text
-          position='relative'
-          top={{ base: '2%', md: '1%' }}
-          fontSize={{ base: '6vw', md: '4vw' }}
-          color='#264653'
-          fontWeight='bold'
-          zIndex={10}
-        >
-          Cockroach Poker
-        </Text>
-        <Box
-          display='flex'
-          justifyContent='center'
-          alignItems='center'
-          width='40%' // Ensures it takes up the full width of the screen
-          height='40%' // Adjust this based on the space you want for the button
-          position='relative'
-          zIndex={10} // Ensure it stays above the other elements
-        >
-          <Button
-            onClick={handleStartGame} // This will start the game and navigate to the GameBoard
-            width={{ base: '30%', md: '20%', large: '15%' }}
-            height={{ base: '20%', md: '12%', large: '10%' }}
-            bg='#E9C46A'
-            color='#264653'
-            fontSize={{ base: '4vw', md: '3vw' }}
-            _hover={{ bg: '#E76F51' }}
-          >
-            Start Game
-          </Button>
-        </Box>
-        {/* Room Code */}
-        <Text
-          position='relative'
-          fontSize={{ base: '7vw', md: '5vw' }}
-          bottom='-20%'
-          color='#264653'
-          fontWeight='bold'
-          mt={4}
-          zIndex={10}
-        >
-          room code: SKD33
-        </Text>
-      </Box>
-
-      {/* Cards Grid - 2 rows, 4 cards per row */}
+      {/* Top Row of Cards */}
       <Grid
-        templateColumns='repeat(4, 1fr)' // 4 columns for 4 cards per row
-        templateRows='repeat(2, 1fr)' // 2 rows
-        gap='10%' // Space between cards
-        width='80%' // Adjust grid width to be centered
-        justifyItems='center' // Center cards inside the grid
+        templateColumns='repeat(4, 1fr)'
+        gap='4'
+        mt='4'
+        justifyItems='center'
+        width='80%'
       >
-        {[...Array(8)].map((_, index) => (
+        {[...Array(4)].map((_, index) => (
           <FlippingCard
             key={index}
             frontColor={index === 3 ? '#a3b18a' : '#F4A261'}
             backColor={index % 2 === 0 ? '#E9C46A' : '#F4A261'}
-            isFlipped={index < playerCount} // Flip based on player count
+            isFlipped={index < playerCount}
+            width='10vw'
+            height='15vw'
+          />
+        ))}
+      </Grid>
+
+      {/* Center Section */}
+      <Box
+        display='flex'
+        flexDirection='column'
+        justifyContent='center'
+        alignItems='center'
+        height='30%'
+        mt={4}
+      >
+        <Text
+          fontSize={{ base: '6vw', md: '4vw', lg: '5vw' }}
+          color='#264653'
+          fontWeight='bold'
+          mb={4}
+        >
+          Cockroach Poker
+        </Text>
+
+        <Button
+          onClick={handleStartGame}
+          bg='#E9C46A'
+          color='#264653'
+          fontSize={{ base: '4vw', md: '2vw' }}
+          _hover={{ bg: '#E76F51' }}
+          px='6'
+          py='4'
+          mb={4}
+        >
+          Start Game
+        </Button>
+
+        <Text
+          fontSize={{ base: '5vw', md: '2vw' }}
+          color='#264653'
+          fontWeight='bold'
+        >
+          Room Code: SKD33
+        </Text>
+      </Box>
+
+      {/* Bottom Row of Cards */}
+      <Grid
+        templateColumns='repeat(4, 1fr)'
+        gap='4'
+        mb='4'
+        justifyItems='center'
+        width='80%'
+      >
+        {[...Array(4)].map((_, index) => (
+          <FlippingCard
+            key={index + 4}
+            frontColor={index === 3 ? '#a3b18a' : '#F4A261'}
+            backColor={index % 2 === 0 ? '#E9C46A' : '#F4A261'}
+            isFlipped={index + 4 < playerCount}
             width='10vw'
             height='15vw'
           />
