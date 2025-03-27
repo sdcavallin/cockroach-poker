@@ -19,8 +19,7 @@ const ChooseAvatarPage = () => {
   const [isDesktop] = useMediaQuery('(min-width: 768px)');
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   const playerId = Cookies.get('player_uuid');
-  const navigate = useNavigate(); // 👈 Add navigation hook
-
+  const navigate = useNavigate(); // useNavigate hook from react-router-dom
   useEffect(() => {
     if (!socket.connected) {
       socket.connect();
