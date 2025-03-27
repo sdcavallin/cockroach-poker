@@ -1,26 +1,49 @@
 import { Box, Button, Text, VStack, useMediaQuery } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import socket from '../socket'; // import your shared socket instance
+import Cookies from 'js-cookie';
 
 const ChooseCardPage = () => {
-  const [isDesktop] = useMediaQuery('(min-width: 1024px)'); // Detect desktop screens
-  const [cards, setCards] = useState([]); // Store player's hand (cards)
+  const [isDesktop] = useMediaQuery('(min-width: 1024px)');
+  const [cards, setCards] = useState([]);
+  const [playerUUID, setPlayerUUID] = useState(null);
+  const [roomCode, setRoomCode] = useState(null);
+  const location = useLocation();
+  const state = location.state || {};
 
   useEffect(() => {
-    const fetchPlayerHand = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/players'); // Replace with actual player ID later
-        if (response.data.success) {
-          setCards(response.data.data.hand); // Only use hand data
-        }
-      } catch (error) {
-        console.error('Error fetching player hand:', error);
-      }
+    // Connect socket
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    // Determine UUID from location or cookie
+    const uuidFromState = state.uuid;
+    const uuidFromCookie = Cookies.get('player_uuid');
+    const finalUUID = uuidFromState || uuidFromCookie;
+
+    if (!finalUUID) return;
+
+    setPlayerUUID(finalUUID);
+    setRoomCode(state.roomCode || '123B'); // default roomCode or pass from state
+
+    // Request player info
+    socket.emit('getPlayer', state.roomCode || '123B', finalUUID);
+
+    const handleReturnPlayer = (player) => {
+      setCards(player.hand);
     };
 
-    fetchPlayerHand();
-  }, []);
+    socket.on('returnPlayer', handleReturnPlayer);
+
+    return () => {
+      socket.off('returnPlayer', handleReturnPlayer);
+    };
+  }, [state]);
+
+  // If we don't have a UUID, redirect to join
+  if (!playerUUID) return <Navigate to='/DummyJoin' replace />;
 
   return (
     <Box
@@ -34,7 +57,6 @@ const ChooseCardPage = () => {
       overflow='hidden'
       p={{ base: '5%', md: '3%' }}
     >
-      {/* Main Content Box */}
       <Box
         width={{ base: '90%', md: '70%', lg: '50%', xl: '40%' }}
         height={{ base: '80%', md: '75%', lg: '70%' }}
@@ -49,7 +71,6 @@ const ChooseCardPage = () => {
         p='5%'
         maxW='500px'
       >
-        {/* Title */}
         <Text
           fontSize={{ base: '6vw', md: '4vw', lg: '28px' }}
           fontWeight='bold'
@@ -64,13 +85,13 @@ const ChooseCardPage = () => {
           Choose a Card
         </Text>
 
-        {/* Scrollable Cards Section */}
         <Box width='100%' height='50%' overflowY='auto' p='5%'>
           {cards.length > 0 ? (
             cards.map((card, index) => (
               <Button
                 as={Link}
                 to='/choosestatement'
+                state={{ selectedCard: card, uuid: playerUUID, roomCode }}
                 key={index}
                 width='100%'
                 height='12%'
@@ -80,7 +101,6 @@ const ChooseCardPage = () => {
                 fontSize={{ base: '4vw', md: '3vw', lg: '20px' }}
                 fontWeight='bold'
                 _hover={{ bg: '#2A9D8F' }}
-                onClick={() => alert(`You selected Card ${card}`)}
               >
                 Card {card}
               </Button>

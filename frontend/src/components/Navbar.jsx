@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  HStack,
   IconButton,
   useDisclosure,
   VStack,
@@ -34,41 +33,20 @@ function Navbar() {
   ];
 
   return (
-    <Box bg='blue.500' p={4} color='white' width='100%'>
-      {/* Hamburger button for small screens */}
-      <Box display={{ base: 'block', md: 'none' }}>
-        <IconButton
-          icon={<HamburgerIcon />}
-          aria-label='Open menu'
-          onClick={onOpen}
-          colorScheme='teal'
-        />
-      </Box>
+    <Box position='absolute' top={4} left={4} zIndex={1000}>
+      {/* Always show hamburger icon */}
+      <IconButton
+        icon={<HamburgerIcon />}
+        aria-label='Open menu'
+        onClick={onOpen}
+        bg='yellow.300'
+        color='white'
+        _hover={{ bg: 'blue.600' }}
+      />
 
-      {/* Horizontal navbar for medium+ screens */}
-      <HStack
-        spacing={4}
-        justify='center'
-        display={{ base: 'none', md: 'flex' }}
-        mt={{ base: 0, md: 2 }}
-      >
-        {navLinks.map((link) => (
-          <Button
-            as={Link}
-            to={link.to}
-            key={link.to}
-            colorScheme='teal'
-            variant='solid'
-          >
-            {link.label}
-          </Button>
-        ))}
-      </HStack>
-
-      {/* Drawer for mobile menu */}
       <Drawer placement='left' onClose={onClose} isOpen={isOpen}>
         <DrawerOverlay />
-        <DrawerContent bg='blue.500' color='white'>
+        <DrawerContent bg='yellow.500' color='white'>
           <DrawerCloseButton />
           <DrawerHeader>Navigation</DrawerHeader>
           <DrawerBody>
