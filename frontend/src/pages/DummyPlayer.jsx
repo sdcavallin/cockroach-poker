@@ -1,5 +1,5 @@
 import { Button, Container, Divider, Input } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
@@ -9,10 +9,20 @@ const socket = io('http://localhost:5000', {
 });
 
 const DummyPlayerPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { roomCode, nickname } = location.state || {};
   const [message, setMessage] = useState('Connecting socket...');
   const [hand, setHand] = useState('?');
-  const [name, setName] = useState('Jimbo');
   const [UUID, setUUID] = useState('0');
+
+  useEffect(() => {
+    //Redirects if data is missing.
+    if (!roomCode || !nickname) {
+      console.log('No roomCode or nickname found. Redirecting...');
+      navigate('/dummyplayerjoin');
+    }
+  }, [roomCode, nickname, navigate]);
 
   useEffect(() => {
     if (!socket.connected) {
@@ -47,7 +57,12 @@ const DummyPlayerPage = () => {
       socket.off('connect', handleConnect);
       socket.off('receiveHand', handleReceiveHand);
     };
-  }, []);
+  }, [location]); //This should ensure that this runs whenever navigated to.
+
+  // Old function using sendCard
+  //   const handleSendCockroach = () => {
+  //     socket.emit('sendCard', '67ad6bd71b76340c29212842', 4);
+  //   };
 
   // Uses gameRoomSendCard to target Players inside GameRoom objects
   const handleSendCockroach = () => {
@@ -59,29 +74,28 @@ const DummyPlayerPage = () => {
   };
 
   const handleConnectToRoom = (event) => {
-    // TODO roomCode should be inputted by the player.
-    const roomCode = '123B';
-    socket.emit('connectToRoom', roomCode, name);
+    //TODO roomCode should be inputted by the player.
+    //let roomCode = '123B';
+    console.log(
+      `Attempting to connect to room ${roomCode} with nickname ${nickname} and ${socket.connected}`
+    );
+    socket.emit('connectToRoom', roomCode, nickname);
   };
 
   return (
     <Container>
       <Container>Socket state: {message}</Container>
       <Button onClick={() => handleSendCockroach()}>
-        Add Cockroach to Sebastian's Hand
+        Add Cockroach to {nickname}'s Hand
       </Button>
-      <Container>Sebastian Hand: {hand}</Container>
-      <Divider />
-      Join a Room
       <Container>
-        Enter Nickname:
-        <Input placeholder={name} onChange={handleNameChange} size='sm' />
+        {nickname}'s Hand: {hand}
       </Container>
       <Container>
-        {name} UUID: {UUID}
+        {nickname} UUID: {UUID}
       </Container>
       <Button onClick={() => handleConnectToRoom()}>
-        Connect to Room 123B
+        Connect to Room {roomCode}
       </Button>
     </Container>
   );

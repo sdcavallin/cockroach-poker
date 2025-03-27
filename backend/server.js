@@ -84,6 +84,7 @@ io.on('connection', (socket) => {
   // connectToRoom: an individual player connects to a gameroom to input their data. Occurs whenever a player socket is connected
   socket.on('connectToRoom', async (roomCode, name) => {
     //const userUUID = getUserUUID(socket.handshake);
+    console.log('Testing');
     let userUUID = '12345';
     //emit to socket the UUID so the client can save it on their side.
 
@@ -166,11 +167,11 @@ io.on('connection', (socket) => {
     const gameRoom = gameRoomService.getGameRoom(roomCode);
 
     if (gameRoom == undefined) {
+      console.log('Game Code is false');
       roomExists = false;
     } else {
       roomExists = true;
     }
-
     socket.emit('recieveJoinCode', roomExists);
   });
 

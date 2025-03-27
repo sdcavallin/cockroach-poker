@@ -1,7 +1,8 @@
-import { Button, Field, Input, Stack, Textarea } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { Container, Button, Textarea } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import DummyPlayerPage from './DummyPlayer.jsx';
 
 const socket = io('http://localhost:5000', {
   autoConnect: false,
@@ -10,6 +11,8 @@ const socket = io('http://localhost:5000', {
 const DummyPlayerJoinPage = () => {
   const [message, setMessage] = useState('Connecting socket...');
   const [roomCode, setRoomCode] = useState('');
+  const [nickname, setNickname] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!socket.connected) {
@@ -26,32 +29,38 @@ const DummyPlayerJoinPage = () => {
       Socket.emit('checkJoinCode', roomCode);
     }
 
-    const handleJoinCode = ({ roomExists }) => {
-      if (roomExists) {
-        //Tranfer screen to DummyPlayer
-      } else {
-        console.log('Invalid room code');
-      }
-    };
-
     socket.on('connect', handleConnect);
-    socket.on('recieveJoinCode', handleJoinCode);
-
     return () => {
       socket.off('connect', handleConnect);
-      socket.off('recieveJoinCode', handleJoinCode);
     };
   }, []);
 
-  // Old function using sendCard
-  //   const handleSendCockroach = () => {
-  //     socket.emit('sendCard', '67ad6bd71b76340c29212842', 4);
-  //   };
+  const handleJoinCode = useCallback(
+    (roomExists) => {
+      if (roomExists) {
+        //Tranfer screen to DummyPlayer
+        console.log(
+          `Valid room code & transfering ${roomCode} and ${nickname}`
+        );
+        navigate('/dummyplayer', { state: { roomCode, nickname } });
+      } else {
+        console.log('Invalid room code');
+      }
+    },
+    [roomCode, nickname, navigate]
+  );
+
+  useEffect(() => {
+    socket.on('recieveJoinCode', handleJoinCode);
+
+    return () => {
+      socket.off('recieveJoinCode', handleJoinCode);
+    };
+  }, [handleJoinCode]);
 
   const handleConnectToPlayer = (event) => {
-    //TODO roomCode should be inputted by the player.
-    if (roomCode.trim() === '') {
-      alert('Please enter a room code');
+    if (roomCode.trim() === '' || nickname.trim() === '') {
+      alert('Please enter both a room code and a nickname');
       return;
     }
     socket.emit('checkJoinCode', roomCode);
@@ -66,6 +75,12 @@ const DummyPlayerJoinPage = () => {
         placeHolder='Enter Room Code'
         value={roomCode}
         onChange={(e) => setRoomCode(e.target.value)}
+      />
+      <Textarea
+        size='sm'
+        placeholder='Enter Nickname'
+        value={nickname}
+        onChange={(e) => setNickname(e.target.value)}
       />
       <Button onClick={handleConnectToPlayer}>Connect to Room</Button>
     </Container>
