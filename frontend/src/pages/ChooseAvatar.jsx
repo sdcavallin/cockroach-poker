@@ -47,20 +47,20 @@ const ChooseAvatarPage = () => {
       return;
     }
 
-    console.log('Navigating with UUID:', playerId);
-    console.log('Room Code:', 'SKD33');
+    const roomCode = Cookies.get('room_code');
 
-    if (!playerId) {
-      alert('Missing player ID — please rejoin the game.');
+    if (!playerId || !roomCode) {
+      alert('Missing player ID or room code — please rejoin the game.');
       return;
     }
 
-    Cookies.set('room_code', 'SKD33', { expires: 2 });
+    console.log('Navigating with UUID:', playerId);
+    console.log('Room Code:', roomCode);
 
     navigate('/choosecard', {
       state: {
         uuid: playerId,
-        roomCode: 'SKD33',
+        roomCode,
       },
     });
   };

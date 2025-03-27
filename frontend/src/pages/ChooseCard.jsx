@@ -5,19 +5,25 @@ import socket from '../socket';
 import Cookies from 'js-cookie';
 
 const ChooseCardPage = () => {
-  const [isDesktop] = useMediaQuery('(min-width: 1024px)');
-  const [cards, setCards] = useState([]);
   const location = useLocation();
-  const state = location.state || {};
 
-  const finalUUID = state.uuid || Cookies.get('player_uuid');
-  const finalRoomCode = state.roomCode || Cookies.get('room_code') || '123B';
+  // Extract values from location.state
+  const { uuid: finalUUID, roomCode: finalRoomCode } = location.state || {};
 
+  // Check if values exist
   if (!finalUUID || !finalRoomCode) {
-    return <Navigate to='/dummyjoin' replace />;
+    return <Navigate to='/' replace />;
   }
 
+  const [isDesktop] = useMediaQuery('(min-width: 1024px)');
+  const [cards, setCards] = useState([]);
 
+  // Save UUID to cookie
+  useEffect(() => {
+    Cookies.set('player_uuid', finalUUID, { expires: 2 });
+  }, [finalUUID]);
+
+  // Connect to socket and fetch player
   useEffect(() => {
     if (!socket.connected) socket.connect();
 
@@ -59,7 +65,6 @@ const ChooseCardPage = () => {
     </Button>
   );
 
-  // 
   const MobileLayout = () => (
     <Box
       width='100vw'
@@ -84,7 +89,6 @@ const ChooseCardPage = () => {
     </Box>
   );
 
-  // 
   const DesktopLayout = () => (
     <Box
       width='100vw'
