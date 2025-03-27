@@ -8,20 +8,23 @@ import {
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 const JoinRoom = () => {
   const [isDesktop] = useMediaQuery('(min-width: 1024px)'); // Detect desktop screens
   const [username, setUsername] = useState(''); // Track username input
   const navigate = useNavigate(); // Navigation for next step
 
-  // Handle Next Button Click
   const handleNext = () => {
     if (username.trim() === '') {
-      alert('Please enter a username!');
+      alert('Please enter a room code!');
       return;
     }
-    console.log(`Username selected: ${username}`);
-    navigate('/chooseavatar'); // Redirect to the next page
+
+    Cookies.set('room_code', username.trim(), { expires: 2 });
+
+    console.log(`Room code selected: ${username}`);
+    navigate('/chooseuname');
   };
 
   return (
@@ -58,7 +61,7 @@ const JoinRoom = () => {
           color='#264653'
           mb='5%'
         >
-          Enter Your Username
+          Enter the Rooomcode From Host Screen
         </Text>
 
         {/* Username Input Field */}

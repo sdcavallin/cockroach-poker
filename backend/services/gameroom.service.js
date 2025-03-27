@@ -133,4 +133,14 @@ export class GameRoomService {
 
     return roomCode;
   }
+
+  getRoomCodeByPlayerUUID(uuid) {
+    for (const [roomCode, gameRoom] of this.gameRoomMap.entries()) {
+      if (gameRoom.players.some(p => p.uuid === uuid)) {
+        return roomCode;
+      }
+    }
+    return null;
+  }
+  
 }
