@@ -59,6 +59,18 @@ const DummyPlayerPage = () => {
     };
   }, [location]); //This should ensure that this runs whenever navigated to.
 
+  useEffect(() => {
+    if (location.state) {
+      socket.emit('getPlayer', location.state.roomCode, UUID);
+    }
+  }, [location.state]);
+
+  const handleReturnPlayer = (player) => {
+    setPlayer(player);
+  };
+
+  socket.on('returnPlayer', handleReturnPlayer);
+
   // Old function using sendCard
   //   const handleSendCockroach = () => {
   //     socket.emit('sendCard', '67ad6bd71b76340c29212842', 4);
@@ -67,10 +79,6 @@ const DummyPlayerPage = () => {
   // Uses gameRoomSendCard to target Players inside GameRoom objects
   const handleSendCockroach = () => {
     socket.emit('gameRoomSendCard', '123B', '12345', 3);
-  };
-
-  const handleNameChange = (event) => {
-    setName(event.target.value);
   };
 
   const handleConnectToRoom = (event) => {
