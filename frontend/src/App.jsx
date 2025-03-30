@@ -15,6 +15,7 @@ import ChooseUName from './pages/ChooseUName.jsx';
 import JoinRoom from './pages/JoinRoom.jsx';
 import DummyJoinPage from './pages/DummyJoin.jsx';
 import DummyPlayPage from './pages/DummyPlay.jsx';
+import PlayerInit from './pages/PlayerJoinPageUnified.jsx';
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
         <Route path='/chooseavatar' element={<ChooseAvatarPage />} />
         <Route path='/chooseuname' element={<ChooseUName />} />
         <Route path='/joinroom' element={<JoinRoom />} />
+        <Route path='/playerinit' element={<PlayerInit />} />
       </Routes>
     </Box>
   );

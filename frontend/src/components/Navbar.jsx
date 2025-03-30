@@ -32,6 +32,7 @@ function Navbar() {
     { to: '/dummyhost', label: 'DummyHost' },
     { to: '/dummyjoin', label: 'DummyJoin' },
     { to: '/dummyplay', label: 'DummyPlay' },
+    { to: '/playerinit', label: 'PlayerInit' },
   ];
 
   return (
