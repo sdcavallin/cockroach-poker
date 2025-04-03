@@ -101,7 +101,7 @@ const PlayerInit = () => {
         />
 
         <Input
-          placeholder='Enter Username'
+          placeholder='Enter Nickname'
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           textAlign='center'

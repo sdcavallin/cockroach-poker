@@ -72,6 +72,8 @@ const LandingPage = () => {
               CREATE
             </Button>
             <Button
+              as={Link}
+              to='/playerinit'
               width={{
                 base: '90%',
                 sm: '85%',
