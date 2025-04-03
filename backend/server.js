@@ -171,7 +171,11 @@ io.on('connection', (socket) => {
     'requestJoinPlayerToRoom',
     async (roomCode, nickname, playerIcon, socketId) => {
       const gameRoom = gameRoomService.getGameRoom(roomCode);
-      if (!gameRoom || gameRoom.gameStatus != GameStatus.SETUP) {
+      if (
+        !gameRoom ||
+        gameRoom.gameStatus != GameStatus.SETUP ||
+        gameRoom.numPlayers > 6
+      ) {
         socket.emit('returnJoinPlayerToRoom', false, null, null);
       } else {
         const uuid = gameRoomService.addPlayerToGameRoom(

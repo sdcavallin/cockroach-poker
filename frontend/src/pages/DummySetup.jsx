@@ -19,6 +19,7 @@ const socket = io('http://localhost:5000', { autoConnect: false });
 const DummySetupPage = () => {
   const [message, setMessage] = useState('Connecting socket...');
   const [gameRoom, setGameRoom] = useState(null);
+  const [playerCount, setPlayerCount] = useState(0);
 
   useEffect(() => {
     if (!socket.connected) {
@@ -67,23 +68,28 @@ const DummySetupPage = () => {
       <Heading size='lg'>Game Setup</Heading>
       {gameRoom ? (
         <Box>
-          <Card>
-            <CardHeader>
-              <Heading size='lg'>Join with Code: {gameRoom.roomCode}</Heading>
-            </CardHeader>
-            <CardBody>
-              <Stack divider={<StackDivider />} spacing='4'>
-                {gameRoom.players.map((player, index) => (
-                  <Box key={index}>
-                    <Heading size='md'>Player: {player.nickname}</Heading>
-                    <Text size='sm'>UUID: {player.uuid}</Text>
-                    <Text size='sm'>Avatar: {player.playerIcon}</Text>
-                    <Text size='sm'>Socket: {player.socketId}</Text>
-                  </Box>
-                ))}
-              </Stack>
-            </CardBody>
-          </Card>
+          <Stack spacing={3}>
+            <Card>
+              <CardBody>
+                <Stack divider={<StackDivider />} spacing={3}>
+                  <Heading size='lg'>
+                    Join with Code: {gameRoom.roomCode}
+                  </Heading>
+                  {gameRoom.players.map((player, index) => (
+                    <Box key={index}>
+                      <Heading size='md'>Player: {player.nickname}</Heading>
+                      <Text size='sm'>UUID: {player.uuid}</Text>
+                      <Text size='sm'>Avatar: {player.playerIcon}</Text>
+                      <Text size='sm'>Socket: {player.socketId}</Text>
+                    </Box>
+                  ))}
+                </Stack>
+              </CardBody>
+            </Card>
+            <Button isDisabled={gameRoom.numPlayers < 2}>
+              Start Game ({gameRoom.numPlayers} players)
+            </Button>
+          </Stack>
         </Box>
       ) : (
         <Button onClick={() => handleRequestCreateEmptyGameRoom()}>

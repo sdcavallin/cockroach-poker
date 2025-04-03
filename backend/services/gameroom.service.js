@@ -117,6 +117,7 @@ export class GameRoomService {
     const player = new Player(playerBody);
 
     gameRoom.players.push(player);
+    gameRoom.numPlayers++;
 
     return uuid;
   }
