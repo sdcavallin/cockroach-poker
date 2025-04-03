@@ -48,17 +48,17 @@ const PlayerInit = () => {
       return;
     }
 
-    Cookies.set('room_code', roomCode.trim(), { expires: 2 });
-    Cookies.set('player_uuid', username.trim(), { expires: 2 });
+    Cookies.set('roomCode', roomCode.trim(), { expires: 2 });
+    Cookies.set('uuid', username.trim(), { expires: 2 });
     socket.emit('selectAvatar', {
       playerId: username.trim(),
       avatar: selectedAvatar,
     });
 
-    navigate('/choosecard', {
+    navigate('/dummyplay', {
       state: {
         uuid: username.trim(),
-        roomCode: roomCode.trim(),
+        roomCode: roomCode.trim().toUpperCase(),
       },
     });
   };

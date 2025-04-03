@@ -16,23 +16,30 @@ const socket = io('http://localhost:5000', {
   autoConnect: false,
 });
 
-// Rejoin Page
-const DummyJoinPage = () => {
+// Join New Game Page
+const DummyJoinSetupPage = () => {
   const [message, setMessage] = useState('Connecting socket...');
-  const [roomCode, setRoomCode] = useState('123B');
-  const [uuid, setUUID] = useState('12345');
+  const [roomCode, setRoomCode] = useState('');
+  const [nickname, setNickname] = useState('');
+  const [playerIcon, setPlayerIcon] = useState('nothing.png');
   const navigate = useNavigate();
 
   const handleJoin = () => {
-    navigate('/DummyPlay', { state: { roomCode: roomCode, uuid: uuid } });
+    socket.emit(
+      'requestJoinPlayerToRoom',
+      roomCode,
+      nickname,
+      playerIcon,
+      socket.id
+    );
   };
 
   const handleRoomCodeChange = (event) => {
     setRoomCode(event.target.value);
   };
 
-  const handleUUIDChange = (event) => {
-    setUUID(event.target.value);
+  const handleNicknameChange = (event) => {
+    setNickname(event.target.value);
   };
 
   useEffect(() => {
@@ -46,29 +53,39 @@ const DummyJoinPage = () => {
       setMessage(`Connected with id ${socket.id}`);
     };
 
+    const handleReturnJoinPlayerToRoom = (success, roomCode, uuid) => {
+      if (success) {
+        navigate('/DummyPlay', { state: { roomCode: roomCode, uuid: uuid } });
+      } else {
+        alert('Could not join room');
+      }
+    };
+
     socket.on('connect', handleConnect);
+    socket.on('returnJoinPlayerToRoom', handleReturnJoinPlayerToRoom);
 
     return () => {
       socket.off('connect', handleConnect);
+      socket.off('returnJoinPlayerToRoom', handleReturnJoinPlayerToRoom);
     };
   }, []);
 
   return (
     <Container>
       <Text>Socket state: {message}</Text>
-      <Heading size='lg'>Rejoin an Ongoing Game</Heading>
+      <Heading size='lg'>Join a New Game</Heading>
       <Text>Room Code:</Text>{' '}
       <Input
         value={roomCode}
         onChange={handleRoomCodeChange}
-        placeholder='123B'
+        placeholder='Enter 4-letter code'
         size='sm'
       />
-      <Text>UUID:</Text>{' '}
+      <Text>Nickname:</Text>{' '}
       <Input
-        value={uuid}
-        onChange={handleUUIDChange}
-        placeholder='12345'
+        value={nickname}
+        onChange={handleNicknameChange}
+        placeholder='Enter your name'
         size='sm'
       />
       <Button onClick={handleJoin}>Join</Button>
@@ -76,4 +93,4 @@ const DummyJoinPage = () => {
   );
 };
 
-export default DummyJoinPage;
+export default DummyJoinSetupPage;

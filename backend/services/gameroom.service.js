@@ -1,5 +1,7 @@
 import GameRoom from '../models/gameroom.model.js';
+import Player from '../models/player.model.js';
 import { GameStatus } from '../utilities/constants.js';
+import { v4 as uuidv4 } from 'uuid';
 
 // Manages GameRoom instances for you.
 export class GameRoomService {
@@ -24,6 +26,7 @@ export class GameRoomService {
   // This returns by reference, meaning if you modify
   // the gameRoom elsewhere, it will modify it in gameRoomMap.
   getGameRoom(roomCode) {
+    console.log('getGameRoom called');
     return this.gameRoomMap.get(roomCode);
   }
 
@@ -49,8 +52,8 @@ export class GameRoomService {
   }
 
   // Create an empty GameRoom.
-  // Returns the generated roomCode.
-  async createEmptyGameRoom() {
+  // Returns the generated room.
+  createEmptyGameRoom() {
     const roomCode = this.generateValidRoomCode();
 
     const gameRoomBody = {
@@ -65,18 +68,15 @@ export class GameRoomService {
 
     this.gameRoomMap.set(roomCode, gameRoom);
 
-    gameRoom.save();
-
-    return roomCode;
+    return gameRoom;
   }
 
-  // Create an empty GameRoom with a specific code and save to database.
-  async createEmptyGameRoom(roomCode) {
+  // Create an empty GameRoom with a specific code.
+  createEmptyGameRoomWithCode(roomCode) {
     if (this.gameRoomMap.has(roomCode)) {
       throw new Error(
         `createEmptyGameRoom(): An active room with code ${roomCode} already exists.`
       );
-      return roomCode;
     }
 
     const gameRoomBody = {
@@ -91,9 +91,34 @@ export class GameRoomService {
 
     this.gameRoomMap.set(roomCode, gameRoom);
 
-    gameRoom.save();
+    return gameRoom;
+  }
 
-    return roomCode;
+  // Add new player to GameRoom. Returns assigned UUID.
+  addPlayerToGameRoom(roomCode, nickname, playerIcon, socketId) {
+    const gameRoom = this.gameRoomMap.get(roomCode);
+    if (!gameRoom) {
+      throw new Error(`addPlayerToGameRoom(): GameRoom ${roomCode} not found.`);
+    }
+
+    const uuid = uuidv4();
+    const playerBody = {
+      uuid: uuid,
+      nickname: nickname,
+      playerIcon: playerIcon,
+      hand: [],
+      handSize: 0,
+      pile: [],
+      pileSize: 0,
+      // TODO: Update this socketId to the /DummyPlay one, not the /DummyJoinSetup
+      socketId: 'WRONG-' + socketId,
+    };
+
+    const player = new Player(playerBody);
+
+    gameRoom.players.push(player);
+
+    return uuid;
   }
 
   // Save GameRoom contents to database.
@@ -123,24 +148,24 @@ export class GameRoomService {
 
   // Generates a roomCode that is not used by any other room.
   generateValidRoomCode() {
-    const characters = 'ABDEFGHIJKLMNPQRSTUVWXY123456789';
+    const characters = 'ABDEFGHIJKLMNPQRSTUWXY123456789';
+    let roomCode = '';
     do {
-      let roomCode = '';
       for (let i = 0; i < 4; i++) {
-        roomCode += characters.charAt(Math.floor(Math.random() * 32));
+        roomCode += characters.charAt(Math.floor(Math.random() * 31));
       }
     } while (this.gameRoomMap.has(roomCode));
 
     return roomCode;
   }
 
+  // Returns roomCode that the player is in by UUID.
   getRoomCodeByPlayerUUID(uuid) {
     for (const [roomCode, gameRoom] of this.gameRoomMap.entries()) {
-      if (gameRoom.players.some(p => p.uuid === uuid)) {
+      if (gameRoom.players.some((p) => p.uuid === uuid)) {
         return roomCode;
       }
     }
     return null;
   }
-  
 }

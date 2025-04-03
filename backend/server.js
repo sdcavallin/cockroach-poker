@@ -5,6 +5,7 @@ import {
   CardNumberToString,
   Cards,
   GAME_ROOM_PREFIX,
+  GameStatus,
 } from './utilities/constants.js';
 import playerRoutes from './routes/player.route.js';
 import gameRoomRoutes from './routes/gameroom.route.js';
@@ -86,8 +87,8 @@ io.on('connection', (socket) => {
     //const userUUID = getUserUUID(socket.handshake);
     console.log('Testing');
     let userUUID = '12345';
-    //emit to socket the UUID so the client can save it on their side.
 
+    //emit to socket the UUID so the client can save it on their side.
     socket.emit('setUUID', userUUID);
 
     socket.join(GAME_ROOM_PREFIX + roomCode);
@@ -136,7 +137,7 @@ io.on('connection', (socket) => {
       .emit('returnGameRoom', gameRoom);
   });
 
-  // gameRoomSendCard: sends to a Player object inside a GameRoom object
+  // gameRoomSendCard: sends to a Player object inside a GameRoom object (DEPRECATED)
   socket.on('gameRoomSendCard', async (roomCode, playerId, card) => {
     console.log(
       `[Room ${roomCode}]: Socket ${socket.id} sent card ${CardNumberToString[card]} to player ${playerId}`
@@ -154,9 +155,39 @@ io.on('connection', (socket) => {
   // requestGameRoom: request for GameRoom data from a host
   socket.on('requestGameRoom', async (roomCode) => {
     console.log(`Socket ${socket.id} requested GameRoom info for ${roomCode}`);
-    const gameRoom = await getGameRoom(roomCode);
+    const gameRoom = gameRoomService.getGameRoom(roomCode);
     socket.emit('returnGameRoom', gameRoom);
   });
+
+  // requestCreateEmptyGameRoom: request to create an empty GameRoom and return it
+  socket.on('requestCreateEmptyGameRoom', async () => {
+    console.log(`Socket ${socket.id} requested to create an empty GameRoom`);
+    const gameRoom = gameRoomService.createEmptyGameRoom();
+    socket.emit('returnEmptyGameRoom', gameRoom);
+  });
+
+  // requestJoinPlayerToRoom: request to create a new player in a GameRoom that is in SETUP
+  socket.on(
+    'requestJoinPlayerToRoom',
+    async (roomCode, nickname, playerIcon, socketId) => {
+      const gameRoom = gameRoomService.getGameRoom(roomCode);
+      if (!gameRoom || gameRoom.gameStatus != GameStatus.SETUP) {
+        socket.emit('returnJoinPlayerToRoom', false, null, null);
+      } else {
+        const uuid = gameRoomService.addPlayerToGameRoom(
+          roomCode,
+          nickname,
+          playerIcon,
+          socketId
+        );
+        socket.emit('returnJoinPlayerToRoom', true, roomCode, uuid);
+        const updatedGameRoom = gameRoomService.getGameRoom(roomCode);
+        socket
+          .to(GAME_ROOM_PREFIX + roomCode)
+          .emit('returnGameRoom', updatedGameRoom);
+      }
+    }
+  );
 
   // checkJoinCode: checks if the room exists for a roomCode, from player
   socket.on('checkJoinCode', async (roomCode) => {
@@ -181,7 +212,7 @@ io.on('connection', (socket) => {
     console.log(
       `Socket ${socket.id} joined room ${GAME_ROOM_PREFIX + roomCode}`
     );
-    const gameRoom = await getGameRoom(roomCode);
+    const gameRoom = gameRoomService.getGameRoom(roomCode);
     socket.emit('returnGameRoom', gameRoom);
   });
 

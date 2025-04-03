@@ -16,6 +16,8 @@ import JoinRoom from './pages/JoinRoom.jsx';
 import DummyJoinPage from './pages/DummyJoin.jsx';
 import DummyPlayPage from './pages/DummyPlay.jsx';
 import PlayerInit from './pages/PlayerJoinPageUnified.jsx';
+import DummySetupPage from './pages/DummySetup.jsx';
+import DummyJoinSetupPage from './pages/DummyJoinSetup.jsx';
 
 function App() {
   return (
@@ -38,6 +40,8 @@ function App() {
         <Route path='/chooseuname' element={<ChooseUName />} />
         <Route path='/joinroom' element={<JoinRoom />} />
         <Route path='/playerinit' element={<PlayerInit />} />
+        <Route path='/dummysetup' element={<DummySetupPage />} />
+        <Route path='/dummyjoinsetup' element={<DummyJoinSetupPage />} />
       </Routes>
     </Box>
   );
