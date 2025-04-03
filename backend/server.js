@@ -23,7 +23,7 @@ import cors from 'cors';
 dotenv.config();
 
 const app = express();
-app.use(cors()); 
+app.use(cors());
 
 const PORT = process.env.PORT || 5000;
 
@@ -62,6 +62,7 @@ const gameRoomService = new GameRoomService();
 })();
 
 // Code to be executed after 1 second. Use only for testing GameRoomService.
+// Note: Sockets making requests to the server should not need to wait 1 second for server startup. You can just put them in socket.on(...)
 setTimeout(() => {
   // Set to true if you want to run this. Otherwise leave as false.
   const shouldIRunThisFunction = false;
@@ -76,7 +77,6 @@ setTimeout(() => {
   // Save GameRoom state (async)
   gameRoomService.saveGameRoom('123B');
 }, 1000);
-// Sockets making requests to the server should not need to wait 1 second for server startup. You can just put them in socket.on(...)
 
 io.on('connection', (socket) => {
   console.log(`Socket ${socket.id} connected.`);
@@ -185,62 +185,64 @@ io.on('connection', (socket) => {
     socket.emit('returnGameRoom', gameRoom);
   });
 
-// selectAvatar: update avatar in memory (no DB call)
-socket.on('selectAvatar', ({ playerId, avatar }) => {
-  try {
-    const roomCode = gameRoomService.getRoomCodeByPlayerUUID(playerId);
-    if (!roomCode) {
-      console.warn(`No room found for player UUID: ${playerId}`);
-      return;
+  // selectAvatar: update avatar in memory (no DB call)
+  socket.on('selectAvatar', ({ playerId, avatar }) => {
+    try {
+      const roomCode = gameRoomService.getRoomCodeByPlayerUUID(playerId);
+      if (!roomCode) {
+        console.warn(`No room found for player UUID: ${playerId}`);
+        return;
+      }
+
+      const gameRoom = gameRoomService.getGameRoom(roomCode);
+      const player = gameRoom.players.find((p) => p.uuid === playerId);
+
+      if (!player) {
+        console.warn(
+          `Player with UUID ${playerId} not found in GameRoom ${roomCode}`
+        );
+        return;
+      }
+
+      player.playerIcon = avatar;
+      console.log(`Avatar updated for ${player.nickname}: ${avatar}`);
+
+      socket.emit('avatarUpdated', { success: true, avatar });
+    } catch (error) {
+      console.error('Error: Could not update avatar in memory:', error);
+      socket.emit('avatarUpdated', {
+        success: false,
+        message: 'Failed to update avatar',
+      });
     }
+  });
 
-    const gameRoom = gameRoomService.getGameRoom(roomCode);
-    const player = gameRoom.players.find((p) => p.uuid === playerId);
+  socket.on('getPlayer', (roomCode, uuid) => {
+    try {
+      // Use gameRoomService to get the game room
+      const gameRoom = gameRoomService.getGameRoom(roomCode);
 
-    if (!player) {
-      console.warn(`Player with UUID ${playerId} not found in GameRoom ${roomCode}`);
-      return;
-    }
+      if (!gameRoom) {
+        console.warn(`No game room found for room code: ${roomCode}`);
+        socket.emit('returnPlayer', null);
+        return;
+      }
 
-    player.playerIcon = avatar; 
-    console.log(`Avatar updated for ${player.nickname}: ${avatar}`);
+      // Find the player in the game room
+      const player = gameRoom.players.find((p) => p.uuid === uuid);
 
-    socket.emit('avatarUpdated', { success: true, avatar });
-  } catch (error) {
-    console.error('Error: Could not update avatar in memory:', error);
-    socket.emit('avatarUpdated', {
-      success: false,
-      message: 'Failed to update avatar',
-    });
-  }
-});
-
-socket.on('getPlayer', (roomCode, uuid) => {
-  try {
-    // Use gameRoomService to get the game room
-    const gameRoom = gameRoomService.getGameRoom(roomCode);
-    
-    if (!gameRoom) {
-      console.warn(`No game room found for room code: ${roomCode}`);
+      if (player) {
+        console.log(`Player found: ${player.nickname}`);
+        socket.emit('returnPlayer', player);
+      } else {
+        console.warn(`No player found with UUID: ${uuid} in room: ${roomCode}`);
+        socket.emit('returnPlayer', null);
+      }
+    } catch (error) {
+      console.error('Error in getPlayer:', error);
       socket.emit('returnPlayer', null);
-      return;
     }
-
-    // Find the player in the game room
-    const player = gameRoom.players.find(p => p.uuid === uuid);
-    
-    if (player) {
-      console.log(`Player found: ${player.nickname}`);
-      socket.emit('returnPlayer', player);
-    } else {
-      console.warn(`No player found with UUID: ${uuid} in room: ${roomCode}`);
-      socket.emit('returnPlayer', null);
-    }
-  } catch (error) {
-    console.error('Error in getPlayer:', error);
-    socket.emit('returnPlayer', null);
-  }
-});
+  });
 });
 server.listen(PORT, () => {
   connectDB();
