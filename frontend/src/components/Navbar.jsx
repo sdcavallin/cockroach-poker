@@ -35,6 +35,7 @@ function Navbar() {
     { to: '/playerinit', label: 'PlayerInit' },
     { to: '/dummysetup', label: 'DummySetup' },
     { to: '/dummyjoinsetup', label: 'DummyJoinSetup' },
+    { to: '/rejoin', label: 'Rejoin' },
   ];
 
   return (

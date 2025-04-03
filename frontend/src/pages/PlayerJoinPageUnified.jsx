@@ -5,6 +5,7 @@ import {
   Input,
   Image,
   useMediaQuery,
+  useToast,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
@@ -20,7 +21,7 @@ const avatars = [
   { name: 'finn', src: '/avatars/finn.png' },
   { name: 'genie-lamp', src: '/avatars/genie-lamp.png' },
   { name: 'jake', src: '/avatars/jake.png' },
-  { name: 'mermaid ', src: '/avatars/mermaid.png' },
+  { name: 'mermaid', src: '/avatars/mermaid.png' },
   { name: 'navi-avatar', src: '/avatars/navi-avatar.png' },
   { name: 'wonder-woman', src: '/avatars/wonder-woman.png' },
 ];
@@ -28,39 +29,69 @@ const avatars = [
 const PlayerInit = () => {
   const [isDesktop] = useMediaQuery('(min-width: 768px)');
   const [roomCode, setRoomCode] = useState('');
-  const [username, setUsername] = useState('');
+  const [nickname, setNickname] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   const navigate = useNavigate();
+  const toast = useToast();
+
+  const generateUUID = () => {
+    return Math.floor(10000 + Math.random() * 90000).toString(); // 5 digit random uuid
+  };
 
   useEffect(() => {
     if (!socket.connected) socket.connect();
-    return () => socket.disconnect();
-  }, []);
 
+    const handleReturnJoinPlayerToRoom = (success, returnedRoomCode, uuid) => {
+      if (success) {
+        Cookies.set('roomCode', returnedRoomCode, { expires: 2 });
+        Cookies.set('uuid', uuid, { expires: 2 }); // ✅ This comes from the server
+        Cookies.set('avatar', selectedAvatar, { expires: 2 });
+
+        navigate('/dummyplay', {
+          state: {
+            uuid: uuid,
+            roomCode: returnedRoomCode,
+          },
+        });
+      } else {
+        toast({
+          title: 'Join Failed',
+          description: 'Could not join room. Try again.',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    };
+
+    socket.on('returnJoinPlayerToRoom', handleReturnJoinPlayerToRoom);
+    return () => {
+      socket.off('returnJoinPlayerToRoom', handleReturnJoinPlayerToRoom);
+    };
+  }, [selectedAvatar, navigate, toast]);
   const handleAvatarClick = (avatarName) => {
     setSelectedAvatar(avatarName);
-    console.log(`Selected Avatar: ${avatarName}`);
   };
 
   const handleNext = () => {
-    if (!roomCode.trim() || !username.trim() || !selectedAvatar) {
-      alert('Please fill out all fields and select an avatar!');
+    if (!roomCode.trim() || !nickname.trim() || !selectedAvatar) {
+      toast({
+        title: 'Missing Fields',
+        description: 'Please fill out all fields and select an avatar!',
+        status: 'warning',
+        duration: 3000,
+        isClosable: true,
+      });
       return;
     }
 
-    Cookies.set('roomCode', roomCode.trim(), { expires: 2 });
-    Cookies.set('uuid', username.trim(), { expires: 2 });
-    socket.emit('selectAvatar', {
-      playerId: username.trim(),
-      avatar: selectedAvatar,
-    });
-
-    navigate('/dummyplay', {
-      state: {
-        uuid: username.trim(),
-        roomCode: roomCode.trim().toUpperCase(),
-      },
-    });
+    socket.emit(
+      'requestJoinPlayerToRoom',
+      roomCode.trim().toUpperCase(),
+      nickname.trim(),
+      selectedAvatar,
+      socket.id
+    );
   };
 
   return (
@@ -102,8 +133,8 @@ const PlayerInit = () => {
 
         <Input
           placeholder='Enter Nickname'
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={nickname}
+          onChange={(e) => setNickname(e.target.value)}
           textAlign='center'
           fontSize='lg'
           width='80%'
@@ -126,7 +157,6 @@ const PlayerInit = () => {
             <Box key={avatar.name} textAlign='center'>
               <Image
                 src={avatar.src}
-                // alt={avatar.name}
                 width={{ base: '60px', md: '80px' }}
                 cursor='pointer'
                 border={
@@ -139,9 +169,6 @@ const PlayerInit = () => {
                 }}
                 onClick={() => handleAvatarClick(avatar.name)}
               />
-              {/* <Text fontSize='sm' mt='1' color='#264653'>
-                {avatar.name}
-              </Text> */}
             </Box>
           ))}
         </Box>

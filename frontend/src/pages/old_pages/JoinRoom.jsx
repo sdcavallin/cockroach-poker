@@ -61,7 +61,7 @@ const JoinRoom = () => {
           color='#264653'
           mb='5%'
         >
-          Enter the Rooomcode From Host Screen
+          Enter the Roomcode From Host Screen
         </Text>
 
         {/* Username Input Field */}
