@@ -349,8 +349,20 @@ io.on('connection', (socket) => {
       gameRoom.players[index] = playerObject;
     }
 
+    gameRoom.currentAction.turnPlayer = gameRoom.currentAction.conspiracy[0];
     gameRoom.currentAction.conspiracy = [];
     //TODO:: MAKE SURE TO CHECK IF THE PLAYER THAT LOST'S PILE HAS 4 OF SAME NUMBER
+    const countMap = {};
+    for (let numCard of gameRoom.players[index].pile) {
+      countMap[numCard] = (countMap[numCard] || 0) + 1;
+      if (countMap[numCard] === 4) {
+        // Four of the name number in the pile
+        console.log(
+          `Player ${gameRoom.players[index].nickname} has four of ${CardNumberToString[numCard]}. They lose!`
+        );
+        // TODO: THAT PLAYER HAS LOST!!
+      }
+    }
   });
 });
 server.listen(PORT, () => {
