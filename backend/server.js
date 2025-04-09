@@ -278,6 +278,80 @@ io.on('connection', (socket) => {
       socket.emit('returnPlayer', null);
     }
   });
+
+  // initPlayerSendCard, uses the uuid of the player the card is sent to
+  // Define the gameactionmodel: conspiracy, card, and claim. card never updates but claim does
+  // IMPORTANT **** ONLY RUN ONCE PER CARD
+  socket.on('initPlayerSendCard', (uuid, card, claim) => {
+    const roomCode = gameRoomService.getRoomCodeByPlayerUUID(uuid);
+    if (!roomCode) {
+      console.warn(`No room found for player UUID: ${playerId}`);
+      return;
+    }
+    const gameRoom = gameRoomService.getGameRoom(roomCode);
+    if (!gameRoom) {
+      console.warn(`No game room found for room code: ${roomCode}`);
+      socket.emit('returnPlayer', null);
+      return;
+    }
+
+    gameRoom.currentAction.conspiracy = [gameRoom.currentAction.turnPlayer];
+    gameRoom.currentAction.card = card;
+    gameRoom.currentAction.claim = claim;
+
+    //Steps: Turn Current Player into the prevPlayer, targeted Player becomes currentPlayer, add currentPlayer to consipiracy.
+    gameRoom.currentAction.prevPlayer = gameRoom.currentAction.turnPlayer;
+    gameRoom.currentAction.turnPlayer = uuid;
+    //TODO:: SEND A SOCKET TO THE TURN PLAYER ASKING FOR A RESPONSE
+  });
+
+  // TODO: playerRecieveCard
+
+  // TODO: Card Resolution, NOTE THIS USES CURRENT PLAYER UUID
+  socket.on('cardResolution', (uuid, callBoolean) => {
+    const roomCode = gameRoomService.getRoomCodeByPlayerUUID(uuid);
+    if (!roomCode) {
+      console.warn(`No room found for player UUID: ${playerId}`);
+      return;
+    }
+    const gameRoom = gameRoomService.getGameRoom(roomCode);
+    if (!gameRoom) {
+      console.warn(`No game room found for room code: ${roomCode}`);
+      socket.emit('returnPlayer', null);
+      return;
+    }
+
+    //Check if card is the same as claim, if so it gets put into prevPlayer's losing pile if not it gets put into current players's pile
+    let conspiracyTruth = gameRoom.currentAction.card === claim;
+
+    //ConspiracyTruth = true then card == claim, callBoolean == true then player states the person is telling the truth
+    let playerObject;
+    if (conspiracyTruth === callBoolean) {
+      //prevPlayer loses, gets prevPlayer's uuid
+      playerObject = gameRoomService.getPlayerByUUID(
+        gameRoom.currentAction.prevPlayer
+      );
+    } else {
+      //turnPlayer loses, gets the currentPlayer's uuid
+      playerObject = gameRoomService.getPlayerByUUID(uuid);
+    }
+    if (!playerObject) {
+      console.warn(
+        `Previous Player Not Found! couldn't find uuid for ${gameRoom.currentAction.prevPlayer}`
+      );
+      return;
+    }
+    playerObject.pile.push(gameRoom.currentAction.card);
+    const index = gameRoom.players.findIndex(
+      (p) => p.uuid === playerObject.uuid
+    );
+    if (index !== -1) {
+      gameRoom.players[index] = playerObject;
+    }
+
+    gameRoom.currentAction.conspiracy = [];
+    //TODO:: MAKE SURE TO CHECK IF THE PLAYER THAT LOST'S PILE HAS 4 OF SAME NUMBER
+  });
 });
 server.listen(PORT, () => {
   connectDB();
