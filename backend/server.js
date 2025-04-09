@@ -303,9 +303,32 @@ io.on('connection', (socket) => {
     gameRoom.currentAction.prevPlayer = gameRoom.currentAction.turnPlayer;
     gameRoom.currentAction.turnPlayer = uuid;
     //TODO:: SEND A SOCKET TO THE TURN PLAYER ASKING FOR A RESPONSE
+    //That player can either decide to send back 'cardResolution' or 'playerPassCard'
   });
 
-  // TODO: playerRecieveCard
+  // TODO: playerRecieveCard, uuid is for the player the player is sending it too
+  socket.on('playerPassCard', (uuid, claim) => {
+    const roomCode = gameRoomService.getRoomCodeByPlayerUUID(uuid);
+    if (!roomCode) {
+      console.warn(`No room found for player UUID: ${playerId}`);
+      return;
+    }
+    const gameRoom = gameRoomService.getGameRoom(roomCode);
+    if (!gameRoom) {
+      console.warn(`No game room found for room code: ${roomCode}`);
+      socket.emit('returnPlayer', null);
+      return;
+    }
+    gameRoom.currentAction.conspiracy.push(gameRoom.currentAction.turnPlayer);
+    gameRoom.currentAction.claim = claim;
+
+    //Steps: Turn Current Player into the prevPlayer, targeted Player becomes currentPlayer, add currentPlayer to consipiracy.
+    gameRoom.currentAction.prevPlayer = gameRoom.currentAction.turnPlayer;
+    gameRoom.currentAction.turnPlayer = uuid;
+    //TODO:: SEND A SOCKET TO THE TURN PLAYER ASKING FOR A RESPONSE
+    //That player can either decide to send back 'cardResolution' or 'playerPassCard'
+    //This socket should be the same as the one in init
+  });
 
   // TODO: Card Resolution, NOTE THIS USES CURRENT PLAYER UUID
   socket.on('cardResolution', (uuid, callBoolean) => {
