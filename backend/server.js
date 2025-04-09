@@ -322,7 +322,8 @@ io.on('connection', (socket) => {
     }
 
     //Check if card is the same as claim, if so it gets put into prevPlayer's losing pile if not it gets put into current players's pile
-    let conspiracyTruth = gameRoom.currentAction.card === claim;
+    let conspiracyTruth =
+      gameRoom.currentAction.card === gameRoom.currentAction.claim;
 
     //ConspiracyTruth = true then card == claim, callBoolean == true then player states the person is telling the truth
     let playerObject;
