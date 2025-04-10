@@ -27,6 +27,7 @@ const DummyPlayPage = () => {
   const [player, setPlayer] = useState(null);
   const [actionUUID, setActionUUID] = useState(null);
   const [actionCard, setActionCard] = useState(null);
+  const [actionClaim, setActionClaim] = useState(null);
   const location = useLocation();
   const state = location.state || {};
 
@@ -36,6 +37,10 @@ const DummyPlayPage = () => {
 
   const handleActionCardChange = (event) => {
     setActionCard(event.target.value);
+  };
+
+  const handleActionClaimChange = (event) => {
+    setActionClaim(event.target.value);
   };
 
   useEffect(() => {
@@ -66,7 +71,45 @@ const DummyPlayPage = () => {
     setPlayer(player);
   };
 
+  const handleRecieveCard = ({claim, conspiracyList}) => {
+    console.log(`The Claim is ${claim} and the list of other who already have seen the card is ${conspiracyList.join(', ')}`);
+    //TODO: The Player is then prompted to either choose to look at or contest the claim.
+    // Simulate prompting the player to accept or contest (replace with real UI later)
+    const response = window.confirm(`Claim: ${claim}\nDo you accept it? Click "Cancel" to contest.`);
+    if(response) {
+      console.log('Player chose to contest the claim!');
+      const callBoolean = window.confirm('Do you think the claim is true or false? Click "OK" for true or "Cancel" for false.');
+
+      socket.emit('cardResolution', player.uuid, callBoolean);
+    }
+    else {
+      socket.emit('playerCheckCard', player.uuid);
+
+      socket.once('checkedCard', card);
+      console.log(`It turns out the card was actually ${card}`);
+      const newClaim = prompt('What is your claim about this card?');
+
+      if(newClaim) {
+        socket.emit('playerPassCard', actionUUID, newClaim);
+      }
+    }
+  }
+
   socket.on('returnPlayer', handleReturnPlayer);
+  socket.on('playerRecieveCard', handleRecieveCard);
+
+  const handleSendCard = () => {
+    if (!player?.uuid || !actionUUID || !actionCard || !actionClaim) {
+      console.warn('Tried to send card but missing data:', {
+        sender: player?.uuid,
+        receiver: actionUUID,
+        card: actionCard,
+        claim: actionClaim
+      });
+      return;
+    }
+    socket.emit('initPlayerSendCard', player.uuid, actionUUID, actionCard, actionClaim);
+  };
 
   return (
     <Container>
@@ -109,7 +152,14 @@ const DummyPlayPage = () => {
                     placeholder='1'
                     size='sm'
                   />{' '}
-                  <Button>Send</Button>
+                  <Text>Claim (1-8):</Text>{' '}
+                  <Input
+                    value={actionClaim}
+                    onChange={handleActionClaimChange}
+                    placeholder='1'
+                    size='sm'
+                  />{' '}
+                  <Button onClick={handleSendCard}>Send</Button>
                   {/* This should call a socket function in the server that adds the card to a hand and then sends updates to the relevant players
                   AND to the host.*/}
                 </Box>

@@ -295,6 +295,8 @@ io.on('connection', (socket) => {
       return;
     }
 
+    //TODO GET RID OF THIS CODE AFTER TESTING!!!
+    gameRoom.currentAction.turnPlayer = senderId;
     if(gameRooom.currentAction.turnPlayer != senderId) {
       //If the player tries to send without it being its turn then it fails,
         return;
