@@ -410,8 +410,7 @@ io.on('connection', (socket) => {
     }
 
     // Sets the turn to whoever should go after the inital player for the conspiracy, adds current player so if conspiracy.size = 1
-    gameRoom.currentAction.conspiracy.push(uuid);
-    gameRoom.currentAction.turnPlayer = gameRoom.currentAction.conspiracy[1];
+    gameRoom.currentAction.turnPlayer = gameRoom.players[index].uuid;
     gameRoom.currentAction.conspiracy = [];
     const countMap = {};
     for (let numCard of gameRoom.players[index].pile) {
