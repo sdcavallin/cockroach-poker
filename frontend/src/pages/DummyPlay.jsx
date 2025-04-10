@@ -85,13 +85,15 @@ const DummyPlayPage = () => {
     else {
       socket.emit('playerCheckCard', player.uuid);
 
-      socket.once('checkedCard', card);
-      console.log(`It turns out the card was actually ${card}`);
-      const newClaim = prompt('What is your claim about this card?');
+      socket.once('checkedCard', (card) => {
+        console.log(`It turns out the card was actually ${card}`);
+        const newClaim = prompt('What is your claim about this card?');
 
-      if(newClaim) {
-        socket.emit('playerPassCard', actionUUID, newClaim);
-      }
+        if(newClaim) {
+          socket.emit('playerPassCard', actionUUID, newClaim);
+        }
+      });
+    }
     }
   }
 
