@@ -28,6 +28,7 @@ const DummyPlayPage = () => {
   const [actionUUID, setActionUUID] = useState(null);
   const [actionCard, setActionCard] = useState(null);
   const [actionClaim, setActionClaim] = useState(null);
+  const [socketReady, setSocketReady] = useState(false);
   const location = useLocation();
   const state = location.state || {};
 
@@ -43,6 +44,31 @@ const DummyPlayPage = () => {
     setActionClaim(event.target.value);
   };
 
+  const handleSendCard = () => {
+    console.log(`Handle Send Card Run`);
+    if (!player?.uuid || !actionUUID || !actionCard || !actionClaim) {
+      console.warn('Tried to send card but missing data:', {
+        sender: player?.uuid,
+        receiver: actionUUID,
+        card: actionCard,
+        claim: actionClaim,
+      });
+      console.log(`Handle Send Card Failed`);
+      return;
+    }
+    if (!socketReady) {
+      console.log('Socket not ready');
+      return;
+    }
+    socket.emit(
+      'initPlayerSendCard',
+      player.uuid,
+      actionUUID,
+      actionCard,
+      actionClaim
+    );
+  };
+
   useEffect(() => {
     if (!socket.connected) {
       socket.connect();
@@ -52,12 +78,58 @@ const DummyPlayPage = () => {
 
     const handleConnect = () => {
       setMessage(`Connected with id ${socket.id}`);
+      setSocketReady(true);
+    };
+    //**TODO: PORT OVER CODE THAT CONNECTS SOCKETID TO A GAMEROOM!
+
+    const handleReturnPlayer = (player) => {
+      setPlayer(player);
+    };
+
+    const handleRecieveCard = ({ claim, conspiracyList }) => {
+      console.log(
+        `The Claim is ${claim} and the list of other who already have seen the card is ${conspiracyList.join(
+          ', '
+        )}`
+      );
+      //TODO: The Player is then prompted to either choose to look at or contest the claim.
+      // Simulate prompting the player to accept or contest (replace with real UI later)
+      const response = window.confirm(
+        `Claim: ${claim}\nDo you accept it? Click "Cancel" to contest.`
+      );
+      if (response) {
+        console.log('Player chose to contest the claim!');
+        const callBoolean = window.confirm(
+          'Do you think the claim is true or false? Click "OK" for true or "Cancel" for false.'
+        );
+
+        socket.emit('cardResolution', player.uuid, callBoolean);
+      } else {
+        socket.emit('playerCheckCard', player.uuid);
+
+        const handleCheckedCard = (card) => {
+          console.log(`It turns out the card was actually ${card}`);
+          const newClaim = prompt('What is your claim about this card?');
+
+          if (newClaim) {
+            socket.emit('playerPassCard', actionUUID, newClaim);
+          }
+
+          socket.off('checkedCard', handleCheckedCard);
+        };
+
+        socket.on('checkedCard', handleCheckedCard);
+      }
     };
 
     socket.on('connect', handleConnect);
+    socket.on('returnPlayer', handleReturnPlayer);
+    socket.on('playerRecieveCard', handleRecieveCard);
 
     return () => {
       socket.off('connect', handleConnect);
+      socket.off('returnPlayer', handleReturnPlayer);
+      socket.off('playerRecieveCard', handleRecieveCard);
     };
   }, []);
 
@@ -65,53 +137,7 @@ const DummyPlayPage = () => {
     if (location.state) {
       socket.emit('getPlayer', location.state.roomCode, location.state.uuid);
     }
-  }, [location.state]);
-
-  const handleReturnPlayer = (player) => {
-    setPlayer(player);
-  };
-
-  const handleRecieveCard = ({claim, conspiracyList}) => {
-    console.log(`The Claim is ${claim} and the list of other who already have seen the card is ${conspiracyList.join(', ')}`);
-    //TODO: The Player is then prompted to either choose to look at or contest the claim.
-    // Simulate prompting the player to accept or contest (replace with real UI later)
-    const response = window.confirm(`Claim: ${claim}\nDo you accept it? Click "Cancel" to contest.`);
-    if(response) {
-      console.log('Player chose to contest the claim!');
-      const callBoolean = window.confirm('Do you think the claim is true or false? Click "OK" for true or "Cancel" for false.');
-
-      socket.emit('cardResolution', player.uuid, callBoolean);
-    }
-    else {
-      socket.emit('playerCheckCard', player.uuid);
-
-      socket.once('checkedCard', (card) => {
-        console.log(`It turns out the card was actually ${card}`);
-        const newClaim = prompt('What is your claim about this card?');
-
-        if(newClaim) {
-          socket.emit('playerPassCard', actionUUID, newClaim);
-        }
-      });
-    }
-    }
-  }
-
-  socket.on('returnPlayer', handleReturnPlayer);
-  socket.on('playerRecieveCard', handleRecieveCard);
-
-  const handleSendCard = () => {
-    if (!player?.uuid || !actionUUID || !actionCard || !actionClaim) {
-      console.warn('Tried to send card but missing data:', {
-        sender: player?.uuid,
-        receiver: actionUUID,
-        card: actionCard,
-        claim: actionClaim
-      });
-      return;
-    }
-    socket.emit('initPlayerSendCard', player.uuid, actionUUID, actionCard, actionClaim);
-  };
+  }, [location.state, socketReady]);
 
   return (
     <Container>

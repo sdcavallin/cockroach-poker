@@ -283,6 +283,9 @@ io.on('connection', (socket) => {
   // Define the gameactionmodel: conspiracy, card, and claim. card never updates but claim does
   // IMPORTANT **** ONLY RUN ONCE PER CARD AND CONSPIRACY
   socket.on('initPlayerSendCard', (senderId, recieverId, card, claim) => {
+    console.log(
+      `Sender ${senderId}, sent card ${card} and claim ${claim}, to ${recieverId}`
+    );
     const roomCode = gameRoomService.getRoomCodeByPlayerUUID(recieverId);
     if (!roomCode) {
       console.warn(`No room found for player UUID: ${recieverId}`);
@@ -297,9 +300,9 @@ io.on('connection', (socket) => {
 
     //TODO GET RID OF THIS CODE AFTER TESTING!!!
     gameRoom.currentAction.turnPlayer = senderId;
-    if(gameRooom.currentAction.turnPlayer != senderId) {
+    if (gameRoom.currentAction.turnPlayer != senderId) {
       //If the player tries to send without it being its turn then it fails,
-        return;
+      return;
     }
 
     gameRoom.currentAction.conspiracy = [gameRoom.currentAction.turnPlayer];
@@ -311,6 +314,11 @@ io.on('connection', (socket) => {
     gameRoom.currentAction.turnPlayer = recieverId;
     //That player can either decide to send back 'cardResolution' or 'playerPassCard'
     const conspiracyList = gameRoom.currentAction.conspiracy;
+    console.log(
+      `SocketId ${
+        gameRoomService.getPlayerByUUID(roomCode, recieverId).socketId
+      }`
+    );
     socket
       .to(gameRoomService.getPlayerByUUID(roomCode, recieverId).socketId)
       .emit('playerRecieveCard', claim, conspiracyList);
