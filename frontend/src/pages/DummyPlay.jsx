@@ -30,7 +30,7 @@ const DummyPlayPage = () => {
   const [actionClaim, setActionClaim] = useState(null);
   const [socketReady, setSocketReady] = useState(false);
   const location = useLocation();
-  const state = location.state || {};
+  const navigate = useNavigate();
 
   const handleActionUUIDChange = (event) => {
     setActionUUID(event.target.value);
@@ -69,6 +69,20 @@ const DummyPlayPage = () => {
     );
   };
 
+  // If user entered from PlayerJoin or ReJoin this passes, if not then it fails.
+  useEffect(() => {
+    const fromProperFlow = !!location.state;
+    const roomCode = Cookies.get('roomCode');
+    const uuid = Cookies.get('uuid');
+
+    if (!fromProperFlow && roomCode && uuid) {
+      console.warn(
+        'User landed via refresh or link — redirecting to RejoinPage'
+      );
+      navigate('/RejoinPage');
+    }
+  }, []);
+
   useEffect(() => {
     if (!socket.connected) {
       socket.connect();
@@ -79,6 +93,20 @@ const DummyPlayPage = () => {
     const handleConnect = () => {
       setMessage(`Connected with id ${socket.id}`);
       setSocketReady(true);
+
+      const roomCode = Cookies.get('roomCode');
+      const uuid = Cookies.get('uuid');
+      if (roomCode && uuid) {
+        socket.emit('getPlayer', roomCode, uuid, socket.id);
+      }
+    };
+    const handleDisconnect = () => {
+      const roomCode = Cookies.get('roomCode');
+      const uuid = Cookies.get('uuid');
+
+      if (roomCode && uuid) {
+        navigate('/RejoinPage');
+      }
     };
     //**TODO: PORT OVER CODE THAT CONNECTS SOCKETID TO A GAMEROOM!
 
@@ -93,7 +121,7 @@ const DummyPlayPage = () => {
         )}`
       );
       //TODO: The Player is then prompted to either choose to look at or contest the claim.
-      // Simulate prompting the player to accept or contest (replace with real UI later)
+      // Simulate prompting the p layer to accept or contest (replace with real UI later)
       const response = window.confirm(
         `Claim: ${claim}\nDo you accept it? Click "Cancel" to contest.`
       );
@@ -123,21 +151,23 @@ const DummyPlayPage = () => {
     };
 
     socket.on('connect', handleConnect);
+    socket.on('disconnect', handleDisconnect);
     socket.on('returnPlayer', handleReturnPlayer);
     socket.on('playerRecieveCard', handleRecieveCard);
 
     return () => {
       socket.off('connect', handleConnect);
+      socket.off('disconnect', handleDisconnect);
       socket.off('returnPlayer', handleReturnPlayer);
       socket.off('playerRecieveCard', handleRecieveCard);
     };
   }, []);
 
   useEffect(() => {
-    if (location.state) {
-      socket.emit('getPlayer', location.state.roomCode, location.state.uuid);
+    if (socket.id != undefined) {
+      socket.emit('getPlayer', Cookies.get('roomCode'), Cookies.get('uuid'));
     }
-  }, [location.state, socketReady]);
+  }, [socket.id]);
 
   return (
     <Container>

@@ -54,6 +54,7 @@ const RejoinPage = () => {
       avatar: storedAvatar,
     });
 
+    //Needs to use state (even if state has no useful information) or else play page will redirect here
     navigate('/choosecard', {
       state: {
         uuid: uuid.trim(),

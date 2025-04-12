@@ -252,7 +252,7 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('getPlayer', (roomCode, uuid) => {
+  socket.on('getPlayer', (roomCode, uuid, sID) => {
     try {
       // Use gameRoomService to get the game room
       const gameRoom = gameRoomService.getGameRoom(roomCode);
@@ -268,6 +268,7 @@ io.on('connection', (socket) => {
 
       if (player) {
         console.log(`Player found: ${player.nickname}`);
+        player.socketId = sID;
         socket.emit('returnPlayer', player);
       } else {
         console.warn(`No player found with UUID: ${uuid} in room: ${roomCode}`);
