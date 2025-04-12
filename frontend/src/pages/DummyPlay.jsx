@@ -70,18 +70,6 @@ const DummyPlayPage = () => {
   };
 
   // If user entered from PlayerJoin or ReJoin this passes, if not then it fails.
-  useEffect(() => {
-    const fromProperFlow = !!location.state;
-    const roomCode = Cookies.get('roomCode');
-    const uuid = Cookies.get('uuid');
-
-    if (!fromProperFlow && roomCode && uuid) {
-      console.warn(
-        'User landed via refresh or link — redirecting to RejoinPage'
-      );
-      navigate('/RejoinPage');
-    }
-  }, []);
 
   useEffect(() => {
     if (!socket.connected) {
@@ -100,21 +88,13 @@ const DummyPlayPage = () => {
         socket.emit('getPlayer', roomCode, uuid, socket.id);
       }
     };
-    const handleDisconnect = () => {
-      const roomCode = Cookies.get('roomCode');
-      const uuid = Cookies.get('uuid');
-
-      if (roomCode && uuid) {
-        navigate('/RejoinPage');
-      }
-    };
     //**TODO: PORT OVER CODE THAT CONNECTS SOCKETID TO A GAMEROOM!
 
     const handleReturnPlayer = (player) => {
       setPlayer(player);
     };
 
-    const handleReceiveCard = ({ claim, conspiracyList }) => {
+    const handleRecieveCard = ({ claim, conspiracyList }) => {
       console.log(
         `The Claim is ${claim} and the list of other who already have seen the card is ${conspiracyList.join(
           ', '
@@ -153,13 +133,13 @@ const DummyPlayPage = () => {
     socket.on('connect', handleConnect);
     socket.on('disconnect', handleDisconnect);
     socket.on('returnPlayer', handleReturnPlayer);
-    socket.on('playerReceiveCard', handleReceiveCard);
+    socket.on('playerRecieveCard', handleRecieveCard);
 
     return () => {
       socket.off('connect', handleConnect);
       socket.off('disconnect', handleDisconnect);
       socket.off('returnPlayer', handleReturnPlayer);
-      socket.off('playerReceiveCard', handleReceiveCard);
+      socket.off('playerRecieveCard', handleRecieveCard);
     };
   }, []);
 
@@ -172,7 +152,7 @@ const DummyPlayPage = () => {
   return (
     <Container>
       <Text>Socket state: {message}</Text>
-      {state.uuid ? '' : <Navigate to='/DummyJoin' replace />}
+      {state.uuid ? '' : <Navigate to='/rejoin' replace />}
       {player ? (
         <Stack spacing={3}>
           <Card>
