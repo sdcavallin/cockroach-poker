@@ -153,7 +153,7 @@ const DummyPlayPage = () => {
   return (
     <Container>
       <Text>Socket state: {message}</Text>
-      {state.uuid ? '' : <Navigate to='/rejoin' replace />}
+      {state.uuid ? '' : <Navigate to='/dummyjoin' replace />}
       {player ? (
         <Stack spacing={3}>
           <Card>
