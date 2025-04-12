@@ -13,9 +13,9 @@ import {
   StackDivider,
   Text,
 } from '@chakra-ui/react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, state } from 'react';
 import Cookies from 'js-cookie';
 
 const socket = io('http://localhost:5000', {
@@ -31,6 +31,7 @@ const DummyPlayPage = () => {
   const [socketReady, setSocketReady] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const state = location.state || {};
 
   const handleActionUUIDChange = (event) => {
     setActionUUID(event.target.value);
@@ -86,6 +87,8 @@ const DummyPlayPage = () => {
       const uuid = Cookies.get('uuid');
       if (roomCode && uuid) {
         socket.emit('getPlayer', roomCode, uuid, socket.id);
+      } else {
+        console.log(`Player didn't connect properly`);
       }
     };
     //**TODO: PORT OVER CODE THAT CONNECTS SOCKETID TO A GAMEROOM!
@@ -131,13 +134,11 @@ const DummyPlayPage = () => {
     };
 
     socket.on('connect', handleConnect);
-    socket.on('disconnect', handleDisconnect);
     socket.on('returnPlayer', handleReturnPlayer);
     socket.on('playerRecieveCard', handleRecieveCard);
 
     return () => {
       socket.off('connect', handleConnect);
-      socket.off('disconnect', handleDisconnect);
       socket.off('returnPlayer', handleReturnPlayer);
       socket.off('playerRecieveCard', handleRecieveCard);
     };
