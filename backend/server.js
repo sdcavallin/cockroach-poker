@@ -166,6 +166,13 @@ io.on('connection', (socket) => {
     socket.emit('returnEmptyGameRoom', gameRoom);
   });
 
+  socket.on('requestStartGame', async (roomCode) => {
+    console.log(`Socket ${socket.id} requested to start game ${roomCode}`);
+    gameRoomService.startGame(roomCode);
+    console.log(`Emitting returnStartGame`);
+    socket.emit('returnStartGame', roomCode);
+  });
+
   // requestJoinPlayerToRoom: request to create a new player in a GameRoom that is in SETUP
   socket.on(
     'requestJoinPlayerToRoom',
@@ -207,11 +214,11 @@ io.on('connection', (socket) => {
     } else {
       roomExists = true;
     }
-    socket.emit('recieveJoinCode', roomExists);
+    socket.emit('receiveJoinCode', roomExists);
   });
 
-  // joinRoom: room join; only used by hosts as of now
-  socket.on('joinRoom', async (roomCode) => {
+  // joinSocketRoom: socket room join; only used by hosts as of now
+  socket.on('joinSocketRoom', async (roomCode) => {
     socket.join(GAME_ROOM_PREFIX + roomCode);
     console.log(
       `Socket ${socket.id} joined room ${GAME_ROOM_PREFIX + roomCode}`
@@ -252,6 +259,7 @@ io.on('connection', (socket) => {
     }
   });
 
+  // getPlayer: returns a player by roomCode and uuid
   socket.on('getPlayer', (roomCode, uuid, sID) => {
     try {
       // Use gameRoomService to get the game room
@@ -283,13 +291,13 @@ io.on('connection', (socket) => {
   // initPlayerSendCard
   // Define the gameactionmodel: conspiracy, card, and claim. card never updates but claim does
   // IMPORTANT **** ONLY RUN ONCE PER CARD AND CONSPIRACY
-  socket.on('initPlayerSendCard', (senderId, recieverId, card, claim) => {
+  socket.on('initPlayerSendCard', (senderId, receiverId, card, claim) => {
     console.log(
-      `Sender ${senderId}, sent card ${card} and claim ${claim}, to ${recieverId}`
+      `Sender ${senderId}, sent card ${card} and claim ${claim}, to ${receiverId}`
     );
-    const roomCode = gameRoomService.getRoomCodeByPlayerUUID(recieverId);
+    const roomCode = gameRoomService.getRoomCodeByPlayerUUID(receiverId);
     if (!roomCode) {
-      console.warn(`No room found for player UUID: ${recieverId}`);
+      console.warn(`No room found for player UUID: ${receiverId}`);
       return;
     }
     const gameRoom = gameRoomService.getGameRoom(roomCode);
@@ -312,24 +320,24 @@ io.on('connection', (socket) => {
 
     //Steps: Turn Current Player into the prevPlayer, targeted Player becomes currentPlayer, add currentPlayer to consipiracy.
     gameRoom.currentAction.prevPlayer = gameRoom.currentAction.turnPlayer;
-    gameRoom.currentAction.turnPlayer = recieverId;
+    gameRoom.currentAction.turnPlayer = receiverId;
     //That player can either decide to send back 'cardResolution' or 'playerPassCard'
     const conspiracyList = gameRoom.currentAction.conspiracy;
     console.log(
       `SocketId ${
-        gameRoomService.getPlayerByUUID(roomCode, recieverId).socketId
+        gameRoomService.getPlayerByUUID(roomCode, receiverId).socketId
       }`
     );
     socket
-      .to(gameRoomService.getPlayerByUUID(roomCode, recieverId).socketId)
-      .emit('playerRecieveCard', claim, conspiracyList);
+      .to(gameRoomService.getPlayerByUUID(roomCode, receiverId).socketId)
+      .emit('playerReceiveCard', claim, conspiracyList);
   });
 
   // playerCheckCard
-  socket.on('playerCheckCard', (recieverId) => {
-    const roomCode = gameRoomService.getRoomCodeByPlayerUUID(recieverId);
+  socket.on('playerCheckCard', (receiverId) => {
+    const roomCode = gameRoomService.getRoomCodeByPlayerUUID(receiverId);
     if (!roomCode) {
-      console.warn(`No room found for player UUID: ${recieverId}`);
+      console.warn(`No room found for player UUID: ${receiverId}`);
       return;
     }
     const gameRoom = gameRoomService.getGameRoom(roomCode);
@@ -340,10 +348,10 @@ io.on('connection', (socket) => {
     }
     gameRoom.currentAction.conspiracy.push(gameRoom.currentAction.turnPlayer);
     const card = gameRoom.currentAction.card;
-    const targetPlayer = gameRoomService.getPlayerByUUID(recieverId);
+    const targetPlayer = gameRoomService.getPlayerByUUID(receiverId);
 
     if (!targetPlayer?.socketId) {
-      console.warn(`No socketId for player ${recieverId}`);
+      console.warn(`No socketId for player ${receiverId}`);
       return;
     }
 
@@ -351,10 +359,10 @@ io.on('connection', (socket) => {
   });
 
   // playerPassCard
-  socket.on('playerPassCard', (recieverId, claim) => {
-    const roomCode = gameRoomService.getRoomCodeByPlayerUUID(recieverId);
+  socket.on('playerPassCard', (receiverId, claim) => {
+    const roomCode = gameRoomService.getRoomCodeByPlayerUUID(receiverId);
     if (!roomCode) {
-      console.warn(`No room found for player UUID: ${recieverId}`);
+      console.warn(`No room found for player UUID: ${receiverId}`);
       return;
     }
     const gameRoom = gameRoomService.getGameRoom(roomCode);
@@ -368,12 +376,12 @@ io.on('connection', (socket) => {
 
     //Steps: Turn Current Player into the prevPlayer, targeted Player becomes currentPlayer, add currentPlayer to consipiracy.
     gameRoom.currentAction.prevPlayer = gameRoom.currentAction.turnPlayer;
-    gameRoom.currentAction.turnPlayer = recieverId;
+    gameRoom.currentAction.turnPlayer = receiverId;
     //That player can either decide to send back 'cardResolution' or 'playerPassCard'
     const conspiracyList = gameRoom.currentAction.conspiracy;
     socket
-      .to(gameRoomService.getPlayerByUUID(roomCode, recieverId).socketId)
-      .emit('playerRecieveCard', claim, conspiracyList);
+      .to(gameRoomService.getPlayerByUUID(roomCode, receiverId).socketId)
+      .emit('playerReceiveCard', claim, conspiracyList);
   });
 
   // Card Resolution, NOTE THIS USES CURRENT PLAYER UUID

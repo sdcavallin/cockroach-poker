@@ -12,13 +12,15 @@ import {
 } from '@chakra-ui/react';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 const socket = io('http://localhost:5000', { autoConnect: false });
 
 const DummyHostPage = () => {
   const [message, setMessage] = useState('Connecting socket...');
   const [gameRoom, setGameRoom] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!socket.connected) {
@@ -29,11 +31,10 @@ const DummyHostPage = () => {
 
     const handleConnect = () => {
       setMessage(`Connected with id ${socket.id}`);
-      handleJoinRoom('123B');
     };
 
     const handleJoinRoom = (roomCode) => {
-      socket.emit('joinRoom', roomCode);
+      socket.emit('joinSocketRoom', roomCode);
     };
 
     const handleReturnGameRoom = (gameRoom) => {
@@ -57,14 +58,22 @@ const DummyHostPage = () => {
     }
   }, [gameRoom]); // Runs when `gameRoom` changes
 */
-  const handleRequestGameRoom = () => {
-    socket.emit('requestGameRoom', '123B');
+  const handleRequestGameRoom = (roomCode) => {
+    socket.emit('requestGameRoom', roomCode);
   };
+
+  useEffect(() => {
+    if (location.state) {
+      socket.emit('joinSocketRoom', location.state.roomCode);
+    }
+  }, [location.state]);
 
   return (
     <Container>
       <Container>Socket state: {message}</Container>
-      <Button onClick={() => handleRequestGameRoom()}>Request Room Info</Button>
+      <Button onClick={() => handleRequestGameRoom('123B')}>
+        Request Room Info for 123B
+      </Button>
       {gameRoom ? (
         <Card>
           <CardHeader>

@@ -26,7 +26,6 @@ export class GameRoomService {
   // This returns by reference, meaning if you modify
   // the gameRoom elsewhere, it will modify it in gameRoomMap.
   getGameRoom(roomCode) {
-    console.log('getGameRoom called');
     return this.gameRoomMap.get(roomCode);
   }
 
@@ -122,13 +121,23 @@ export class GameRoomService {
     return uuid;
   }
 
+  // Start game.
+  // Update GameRoom contents.
+  startGame(roomCode) {
+    const gameRoom = this.gameRoomMap.get(roomCode);
+
+    gameRoom.gameStatus = GameStatus.ONGOING;
+
+    // TODO: Shuffle and deal cards.
+  }
+
   // Save GameRoom contents to database.
   async saveGameRoom(roomCode) {
     const gameRoom = this.gameRoomMap.get(roomCode);
     gameRoom.save();
   }
 
-  // Saves all GameRooms to the database. (EXPENSIVE, likely will not be used)
+  // Saves all GameRooms to the database. (EXPENSIVE, use sparingly)
   async saveAll() {
     this.gameRoomMap.forEach((roomCode, gameRoom) => {
       gameRoom.save();
@@ -137,7 +146,7 @@ export class GameRoomService {
 
   // Used to end a game.
   // Will update the game status and remove it from the map.
-  async terminateGameRoom(roomCode) {
+  async terminateGameRoomAndSave(roomCode) {
     const gameRoom = this.gameRoomMap.get(roomCode);
 
     gameRoom.gameStatus = GameStatus.ENDED;

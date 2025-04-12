@@ -51,10 +51,10 @@ const DummyPlayerJoinPage = () => {
   );
 
   useEffect(() => {
-    socket.on('recieveJoinCode', handleJoinCode);
+    socket.on('receiveJoinCode', handleJoinCode);
 
     return () => {
-      socket.off('recieveJoinCode', handleJoinCode);
+      socket.off('receiveJoinCode', handleJoinCode);
     };
   }, [handleJoinCode]);
 

@@ -114,7 +114,7 @@ const DummyPlayPage = () => {
       setPlayer(player);
     };
 
-    const handleRecieveCard = ({ claim, conspiracyList }) => {
+    const handleReceiveCard = ({ claim, conspiracyList }) => {
       console.log(
         `The Claim is ${claim} and the list of other who already have seen the card is ${conspiracyList.join(
           ', '
@@ -153,13 +153,13 @@ const DummyPlayPage = () => {
     socket.on('connect', handleConnect);
     socket.on('disconnect', handleDisconnect);
     socket.on('returnPlayer', handleReturnPlayer);
-    socket.on('playerRecieveCard', handleRecieveCard);
+    socket.on('playerReceiveCard', handleReceiveCard);
 
     return () => {
       socket.off('connect', handleConnect);
       socket.off('disconnect', handleDisconnect);
       socket.off('returnPlayer', handleReturnPlayer);
-      socket.off('playerRecieveCard', handleRecieveCard);
+      socket.off('playerReceiveCard', handleReceiveCard);
     };
   }, []);
 

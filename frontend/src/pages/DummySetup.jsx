@@ -12,14 +12,15 @@ import {
 } from '@chakra-ui/react';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import { useNavigate } from 'react-router-dom';
 
 const socket = io('http://localhost:5000', { autoConnect: false });
 
+// Waiting Room
 const DummySetupPage = () => {
   const [message, setMessage] = useState('Connecting socket...');
   const [gameRoom, setGameRoom] = useState(null);
-  const [playerCount, setPlayerCount] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!socket.connected) {
@@ -33,7 +34,7 @@ const DummySetupPage = () => {
     };
 
     const handleJoinRoom = (roomCode) => {
-      socket.emit('joinRoom', roomCode);
+      socket.emit('joinSocketRoom', roomCode);
     };
 
     const handleReturnGameRoom = (gameRoom) => {
@@ -47,19 +48,29 @@ const DummySetupPage = () => {
       handleJoinRoom(gameRoom.roomCode);
     };
 
+    const handleReturnStartGame = (roomCode) => {
+      navigate('/DummyHost', { state: { roomCode: roomCode } });
+    };
+
     socket.on('connect', handleConnect);
     socket.on('returnGameRoom', handleReturnGameRoom);
     socket.on('returnEmptyGameRoom', handleReturnEmptyGameRoom);
+    socket.on('returnStartGame', handleReturnStartGame);
 
     return () => {
       socket.off('connect', handleConnect);
       socket.off('returnGameRoom', handleReturnGameRoom);
       socket.off('returnEmptyGameRoom', handleReturnEmptyGameRoom);
+      socket.off('returnStartGame', handleReturnStartGame);
     };
   }, []);
 
   const handleRequestCreateEmptyGameRoom = () => {
     socket.emit('requestCreateEmptyGameRoom');
+  };
+
+  const handleRequestStartGame = () => {
+    socket.emit('requestStartGame', gameRoom.roomCode);
   };
 
   return (
@@ -86,13 +97,16 @@ const DummySetupPage = () => {
                 </Stack>
               </CardBody>
             </Card>
-            <Button isDisabled={gameRoom.numPlayers < 2}>
+            <Button
+              isDisabled={gameRoom.numPlayers < 2}
+              onClick={handleRequestStartGame}
+            >
               Start Game ({gameRoom.numPlayers} players)
             </Button>
           </Stack>
         </Box>
       ) : (
-        <Button onClick={() => handleRequestCreateEmptyGameRoom()}>
+        <Button onClick={handleRequestCreateEmptyGameRoom}>
           Create Empty Room
         </Button>
       )}

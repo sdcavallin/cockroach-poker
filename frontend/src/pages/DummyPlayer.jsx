@@ -8,6 +8,7 @@ const socket = io('http://localhost:5000', {
   autoConnect: false,
 });
 
+// Old
 const DummyPlayerPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -70,11 +71,6 @@ const DummyPlayerPage = () => {
   };
 
   socket.on('returnPlayer', handleReturnPlayer);
-
-  // Old function using sendCard
-  //   const handleSendCockroach = () => {
-  //     socket.emit('sendCard', '67ad6bd71b76340c29212842', 4);
-  //   };
 
   // Uses gameRoomSendCard to target Players inside GameRoom objects
   const handleSendCockroach = () => {
