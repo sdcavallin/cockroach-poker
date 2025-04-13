@@ -5,22 +5,69 @@ import {
   CardBody,
   CardHeader,
   Container,
+  Divider,
   Heading,
+  HStack,
+  Input,
   Stack,
   StackDivider,
   Text,
 } from '@chakra-ui/react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
-const socket = io('http://localhost:5000', { autoConnect: false });
+const socket = io('http://localhost:5000', {
+  autoConnect: false,
+});
 
-const DummyHostPage = () => {
+const DummyPlayPage = () => {
   const [message, setMessage] = useState('Connecting socket...');
-  const [gameRoom, setGameRoom] = useState(null);
-  const navigate = useNavigate();
+  const [player, setPlayer] = useState(null);
+  const [actionUUID, setActionUUID] = useState(null);
+  const [actionCard, setActionCard] = useState(null);
+  const [actionClaim, setActionClaim] = useState(null);
+  const [socketReady, setSocketReady] = useState(false);
   const location = useLocation();
+  const state = location.state || {};
+
+  const handleActionUUIDChange = (event) => {
+    setActionUUID(event.target.value);
+  };
+
+  const handleActionCardChange = (event) => {
+    setActionCard(event.target.value);
+  };
+
+  const handleActionClaimChange = (event) => {
+    setActionClaim(event.target.value);
+  };
+
+  const handleSendCard = () => {
+    console.log(`Handle Send Card Run`);
+    if (!player?.uuid || !actionUUID || !actionCard || !actionClaim) {
+      console.warn('Tried to send card but missing data:', {
+        sender: player?.uuid,
+        receiver: actionUUID,
+        card: actionCard,
+        claim: actionClaim,
+      });
+      console.log(`Handle Send Card Failed`);
+      return;
+    }
+    if (!socketReady) {
+      console.log('Socket not ready');
+      return;
+    }
+    socket.emit(
+      'initPlayerSendCard',
+      player.uuid,
+      actionUUID,
+      actionCard,
+      actionClaim
+    );
+  };
 
   useEffect(() => {
     if (!socket.connected) {
@@ -31,73 +78,135 @@ const DummyHostPage = () => {
 
     const handleConnect = () => {
       setMessage(`Connected with id ${socket.id}`);
+      setSocketReady(true);
+    };
+    //**TODO: PORT OVER CODE THAT CONNECTS SOCKETID TO A GAMEROOM!
+
+    const handleReturnPlayer = (player) => {
+      setPlayer(player);
     };
 
-    const handleJoinRoom = (roomCode) => {
-      socket.emit('joinSocketRoom', roomCode);
-    };
+    const handleRecieveCard = ({ claim, conspiracyList }) => {
+      console.log(
+        `The Claim is ${claim} and the list of other who already have seen the card is ${conspiracyList.join(
+          ', '
+        )}`
+      );
+      //TODO: The Player is then prompted to either choose to look at or contest the claim.
+      // Simulate prompting the player to accept or contest (replace with real UI later)
+      const response = window.confirm(
+        `Claim: ${claim}\nDo you accept it? Click "Cancel" to contest.`
+      );
+      if (response) {
+        console.log('Player chose to contest the claim!');
+        const callBoolean = window.confirm(
+          'Do you think the claim is true or false? Click "OK" for true or "Cancel" for false.'
+        );
 
-    const handleReturnGameRoom = (gameRoom) => {
-      console.log(gameRoom);
-      setGameRoom(gameRoom);
+        socket.emit('cardResolution', player.uuid, callBoolean);
+      } else {
+        socket.emit('playerCheckCard', player.uuid);
+
+        const handleCheckedCard = (card) => {
+          console.log(`It turns out the card was actually ${card}`);
+          const newClaim = prompt('What is your claim about this card?');
+
+          if (newClaim) {
+            socket.emit('playerPassCard', actionUUID, newClaim);
+          }
+
+          socket.off('checkedCard', handleCheckedCard);
+        };
+
+        socket.on('checkedCard', handleCheckedCard);
+      }
     };
 
     socket.on('connect', handleConnect);
-    socket.on('returnGameRoom', handleReturnGameRoom);
+    socket.on('returnPlayer', handleReturnPlayer);
+    socket.on('playerRecieveCard', handleRecieveCard);
 
     return () => {
       socket.off('connect', handleConnect);
-      socket.off('returnGameRoom', handleReturnGameRoom);
+      socket.off('returnPlayer', handleReturnPlayer);
+      socket.off('playerRecieveCard', handleRecieveCard);
     };
   }, []);
-  /*
-  useEffect(() => {
-    // This effect runs whenever `gameRoom` changes
-    if (gameRoom) {
-      console.log('Updated gameRoom:', gameRoom);
-    }
-  }, [gameRoom]); // Runs when `gameRoom` changes
-*/
-  const handleRequestGameRoom = (roomCode) => {
-    socket.emit('requestGameRoom', roomCode);
-  };
 
   useEffect(() => {
     if (location.state) {
-      socket.emit('joinSocketRoom', location.state.roomCode);
+      socket.emit('getPlayer', location.state.roomCode, location.state.uuid);
     }
-  }, [location.state]);
+  }, [location.state, socketReady]);
 
   return (
-    <Container>
-      <Container>Socket state: {message}</Container>
-      <Button onClick={() => handleRequestGameRoom('123B')}>
-        Request Room Info for 123B
-      </Button>
-      {gameRoom ? (
-        <Card>
-          <CardHeader>
-            <Heading size='lg'>Game Room: {gameRoom.roomCode}</Heading>
-          </CardHeader>
-          <CardBody>
-            <Stack divider={<StackDivider />} spacing='4'>
-              {gameRoom.players.map((player, index) => (
-                <Box key={index}>
-                  <Heading size='md'>Player: {player.nickname}</Heading>
+    <Box    
+    width="100vw"
+    height="100vh"
+    bg="yellow.100"
+    overflowY="auto"
+    p={6}
+  >
+  
+      <Text>Socket state: {message}</Text>
+      {state.uuid ? '' : <Navigate to='/DummyJoin' replace />}
+      {player ? (
+        <Stack spacing={3}>
+          <Card>
+            <CardBody>
+              <Stack divider={<StackDivider />} spacing={3}>
+                <Heading size='lg'>Player: {player.nickname}</Heading>
+                <Box>
                   <Text size='sm'>UUID: {player.uuid}</Text>
                   <Text size='sm'>Hand: {JSON.stringify(player.hand)}</Text>
+                  <Text size='sm'>Hand Size: {player.handSize}</Text>
                   <Text size='sm'>Pile: {JSON.stringify(player.pile)}</Text>
+                  <Text size='sm'>Pile Size: {player.pileSize}</Text>
                   <Text size='sm'>Socket: {player.socketId}</Text>
                 </Box>
-              ))}
-            </Stack>
-          </CardBody>
-        </Card>
+              </Stack>
+            </CardBody>
+          </Card>
+          <Card>
+            <CardBody>
+              <Stack divider={<StackDivider />} spacing={3}>
+                <Heading size='lg'>Game Actions</Heading>
+                <Box>
+                  <Heading size='md'>Send Card to Player</Heading>
+                  <Text>Player UUID:</Text>{' '}
+                  <Input
+                    value={actionUUID}
+                    onChange={handleActionUUIDChange}
+                    placeholder='23456'
+                    size='sm'
+                  />
+                  <Text>Card (1-8):</Text>{' '}
+                  <Input
+                    value={actionCard}
+                    onChange={handleActionCardChange}
+                    placeholder='1'
+                    size='sm'
+                  />{' '}
+                  <Text>Claim (1-8):</Text>{' '}
+                  <Input
+                    value={actionClaim}
+                    onChange={handleActionClaimChange}
+                    placeholder='1'
+                    size='sm'
+                  />{' '}
+                  <Button onClick={handleSendCard}>Send</Button>
+                  {/* This should call a socket function in the server that adds the card to a hand and then sends updates to the relevant players
+                  AND to the host.*/}
+                </Box>
+              </Stack>
+            </CardBody>
+          </Card>
+        </Stack>
       ) : (
-        ''
+        `GameRoom ${state.roomCode} or Player UUID ${state.uuid} does not exist.`
       )}
-    </Container>
+    </Box>
   );
 };
 
-export default DummyHostPage;
+export default DummyPlayPage;

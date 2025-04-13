@@ -44,22 +44,21 @@ const GameBoard = () => {
   };
 
   // chakra ui breakpoints for screen sizes : base = default for all screens, sm = mobile , md = tablet, lg = laptop, xl = desktop
-
-  // Image list based on player count
   const images = [
-    { src: 'images/bat_silhouette.png', left: '5%', bottom: '5%' },
-    { src: 'images/toad_silhouette.png', right: '5%', top: '5%' },
-    { src: 'images/cockroach_silhouette.png', left: '5%', top: '5%' },
-    {
-      src: 'images/rat_silhouette.png',
-      right: '5%',
-      bottom: '5%',
-      transform: 'scaleX(-1)',
-    },
+    // Corners
+    { src: 'avatars/bmo.png', right: '5%', bottom: '5%' }, // P1 - bottom right
+    { src: 'avatars/finn.png', right: '5%', top: '5%' },    // P2 - top right
+    { src: 'avatars/navi-avatar.png', left: '5%', top: '5%' },     // P3 - top left
+    { src: 'avatars/harry-potter.png', left: '5%', bottom: '5%' },  // P4 - bottom left
+  
+    // Top & bottom Centers
+    { src: 'avatars/jake.png', left: '50%', top: '0%', transform: 'translateX(-50%)' },    // P5 - top center
+    { src: 'avatars/wonder-woman.png', left: '50%', bottom: '0%', transform: 'translateX(-50%)' }, // P6 - bottom center
   ];
+  
 
   // Adjust the images based on player count (use gameRoom.players.length if available)
-  const visibleImages = images.slice(0, gameRoom ? gameRoom.players.length : 0);
+  const visibleImages = images.slice(0, gameRoom ? Math.min(gameRoom.players.length, 6) : 0);
 
   return (
     <Container
@@ -138,14 +137,15 @@ const GameBoard = () => {
 
             {/* Render images based on player count */}
             {visibleImages.map((img, i) => (
-              <Image
-                key={i}
-                position='absolute'
-                src={img.src}
-                width={['50px', '65px', '80px']}
-                {...img}
-              />
-            ))}
+  <Image
+    key={i}
+    position="absolute"
+    src={img.src}
+    width={['50px', '65px', '80px']}
+    {...img} // spreads the position styles
+  />
+))}
+
           </Box>
         </Box>
       ) : // <Text>Loading Game...</Text>

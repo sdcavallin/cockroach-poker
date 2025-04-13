@@ -1,17 +1,49 @@
-import { Box, Button, Text, Input, useToast } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
-import Cookies from 'js-cookie';
-import { useNavigate } from 'react-router-dom';
+import {
+  Box,
+  Button,
+  Text,
+  Input,
+  useToast,
+  Heading,
+} from '@chakra-ui/react';
 import { io } from 'socket.io-client';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
-const socket = io('http://localhost:5000', { autoConnect: false });
+const socket = io('http://localhost:5000', {
+  autoConnect: false,
+});
 
 const RejoinPage = () => {
   const [message, setMessage] = useState('Connecting socket...');
-  const [roomCode, setRoomCode] = useState('');
-  const [uuid, setUUID] = useState('');
-  const toast = useToast();
+  const [roomCode, setRoomCode] = useState('123B');
+  const [uuid, setUUID] = useState('12345');
   const navigate = useNavigate();
+  const toast = useToast();
+
+  const handleJoin = () => {
+    if (!roomCode.trim() || !uuid.trim()) {
+      toast({
+        title: 'Missing Info',
+        description: 'Please enter both a room code and your UUID.',
+        status: 'warning',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    navigate('/PlayerPlay', { state: { roomCode: roomCode, uuid: uuid } });
+  };
+
+  const handleRoomCodeChange = (event) => {
+    setRoomCode(event.target.value);
+  };
+
+  const handleUUIDChange = (event) => {
+    setUUID(event.target.value);
+  };
 
   useEffect(() => {
     if (!socket.connected) {
@@ -30,38 +62,6 @@ const RejoinPage = () => {
       socket.off('connect', handleConnect);
     };
   }, []);
-
-  const handleRejoin = () => {
-    if (!roomCode.trim() || !uuid.trim()) {
-      toast({
-        title: 'Missing Info',
-        description: 'Please enter both a room code and your UUID.',
-        status: 'warning',
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    const storedAvatar = Cookies.get('avatar') || 'baby-yoda';
-
-    Cookies.set('roomCode', roomCode.trim(), { expires: 2 });
-    Cookies.set('uuid', uuid.trim(), { expires: 2 });
-    Cookies.set('avatar', storedAvatar, { expires: 2 });
-
-    socket.emit('selectAvatar', {
-      playerId: uuid.trim(),
-      avatar: storedAvatar,
-    });
-
-    //Needs to use state (even if state has no useful information) or else play page will redirect here
-    navigate('/choosecard', {
-      state: {
-        uuid: uuid.trim(),
-        roomCode: roomCode.trim().toUpperCase(),
-      },
-    });
-  };
 
   return (
     <Box
@@ -85,18 +85,21 @@ const RejoinPage = () => {
         alignItems='center'
         textAlign={'center'}
       >
-        <Text fontSize='3xl' fontWeight='bold' color='#264653' mb='4'>
-          You got disconnected! Let's get you back in.
-        </Text>
+        <Heading size='lg' fontWeight='bold' color='#264653' mb='4'>
+          Rejoin an Ongoing Game
+        </Heading>
 
         <Text fontSize='md' color='#264653' mb='2'>
           Socket status: {message}
         </Text>
 
+        <Text fontSize='md' fontWeight='bold' color='#264653' alignSelf='flex-start' ml='10%' mb='1'>
+          Room Code:
+        </Text>
         <Input
           placeholder='Enter Room Code'
           value={roomCode}
-          onChange={(e) => setRoomCode(e.target.value)}
+          onChange={handleRoomCodeChange}
           textAlign='center'
           fontSize='lg'
           width='80%'
@@ -105,10 +108,13 @@ const RejoinPage = () => {
           mb='4'
         />
 
+        <Text fontSize='md' fontWeight='bold' color='#264653' alignSelf='flex-start' ml='10%' mb='1'>
+          UUID:
+        </Text>
         <Input
           placeholder='Enter Your UUID'
           value={uuid}
-          onChange={(e) => setUUID(e.target.value)}
+          onChange={handleUUIDChange}
           textAlign='center'
           fontSize='lg'
           width='80%'
@@ -121,9 +127,9 @@ const RejoinPage = () => {
           colorScheme='teal'
           size='lg'
           fontSize='xl'
-          onClick={handleRejoin}
+          onClick={handleJoin}
         >
-          Rejoin Game
+          Join Game
         </Button>
       </Box>
     </Box>

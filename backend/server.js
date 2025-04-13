@@ -321,6 +321,11 @@ io.on('connection', (socket) => {
     //Steps: Turn Current Player into the prevPlayer, targeted Player becomes currentPlayer, add currentPlayer to consipiracy.
     gameRoom.currentAction.prevPlayer = gameRoom.currentAction.turnPlayer;
     gameRoom.currentAction.turnPlayer = receiverId;
+
+    io.to(GAME_ROOM_PREFIX + roomCode).emit(
+      'turnPlayerUpdated',
+      gameRoom.currentAction.turnPlayer
+    );
     //That player can either decide to send back 'cardResolution' or 'playerPassCard'
     const conspiracyList = gameRoom.currentAction.conspiracy;
     console.log(
@@ -377,6 +382,12 @@ io.on('connection', (socket) => {
     //Steps: Turn Current Player into the prevPlayer, targeted Player becomes currentPlayer, add currentPlayer to consipiracy.
     gameRoom.currentAction.prevPlayer = gameRoom.currentAction.turnPlayer;
     gameRoom.currentAction.turnPlayer = receiverId;
+
+    io.to(GAME_ROOM_PREFIX + roomCode).emit(
+      'turnPlayerUpdated',
+      gameRoom.currentAction.turnPlayer
+    );
+
     //That player can either decide to send back 'cardResolution' or 'playerPassCard'
     const conspiracyList = gameRoom.currentAction.conspiracy;
     socket
@@ -429,6 +440,13 @@ io.on('connection', (socket) => {
     // Sets the turn to whoever should go after the inital player for the conspiracy, adds current player so if conspiracy.size = 1
     gameRoom.currentAction.turnPlayer = gameRoom.players[index].uuid;
     gameRoom.currentAction.conspiracy = [];
+
+    io.to(GAME_ROOM_PREFIX + roomCode).emit(
+      'turnPlayerUpdated',
+      gameRoom.currentAction.turnPlayer
+    );
+
+    
     const countMap = {};
     for (let numCard of gameRoom.players[index].pile) {
       countMap[numCard] = (countMap[numCard] || 0) + 1;

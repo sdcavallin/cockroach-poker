@@ -22,9 +22,6 @@ function Navbar() {
     { to: '/host', label: 'Host' },
     { to: '/player', label: 'Player' },
     { to: '/gameboard', label: 'Gameboard' },
-    { to: '/chooseplayer', label: 'ChoosePlayer' },
-    { to: '/choosecard', label: 'ChooseCard' },
-    { to: '/choosestatement', label: 'ChooseStatement' },
     { to: '/dummyplayer', label: 'DummyPlayer' },
     { to: '/dummyhost', label: 'DummyHost' },
     { to: '/dummyjoin', label: 'DummyJoin' },
@@ -33,6 +30,7 @@ function Navbar() {
     { to: '/dummysetup', label: 'DummySetup' },
     { to: '/dummyjoinsetup', label: 'DummyJoinSetup' },
     { to: '/rejoin', label: 'Rejoin' },
+    { to: '/playerplay', label: 'PlayerPlay'},
   ];
 
   return (

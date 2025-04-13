@@ -54,6 +54,18 @@ export const CardNumberToString = {
   8: 'Stinkbug',
 };
 
+
+export const CardNumberToImage = {
+  0: '/cards/back',
+  1: '/cards/bat.png',
+  2: '/cards/fly.png',
+  3: '/cards/cockroach.png',
+  4: '/cards/toad.png',
+  5: '/cards/rat.png',
+  6: '/cards/scorpion.png',
+  7: '/cards/spider.png',
+  8: '/cards/stinkbug.png',
+};
 /*
 GAME_ROOM_PREFIX 
 Prefix for socket.io rooms. For example, game:123B
