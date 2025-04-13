@@ -24,7 +24,7 @@ import {
   Image,
   Avatar,
   VStack,
-  Textarea
+  Textarea,
   // Modal
 } from '@chakra-ui/react';
 import { Navigate, useLocation } from 'react-router-dom';
@@ -33,13 +33,11 @@ import { useState, useEffect } from 'react';
 import Cookies from 'js-cookie';
 import { useToast } from '@chakra-ui/react';
 
-
 // const toast = useToast();
 
 const socket = io('http://localhost:5000', {
   autoConnect: false,
 });
-
 
 const PlayerPlay = () => {
   const toast = useToast();
@@ -63,7 +61,6 @@ const PlayerPlay = () => {
   const [receivedCardData, setReceivedCardData] = useState(null);
   // const [cardModalOpen, setCardModalOpen] = useState(false);
 
-  
   const handleCardSelection = (card) => {
     setSelectedCard(card);
     selectCardDrawer.onClose();
@@ -78,14 +75,14 @@ const PlayerPlay = () => {
 
   const handleStatementSubmit = () => {
     if (!statement.trim()) {
-      alert("Please enter a statement");
+      alert('Please enter a statement');
       return;
     }
 
-    console.log("Sending card:", {
+    console.log('Sending card:', {
       card: selectedCard,
       player: selectedPlayer,
-      statement: statement
+      statement: statement,
     });
 
     socket.emit(
@@ -100,7 +97,9 @@ const PlayerPlay = () => {
     setSelectedCard(null);
     setSelectedPlayer(null);
     setStatement('');
-    alert(`Card ${selectedCard} sent to ${selectedPlayer.nickname} with statement: "${statement}"`);
+    alert(
+      `Card ${selectedCard} sent to ${selectedPlayer.nickname} with statement: "${statement}"`
+    );
   };
 
   const startCardAction = () => {
@@ -127,7 +126,7 @@ const PlayerPlay = () => {
       setReceivedCardData({ claim, conspiracyList });
       setCardModalOpen(true);
     };
-    
+
     const handleReturnGameRoom = (gameRoom) => {
       console.log('Received game room:', gameRoom);
       setPlayers(gameRoom.players || []);
@@ -149,6 +148,7 @@ const PlayerPlay = () => {
   useEffect(() => {
     if (socketReady && state.roomCode && state.uuid) {
       socket.emit('getPlayer', state.roomCode, state.uuid);
+      socket.emit('setSocketId', state.roomCode, state.uuid, socket.id);
       socket.emit('requestGameRoom', state.roomCode);
     }
   }, [socketReady, state.roomCode, state.uuid]);
@@ -180,33 +180,32 @@ const PlayerPlay = () => {
     const handleTurnPlayerUpdate = (turnPlayerId) => {
       if (turnPlayerId === player?.uuid) {
         toast({
-          title: "Your Turn!",
-          description: "Another player has sent you a card",
-          status: "info",
+          title: 'Your Turn!',
+          description: 'Another player has sent you a card',
+          status: 'info',
           duration: 5000,
           isClosable: true,
-          position: "top",
+          position: 'top',
         });
       }
     };
-  
+
     socket.on('turnPlayerUpdated', handleTurnPlayerUpdate);
-  
+
     return () => {
       socket.off('turnPlayerUpdated', handleTurnPlayerUpdate);
     };
   }, [player, toast]);
-  
-  
+
   return (
     <Box
-      width="100vw"
-      height="100vh"
-      bg="#E9C46A"
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      p="5%"
+      width='100vw'
+      height='100vh'
+      bg='#E9C46A'
+      display='flex'
+      justifyContent='center'
+      alignItems='center'
+      p='5%'
     >
       {/* <Modal isOpen={cardModalOpen} onClose={() => setCardModalOpen(false)} isCentered>
   <ModalOverlay />
@@ -242,200 +241,281 @@ const PlayerPlay = () => {
       <Box
         width={{ base: '90%', md: '70%', lg: '50%', xl: '40%' }}
         maxHeight={{ base: '85vh', md: '90vh' }}
-        bg="#FFF9C4"
-        border="2px solid #FBC02D"
-        borderRadius="md"
-        boxShadow="xl"
-        p="5%"
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        textAlign="center"
-        overflowY="auto"
+        bg='#FFF9C4'
+        border='2px solid #FBC02D'
+        borderRadius='md'
+        boxShadow='xl'
+        p='5%'
+        display='flex'
+        flexDirection='column'
+        alignItems='center'
+        textAlign='center'
+        overflowY='auto'
       >
         {!state.uuid ? (
-          <Navigate to="/Rejoin" replace />
+          <Navigate to='/Rejoin' replace />
         ) : player ? (
-          <Stack spacing={3} width="100%">
-                {player && (
-      <Box
-        width="100%"
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        mb={4}
-      >
-        <HStack spacing={3}>
-        <Avatar size="md" src={player.avatar} name={player.nickname} />
-          <Text fontSize="lg" fontWeight="bold">{player.nickname}</Text>
-        </HStack>
-        <Text fontSize="sm" color="gray.500">
-          {`You are Player ID: ${player.uuid?.slice(0, 6)}...`}
-        </Text>
-      </Box>
-    )}
+          <Stack spacing={3} width='100%'>
+            {player && (
+              <Box
+                width='100%'
+                display='flex'
+                alignItems='center'
+                justifyContent='space-between'
+                mb={4}
+              >
+                <HStack spacing={3}>
+                  <Avatar
+                    size='md'
+                    src={player.avatar}
+                    name={player.nickname}
+                  />
+                  <Text fontSize='lg' fontWeight='bold'>
+                    {player.nickname}
+                  </Text>
+                </HStack>
+                <Text fontSize='sm' color='gray.500'>
+                  {`You are Player ID: ${player.uuid?.slice(0, 6)}...`}
+                </Text>
+              </Box>
+            )}
             <Card>
-              <CardHeader bg="#FBC02D" borderTopRadius="md">
-                <Heading size="md" textAlign="center">Your Hand</Heading>
+              <CardHeader bg='#FBC02D' borderTopRadius='md'>
+                <Heading size='md' textAlign='center'>
+                  Your Hand
+                </Heading>
               </CardHeader>
-              <CardBody maxHeight="300px" overflowY="auto" p={4}>
+              <CardBody maxHeight='300px' overflowY='auto' p={4}>
                 <SimpleGrid columns={2} spacing={4}>
                   {player?.hand?.map((card, index) => (
                     <Box
                       key={`${card}-${index}`}
-                      bg="white"
-                      height="140px"
-                      border="2px solid"
-                      borderColor={selectedCard === card ? "teal.500" : "gray.200"}
-                      borderRadius="md"
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
-                      flexDirection="column"
-                      _hover={{ borderColor: "teal.300", transform: "scale(1.05)" }}
-                      transition="all 0.2s"
-                      cursor="pointer"
+                      bg='white'
+                      height='140px'
+                      border='2px solid'
+                      borderColor={
+                        selectedCard === card ? 'teal.500' : 'gray.200'
+                      }
+                      borderRadius='md'
+                      display='flex'
+                      justifyContent='center'
+                      alignItems='center'
+                      flexDirection='column'
+                      _hover={{
+                        borderColor: 'teal.300',
+                        transform: 'scale(1.05)',
+                      }}
+                      transition='all 0.2s'
+                      cursor='pointer'
                       onClick={() => handleCardSelection(card)}
                     >
                       <Image
                         src={CardNumberToImage[card]}
                         alt={CardNumberToString[card]}
-                        boxSize="80px"
+                        boxSize='80px'
                         mb={2}
                       />
-                      <Text fontWeight="bold">{CardNumberToString[card]}</Text>
+                      <Text fontWeight='bold'>{CardNumberToString[card]}</Text>
                     </Box>
                   ))}
                 </SimpleGrid>
               </CardBody>
             </Card>
 
-            <Button colorScheme="yellow" onClick={selectCardDrawer.onOpen} width="100%">
+            <Button
+              colorScheme='yellow'
+              onClick={selectCardDrawer.onOpen}
+              width='100%'
+            >
               Play!
             </Button>
 
+            <Drawer
+              isOpen={selectCardDrawer.isOpen}
+              placement='right'
+              onClose={selectCardDrawer.onClose}
+              size='md'
+            >
+              <DrawerOverlay />
+              <DrawerContent bg='#F4A261'>
+                <DrawerCloseButton />
+                <DrawerHeader bg='#E76F51'>Select a Card</DrawerHeader>
+                <DrawerBody>
+                  <Text mb={4}>Choose one of your cards to send:</Text>
+                  <SimpleGrid columns={2} spacing={4}>
+                    {player?.hand?.map((card) => (
+                      <Box
+                        key={card}
+                        bg='white'
+                        height='140px'
+                        border='2px solid'
+                        borderColor={
+                          selectedCard === card ? 'teal.500' : 'gray.200'
+                        }
+                        borderRadius='md'
+                        display='flex'
+                        justifyContent='center'
+                        alignItems='center'
+                        cursor='pointer'
+                        onClick={() => handleCardSelection(card)}
+                        _hover={{
+                          borderColor: 'teal.300',
+                          transform: 'scale(1.05)',
+                        }}
+                        transition='all 0.2s'
+                        flexDirection='column'
+                      >
+                        <Image
+                          src={CardNumberToImage[card]}
+                          alt={CardNumberToString[card]}
+                          boxSize='80px'
+                          mb={2}
+                        />
+                        <Text fontWeight='bold'>
+                          {CardNumberToString[card]}
+                        </Text>
+                      </Box>
+                    ))}
+                  </SimpleGrid>
+                </DrawerBody>
+                <DrawerFooter>
+                  <Button variant='outline' onClick={selectCardDrawer.onClose}>
+                    Cancel
+                  </Button>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
 
-<Drawer isOpen={selectCardDrawer.isOpen} placement="right" onClose={selectCardDrawer.onClose} size="md">
-  <DrawerOverlay />
-  <DrawerContent bg="#F4A261">
-    <DrawerCloseButton />
-    <DrawerHeader bg="#E76F51">Select a Card</DrawerHeader>
-    <DrawerBody>
-      <Text mb={4}>Choose one of your cards to send:</Text>
-      <SimpleGrid columns={2} spacing={4}>
-        {player?.hand?.map((card) => (
-          <Box
-            key={card}
-            bg="white"
-            height="140px"
-            border="2px solid"
-            borderColor={selectedCard === card ? "teal.500" : "gray.200"}
-            borderRadius="md"
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            cursor="pointer"
-            onClick={() => handleCardSelection(card)}
-            _hover={{ borderColor: "teal.300", transform: "scale(1.05)" }}
-            transition="all 0.2s"
-            flexDirection="column"
-          >
-            <Image
-              src={CardNumberToImage[card]}
-              alt={CardNumberToString[card]}
-              boxSize="80px"
-              mb={2}
-            />
-            <Text fontWeight="bold">{CardNumberToString[card]}</Text>
-          </Box>
-        ))}
-      </SimpleGrid>
-    </DrawerBody>
-    <DrawerFooter>
-      <Button variant="outline" onClick={selectCardDrawer.onClose}>Cancel</Button>
-    </DrawerFooter>
-  </DrawerContent>
-</Drawer>
+            <Drawer
+              isOpen={selectPlayerDrawer.isOpen}
+              placement='right'
+              onClose={selectPlayerDrawer.onClose}
+              size='md'
+            >
+              <DrawerOverlay />
+              <DrawerContent bg='#F4A261'>
+                <DrawerCloseButton />
+                <DrawerHeader bg='#E76F51'>Choose a Player</DrawerHeader>
+                <DrawerBody>
+                  <Text mb={4}>
+                    Select a player to send card {selectedCard} to:
+                  </Text>
+                  <VStack spacing={4} align='stretch'>
+                    {players
+                      .filter((p) => p.uuid !== player?.uuid)
+                      .map((otherPlayer) => (
+                        <Box
+                          key={otherPlayer.uuid}
+                          bg='white'
+                          p={4}
+                          border='2px solid'
+                          borderColor={
+                            selectedPlayer?.uuid === otherPlayer.uuid
+                              ? 'teal.500'
+                              : 'gray.200'
+                          }
+                          borderRadius='md'
+                          display='flex'
+                          alignItems='center'
+                          cursor='pointer'
+                          onClick={() => handlePlayerSelection(otherPlayer)}
+                          _hover={{
+                            borderColor: 'teal.300',
+                            transform: 'translateX(5px)',
+                          }}
+                          transition='all 0.2s'
+                        >
+                          <Avatar
+                            size='md'
+                            src={player.avatar}
+                            name={player.nickname}
+                          />
+                          <Text fontWeight='bold'>{otherPlayer.nickname}</Text>
+                        </Box>
+                      ))}
+                  </VStack>
+                </DrawerBody>
+                <DrawerFooter>
+                  <Button
+                    variant='outline'
+                    mr={3}
+                    onClick={() => {
+                      selectPlayerDrawer.onClose();
+                      selectCardDrawer.onOpen();
+                    }}
+                  >
+                    Back
+                  </Button>
+                  <Button
+                    variant='outline'
+                    onClick={selectPlayerDrawer.onClose}
+                  >
+                    Cancel
+                  </Button>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
 
-<Drawer isOpen={selectPlayerDrawer.isOpen} placement="right" onClose={selectPlayerDrawer.onClose} size="md">
-  <DrawerOverlay />
-  <DrawerContent bg="#F4A261">
-    <DrawerCloseButton />
-    <DrawerHeader bg="#E76F51">Choose a Player</DrawerHeader>
-    <DrawerBody>
-      <Text mb={4}>Select a player to send card {selectedCard} to:</Text>
-      <VStack spacing={4} align="stretch">
-        {players.filter(p => p.uuid !== player?.uuid).map((otherPlayer) => (
-          <Box
-            key={otherPlayer.uuid}
-            bg="white"
-            p={4}
-            border="2px solid"
-            borderColor={selectedPlayer?.uuid === otherPlayer.uuid ? "teal.500" : "gray.200"}
-            borderRadius="md"
-            display="flex"
-            alignItems="center"
-            cursor="pointer"
-            onClick={() => handlePlayerSelection(otherPlayer)}
-            _hover={{ borderColor: "teal.300", transform: "translateX(5px)" }}
-            transition="all 0.2s"
-          >
-<Avatar size="md" src={player.avatar} name={player.nickname} />
-            <Text fontWeight="bold">{otherPlayer.nickname}</Text>
-          </Box>
-        ))}
-      </VStack>
-    </DrawerBody>
-    <DrawerFooter>
-      <Button variant="outline" mr={3} onClick={() => {
-        selectPlayerDrawer.onClose();
-        selectCardDrawer.onOpen();
-      }}>Back</Button>
-      <Button variant="outline" onClick={selectPlayerDrawer.onClose}>Cancel</Button>
-    </DrawerFooter>
-  </DrawerContent>
-</Drawer>
-
-<Drawer isOpen={makeStatementDrawer.isOpen} placement="right" onClose={makeStatementDrawer.onClose} size="md">
-  <DrawerOverlay />
-  <DrawerContent bg="#F4A261">
-    <DrawerCloseButton />
-    <DrawerHeader bg="#E76F51">Make a Statement</DrawerHeader>
-    <DrawerBody>
-      <VStack spacing={4} align="stretch">
-        <Text>
-          You're sending card {selectedCard} to {selectedPlayer?.nickname}
-        </Text>
-        <Text fontWeight="bold">What statement will you make about this card?</Text>
-        <Text fontSize="sm" color="gray.600">
-          Your statement can be truthful or a bluff. Other players will decide whether to believe you or challenge your claim.
-        </Text>
-        <Box bg="#FFF9C4" p={4} borderRadius="md">
-          <Text mb={2} fontWeight="bold">This card is a:</Text>
-          <Textarea
-            value={statement}
-            onChange={(e) => setStatement(e.target.value)}
-            placeholder="Enter your statement or claim about this card..."
-            bg="white"
-            rows={4}
-          />
-        </Box>
-      </VStack>
-    </DrawerBody>
-    <DrawerFooter>
-      <Button variant="outline" mr={3} onClick={() => {
-        makeStatementDrawer.onClose();
-        selectPlayerDrawer.onOpen();
-      }}>Back</Button>
-      <Button colorScheme="teal" onClick={handleStatementSubmit}>Send Card</Button>
-    </DrawerFooter>
-  </DrawerContent>
-</Drawer>
-
+            <Drawer
+              isOpen={makeStatementDrawer.isOpen}
+              placement='right'
+              onClose={makeStatementDrawer.onClose}
+              size='md'
+            >
+              <DrawerOverlay />
+              <DrawerContent bg='#F4A261'>
+                <DrawerCloseButton />
+                <DrawerHeader bg='#E76F51'>Make a Statement</DrawerHeader>
+                <DrawerBody>
+                  <VStack spacing={4} align='stretch'>
+                    <Text>
+                      You're sending card {selectedCard} to{' '}
+                      {selectedPlayer?.nickname}
+                    </Text>
+                    <Text fontWeight='bold'>
+                      What statement will you make about this card?
+                    </Text>
+                    <Text fontSize='sm' color='gray.600'>
+                      Your statement can be truthful or a bluff. Other players
+                      will decide whether to believe you or challenge your
+                      claim.
+                    </Text>
+                    <Box bg='#FFF9C4' p={4} borderRadius='md'>
+                      <Text mb={2} fontWeight='bold'>
+                        This card is a:
+                      </Text>
+                      <Textarea
+                        value={statement}
+                        onChange={(e) => setStatement(e.target.value)}
+                        placeholder='Enter your statement or claim about this card...'
+                        bg='white'
+                        rows={4}
+                      />
+                    </Box>
+                  </VStack>
+                </DrawerBody>
+                <DrawerFooter>
+                  <Button
+                    variant='outline'
+                    mr={3}
+                    onClick={() => {
+                      makeStatementDrawer.onClose();
+                      selectPlayerDrawer.onOpen();
+                    }}
+                  >
+                    Back
+                  </Button>
+                  <Button colorScheme='teal' onClick={handleStatementSubmit}>
+                    Send Card
+                  </Button>
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
           </Stack>
         ) : (
           <Text>
-            GameRoom {state.roomCode} or Player UUID {state.uuid} does not exist.
+            GameRoom {state.roomCode} or Player UUID {state.uuid} does not
+            exist.
           </Text>
         )}
       </Box>

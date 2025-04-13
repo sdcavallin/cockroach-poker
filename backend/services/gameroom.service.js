@@ -178,4 +178,22 @@ export class GameRoomService {
     }
     return null;
   }
+  // Set a player's socketId to a value, based on UUID, should be run every time a player connects, returns player for verification
+  setPlayerSocketId(roomCode, uuid, socketId) {
+    const gameRoom = this.gameRoomMap.get(roomCode);
+    if (!gameRoom) {
+      throw new Error(`setPlayerSocketId(): GameRoom ${roomCode} not found.`);
+    }
+
+    // Find the player within the room
+    const player = gameRoom.players.find((p) => p.uuid === uuid);
+    if (!player) {
+      throw new Error(
+        `setPlayerSocketId(): Player with UUID ${uuid} not found in room ${roomCode}.`
+      );
+    }
+
+    player.socketId = socketId;
+    return player;
+  }
 }

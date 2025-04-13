@@ -260,7 +260,7 @@ io.on('connection', (socket) => {
   });
 
   // getPlayer: returns a player by roomCode and uuid
-  socket.on('getPlayer', (roomCode, uuid, sID) => {
+  socket.on('getPlayer', (roomCode, uuid) => {
     try {
       // Use gameRoomService to get the game room
       const gameRoom = gameRoomService.getGameRoom(roomCode);
@@ -276,7 +276,6 @@ io.on('connection', (socket) => {
 
       if (player) {
         console.log(`Player found: ${player.nickname}`);
-        player.socketId = sID;
         socket.emit('returnPlayer', player);
       } else {
         console.warn(`No player found with UUID: ${uuid} in room: ${roomCode}`);
@@ -288,6 +287,24 @@ io.on('connection', (socket) => {
     }
   });
 
+  // setSocketId: sets a player by roomCode and uuid's socket to socketId
+  socket.on('setSocketId', (roomCode, uuid, socketId) => {
+    // Use gameRoomService to check if the gameRoom is real
+    console.log(`Socket ID: ${socketId}`);
+    const gameRoom = gameRoomService.getGameRoom(roomCode);
+    if (!gameRoom) {
+      console.warn(`No game room found for room code: ${roomCode}`);
+      return;
+    }
+
+    //calls setPlayerSocketId in gameRoomService
+    const player = gameRoomService.setPlayerSocketId(roomCode, uuid, socketId);
+    if (!player) {
+      console.warn(
+        `setPlayerSocketId(): Player with UUID ${uuid} not found in room ${roomCode}.`
+      );
+    }
+  });
   // initPlayerSendCard
   // Define the gameactionmodel: conspiracy, card, and claim. card never updates but claim does
   // IMPORTANT **** ONLY RUN ONCE PER CARD AND CONSPIRACY
@@ -446,7 +463,6 @@ io.on('connection', (socket) => {
       gameRoom.currentAction.turnPlayer
     );
 
-    
     const countMap = {};
     for (let numCard of gameRoom.players[index].pile) {
       countMap[numCard] = (countMap[numCard] || 0) + 1;
