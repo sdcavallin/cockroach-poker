@@ -24,7 +24,8 @@ import {
   Image,
   Avatar,
   VStack,
-  Textarea,
+  Textarea
+  // Modal
 } from '@chakra-ui/react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { io } from 'socket.io-client';
@@ -60,7 +61,7 @@ const PlayerPlay = () => {
   const makeStatementDrawer = useDisclosure();
   const mainActionDrawer = useDisclosure();
   const [receivedCardData, setReceivedCardData] = useState(null);
-  const [cardModalOpen, setCardModalOpen] = useState(false);
+  // const [cardModalOpen, setCardModalOpen] = useState(false);
 
   
   const handleCardSelection = (card) => {
@@ -207,7 +208,7 @@ const PlayerPlay = () => {
       alignItems="center"
       p="5%"
     >
-      <Modal isOpen={cardModalOpen} onClose={() => setCardModalOpen(false)} isCentered>
+      {/* <Modal isOpen={cardModalOpen} onClose={() => setCardModalOpen(false)} isCentered>
   <ModalOverlay />
   <ModalContent bg="#fff7d6" p={6} borderRadius="md">
     <ModalHeader textAlign="center">You Received a Card!</ModalHeader>
@@ -236,7 +237,7 @@ const PlayerPlay = () => {
       </Button>
     </ModalBody>
   </ModalContent>
-</Modal>
+</Modal> */}
 
       <Box
         width={{ base: '90%', md: '70%', lg: '50%', xl: '40%' }}
