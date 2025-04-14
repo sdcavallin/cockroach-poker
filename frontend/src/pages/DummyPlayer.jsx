@@ -16,6 +16,7 @@ const DummyPlayerPage = () => {
   const [message, setMessage] = useState('Connecting socket...');
   const [hand, setHand] = useState('?');
   const [UUID, setUUID] = useState('0');
+  const [player, setPlayer] = useState(null); // added this becasue it was throwing an error when i tried to use it -adithi
 
   useEffect(() => {
     //Redirects if data is missing.

@@ -7,7 +7,11 @@ import { io } from 'socket.io-client';
 // Initialize socket connection
 const socket = io('http://localhost:5000', { autoConnect: false });
 
+import { useLocation } from 'react-router-dom';
+
 const StartBoard = () => {
+  const location = useLocation();
+  const { roomCode } = location.state || {};
   const [message, setMessage] = useState('Connecting socket...');
   const [playerCount, setPlayerCount] = useState(0); // Store the number of players
   const [isGameStarted, setIsGameStarted] = useState(false); // Track if the game has started
@@ -48,10 +52,10 @@ const StartBoard = () => {
 
   // Start Game button functionality
   const handleStartGame = () => {
-    setIsGameStarted(true); // Set the game as started
-    navigate('/gameboard'); // Programmatically navigate to the game board page
+    setIsGameStarted(true);
+    navigate('/gameboard', { state: { roomCode } }); 
   };
-
+  
   return (
     <Container
       maxW='100vw'
@@ -66,23 +70,23 @@ const StartBoard = () => {
     >
       {/* Top Row of Cards */}
       <Grid
-        templateColumns='repeat(4, 1fr)'
-        gap='4'
-        mt='4'
-        justifyItems='center'
-        width='80%'
-      >
-        {[...Array(4)].map((_, index) => (
-          <FlippingCard
-            key={index}
-            frontColor={index === 3 ? '#a3b18a' : '#F4A261'}
-            backColor={index % 2 === 0 ? '#E9C46A' : '#F4A261'}
-            isFlipped={index < playerCount}
-            width='10vw'
-            height='15vw'
-          />
-        ))}
-      </Grid>
+  templateColumns="repeat(3, 1fr)" 
+  gap="4"
+  mt="4"
+  justifyItems="center"
+  width="80%"
+>
+  {[...Array(3)].map((_, index) => (
+    <FlippingCard
+      key={index}
+      isFlipped={index < playerCount}
+      width="10vw"
+      height="15vw"
+      backImage="/cards/back.png"
+    />
+  ))}
+</Grid>
+
 
       {/* Center Section */}
       <Box
@@ -116,33 +120,34 @@ const StartBoard = () => {
         </Button>
 
         <Text
-          fontSize={{ base: '5vw', md: '2vw' }}
-          color='#264653'
-          fontWeight='bold'
-        >
-          Room Code: 123B
-        </Text>
+  fontSize={{ base: '5vw', md: '2vw' }}
+  color='#264653'
+  fontWeight='bold'
+>
+  Room Code: {roomCode || 'N/A'}
+</Text>
+
       </Box>
 
       {/* Bottom Row of Cards */}
       <Grid
-        templateColumns='repeat(4, 1fr)'
-        gap='4'
-        mb='4'
-        justifyItems='center'
-        width='80%'
-      >
-        {[...Array(4)].map((_, index) => (
-          <FlippingCard
-            key={index + 4}
-            frontColor={index === 3 ? '#a3b18a' : '#F4A261'}
-            backColor={index % 2 === 0 ? '#E9C46A' : '#F4A261'}
-            isFlipped={index + 4 < playerCount}
-            width='10vw'
-            height='15vw'
-          />
-        ))}
-      </Grid>
+  templateColumns="repeat(3, 1fr)" 
+  gap="4"
+  mb="4"
+  justifyItems="center"
+  width="80%"
+>
+  {[...Array(3)].map((_, index) => (
+    <FlippingCard
+      key={index + 3} 
+      isFlipped={index + 3 < playerCount}
+      width="10vw"
+      height="15vw"
+      backImage="/cards/back.png"
+    />
+  ))}
+</Grid>
+
     </Container>
   );
 };

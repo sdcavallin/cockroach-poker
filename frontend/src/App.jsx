@@ -15,6 +15,8 @@ import DummySetupPage from './pages/DummySetup.jsx';
 import DummyJoinSetupPage from './pages/DummyJoinSetup.jsx';
 import RejoinPage from './pages/RejoinPage.jsx';
 import PlayerPlay from './pages/PlayerPlay.jsx';
+import StartBoard from './pages/Host_HomePage.jsx'; 
+
 function App() {
   return (
     <Box>
@@ -35,6 +37,7 @@ function App() {
         <Route path='/dummyjoinsetup' element={<DummyJoinSetupPage />} />
         <Route path='/rejoin' element={<RejoinPage />} />
         <Route path='/playerplay' element={<PlayerPlay/>} />
+        <Route path='/startboard' element={<StartBoard/>} />
       </Routes>
     </Box>
   );

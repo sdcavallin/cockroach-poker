@@ -312,7 +312,8 @@ const PlayerPlay = () => {
                       <Image
                         src={CardNumberToImage[card]}
                         alt={CardNumberToString[card]}
-                        boxSize='80px'
+                        height='80px'
+                        objectFit="contain"
                         mb={2}
                       />
                       <Text fontWeight='bold'>{CardNumberToString[card]}</Text>

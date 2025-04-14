@@ -1,60 +1,48 @@
 import { useState } from 'react';
-import { Box } from '@chakra-ui/react';
+import { Box, Image, Text } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 
 const MotionBox = motion(Box);
 
 const FlippingCard = ({
-  frontColor,
-  backColor,
-  width = '20%', // Percentage-based width
-  height = '30%', // Percentage-based height
+  frontColor = '#F4A261',
+  backImage = '/cards/back.png',
+  isFlipped = false,
+  width = '100px',
+  height = '150px',
 }) => {
-  const [isFlipped, setIsFlipped] = useState(false);
-
   return (
-    <MotionBox
-      width={width} // Use percentage-based width
-      height={height} // Use percentage-based height
-      borderRadius='md'
-      position='relative'
-      cursor='pointer'
-      onClick={() => setIsFlipped(!isFlipped)}
-      animate={{ rotateY: isFlipped ? 180 : 0 }}
-      transition={{ duration: 0.6 }}
-      transformStyle='preserve-3d'
+    <Box
+      width={width}
+      height={height}
+      borderRadius="md"
+      boxShadow="md"
+      overflow="hidden"
+      bg={frontColor}
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      transform={isFlipped ? 'rotateY(180deg)' : 'none'}
+      transition="transform 0.4s"
     >
-      {/* Card Front */}
-      <Box
-        position='absolute'
-        width='100%' // Take full width
-        height='100%' // Take full height
-        bg={frontColor}
-        borderRadius='md'
-        display='flex'
-        justifyContent='center'
-        alignItems='center'
-        backfaceVisibility='hidden'
-      >
-        Front
-      </Box>
+      {/* BACK */}
+      {!isFlipped && (
+        <Image
+          src={backImage}
+          alt="Card Back"
+          objectFit="cover"
+          width="100%"
+          height="100%"
+        />
+      )}
 
-      {/* Card Back */}
-      <Box
-        position='absolute'
-        width='100%' // Take full width
-        height='100%' // Take full height
-        bg={backColor}
-        borderRadius='md'
-        display='flex'
-        justifyContent='center'
-        alignItems='center'
-        transform='rotateY(180deg)'
-        backfaceVisibility='hidden'
-      >
-        Back
-      </Box>
-    </MotionBox>
+      {/* FRONT (placeholder) */}
+      {isFlipped && (
+        <Text color="white" fontWeight="bold">
+          Flipped! 
+        </Text>
+      )}
+    </Box>
   );
 };
 

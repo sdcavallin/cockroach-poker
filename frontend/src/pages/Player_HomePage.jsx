@@ -1,105 +1,215 @@
-import { Box, Button, Text, Image, VStack, HStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Text,
+  Image,
+  VStack,
+  HStack,
+  Heading,
+  Stack,
+  StackDivider,
+  Card,
+  CardBody,
+  Container,
+} from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
 import { Link } from 'react-router-dom';
 
+const socket = io('http://localhost:5000', { autoConnect: false });
+
 const LandingPage = () => {
+  const [gameRoom, setGameRoom] = useState(null);
+  const [message, setMessage] = useState('Connecting socket...');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    const handleConnect = () => {
+      setMessage(`Connected with id ${socket.id}`);
+    };
+
+    const handleReturnEmptyGameRoom = (room) => {
+      socket.emit('joinSocketRoom', room.roomCode);
+      navigate('/startboard', { state: { roomCode: room.roomCode } });
+    };
+    
+
+    const handleReturnGameRoom = (room) => {
+      setGameRoom(room);
+    };
+
+    const handleReturnStartGame = (roomCode) => {
+      navigate('/host', { state: { roomCode } });
+    };
+
+    socket.on('connect', handleConnect);
+    socket.on('returnEmptyGameRoom', handleReturnEmptyGameRoom);
+    socket.on('returnGameRoom', handleReturnGameRoom);
+    socket.on('returnStartGame', handleReturnStartGame);
+
+    return () => {
+      socket.off('connect', handleConnect);
+      socket.off('returnEmptyGameRoom', handleReturnEmptyGameRoom);
+      socket.off('returnGameRoom', handleReturnGameRoom);
+      socket.off('returnStartGame', handleReturnStartGame);
+    };
+  }, []);
+
+  const handleCreate = () => {
+    socket.emit('requestCreateEmptyGameRoom');
+  };
+
+  const handleStartGame = () => {
+    if (gameRoom) {
+      socket.emit('requestStartGame', gameRoom.roomCode);
+    }
+  };
+
+  // === Waiting Room ===
+  if (gameRoom) {
+    return (
+      <Container>
+        <Text>Socket state: {message}</Text>
+        <Heading size="lg">Game Setup</Heading>
+        <Stack spacing={3}>
+          <Card>
+            <CardBody>
+              <Stack divider={<StackDivider />} spacing={3}>
+                <Heading size="lg">
+                  Join with Code: {gameRoom.roomCode}
+                </Heading>
+                {gameRoom.players.map((player, index) => (
+                  <Box key={index}>
+                    <Heading size="md">Player: {player.nickname}</Heading>
+                    <Text size="sm">UUID: {player.uuid}</Text>
+                    <Text size="sm">Avatar: {player.playerIcon}</Text>
+                    <Text size="sm">Socket: {player.socketId}</Text>
+                  </Box>
+                ))}
+              </Stack>
+            </CardBody>
+          </Card>
+          <Button
+            isDisabled={gameRoom.numPlayers < 2}
+            onClick={handleStartGame}
+          >
+            Start Game ({gameRoom.numPlayers} players)
+          </Button>
+        </Stack>
+      </Container>
+    );
+  }
+
+  // === Default Landing Page ===
   return (
     <Box
-      width='100vw'
-      height='100vh'
-      bg='#2A9D8F' // Background color
-      display='flex'
-      justifyContent='center'
-      alignItems='center'
-      flexDirection='column'
-      overflow='hidden'
-      p={{ base: '5%', sm: '4%', md: '3%', lg: '2%', xl: '1%' }} // Adjust padding
+      width="100vw"
+      height="100vh"
+      bg="#2A9D8F"
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      flexDirection="column"
+      overflow="hidden"
+      p={{ base: '5%', sm: '4%', md: '3%', lg: '2%', xl: '1%' }}
     >
       <HStack
-        spacing={{ base: '5%', sm: '4%', md: '3%', lg: '2%', xl: '1%' }} // Responsive spacing
-        width={{ base: '90%', sm: '85%', md: '80%', lg: '75%', xl: '70%' }} // Responsive width
-        height={{ base: '85%', sm: '80%', md: '75%', lg: '70%', xl: '65%' }} // Responsive height
-        justifyContent='center'
-        alignItems='center'
-        flexDirection={{ base: 'column', md: 'row' }} // Switch to row for larger screens
-      >
-        {/* Title & Buttons */}
-        <VStack
-          spacing={{ base: '5%', sm: '4%', md: '3%', lg: '2%' }} // Responsive spacing
-          alignItems='center'
-          width={{ base: '80%', sm: '70%', md: '60%', lg: '50%', xl: '45%' }} // Responsive width
+        spacing={{ base: '5%', sm: '4%', md: '3%', lg: '2%', xl: '1%' }}
+        width={{ base: '90%', sm: '85%', md: '80%', lg: '75%', xl: '70%' }}
+        height={{ base: '85%', sm: '80%', md: '75%', lg: '70%', xl: '65%' }}
+        justifyContent="center"
+        alignItems="center"
+        flexDirection={{ base: 'column', md: 'row' }}
+      ><Box
+      bg="#F4A261"
+      p={{ base: 4, sm: 6, md: 8 }}
+      borderRadius="md"
+      boxShadow="lg"
+      border="4px solid"
+      borderColor="#33A00A"
+      width={{
+        base: '90%',
+        sm: '80%',
+        md: '70%',
+        lg: '50%',
+        xl: '40%',
+      }}
+    >
+      <VStack spacing={6} alignItems="center">
+        <Text
+          fontSize={{
+            base: '8vw',
+            sm: '6vw',
+            md: '4vw',
+            lg: '3vw',
+            xl: '2.5vw',
+          }}
+          fontWeight="bold"
+          textAlign="center"
+          color="#264653"
         >
-          <Text
+          COCKROACH <br /> POKER
+        </Text>
+    
+        <Box width="100%">
+          <Button
+            onClick={handleCreate}
+            bg="#E9C46A"
+            color="#264653"
+            _hover={{ bg: '#F4A261' }}
+            width="100%"
             fontSize={{
-              base: '8vw',
-              sm: '6vw',
-              md: '4vw',
-              lg: '3vw',
-              xl: '2.5vw',
-            }} // Responsive font size
-            fontWeight='bold'
-            textAlign='center'
-            bg='#F4A261'
-            p={{ base: '4%', sm: '3%', md: '2%', lg: '2%' }} // Responsive padding
-            borderRadius='md'
-            color='#264653'
-            width='100%'
+              base: '5vw',
+              sm: '4vw',
+              md: '3vw',
+              lg: '2.5vw',
+              xl: '2vw',
+            }}
           >
-            COCKROACH <br /> POKER
-          </Text>
-          <VStack
-            spacing={{ base: '5%', sm: '6%', md: '7%', lg: '8%', xl: '9%' }} // Adjusts spacing based on screen size
-            alignItems='center'
-            width={{ base: '80%', sm: '70%', md: '60%', lg: '50%', xl: '45%' }}
+            CREATE
+          </Button>
+        </Box>
+    
+        <Box width="100%" mt={{ base: 4, sm: 6, md: 8, lg: 10, xl: 12 }}>
+          <Button
+            as={Link}
+            to="/playerinit"
+            bg="#E9C46A"
+            color="#264653"
+            _hover={{ bg: '#F4A261' }}
+            width="100%"
+            fontSize={{
+              base: '5vw',
+              sm: '4vw',
+              md: '3vw',
+              lg: '2.5vw',
+              xl: '2vw',
+            }}
           >
-            <Button
-              as={Link}
-              to='/host'
-              width={{
-                base: '90%',
-                sm: '85%',
-                md: '80%',
-                lg: '75%',
-                xl: '70%',
-              }}
-              fontSize={{
-                base: '5vw',
-                sm: '4vw',
-                md: '3vw',
-                lg: '2.5vw',
-                xl: '2vw',
-              }}
-            >
-              CREATE
-            </Button>
-            <Button
-              as={Link}
-              to='/playerinit'
-              width={{
-                base: '90%',
-                sm: '85%',
-                md: '80%',
-                lg: '75%',
-                xl: '70%',
-              }}
-              fontSize={{
-                base: '5vw',
-                sm: '4vw',
-                md: '3vw',
-                lg: '2.5vw',
-                xl: '2vw',
-              }}
-            >
-              JOIN
-            </Button>
-          </VStack>
-        </VStack>
+            JOIN
+          </Button>
+        </Box>
+      </VStack>
+    </Box>
+    
 
-        {/* Cards Image */}
+
         <Image
-          src='/images/cards.png'
-          alt='Cards'
-          width={{ base: '50%', sm: '40%', md: '30%', lg: '25%', xl: '20%' }} // Responsive image width
-          transform={{ base: 'rotate(15deg)', md: 'rotate(20deg)' }} // Adjust rotation for larger screens
+          src="/cards/back.png"
+          alt="Back"
+          width={{
+            base: '30%',
+            sm: '25%',
+            md: '25%',
+            lg: '25%',
+            xl: '20%',
+          }}
+          transform={{ base: 'rotate(15deg)', md: 'rotate(20deg)' }}
         />
       </HStack>
     </Box>
