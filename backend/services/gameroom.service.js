@@ -196,4 +196,126 @@ export class GameRoomService {
     player.socketId = socketId;
     return player;
   }
+
+  // starts a new conspiracy and returns the gameRoom for that conspiracy
+  startConspiracy(roomCode, uuid) {
+    const gameRoom = this.gameRoomMap.get(roomCode);
+    if (!gameRoom) {
+      throw new Error(`getConspiracyCard(): GameRoom ${roomCode} not found.`);
+    }
+
+    if (gameRoom.currentAction.turnPlayer != senderId) {
+      //If the player tries to send without it being its turn then it fails,
+      console.log(`getConspiracyCard(): not current player ${uuid} Id`);
+      return;
+    }
+
+    gameRoom.currentAction.conspiracy = [gameRoom.currentAction.turnPlayer];
+    gameRoom.currentAction.card = card;
+    gameRoom.currentAction.claim = claim;
+
+    //Steps: Turn Current Player into the prevPlayer, targeted Player becomes currentPlayer, add currentPlayer to consipiracy.
+    gameRoom.currentAction.prevPlayer = gameRoom.currentAction.turnPlayer;
+    gameRoom.currentAction.turnPlayer = receiverId;
+
+    return gameRoom;
+  }
+
+  // Getter for the current conspiracy card
+  getConspiracyCard(roomCode) {
+    const gameRoom = this.gameRoomMap.get(roomCode);
+    if (!gameRoom) {
+      throw new Error(`getConspiracyCard(): GameRoom ${roomCode} not found.`);
+    }
+
+    return gameRoom.currentAction.card;
+  }
+
+  // add a player to the room's conspiracy
+  addConspiracy(roomCode, uuid) {
+    const gameRoom = this.gameRoomMap.get(roomCode);
+    if (!gameRoom) {
+      throw new Error(`addConspiracy(): GameRoom ${roomCode} not found.`);
+    }
+    gameRoom.currentAction.conspiracy.push(uuid);
+    return;
+  }
+
+  // updates claim and sends card while returning the gameRoom
+  sendCard(roomCode, receiverId, claim) {
+    const gameRoom = this.gameRoomMap.get(roomCode);
+    if (!gameRoom) {
+      throw new Error(`sendCard(): GameRoom ${roomCode} not found.`);
+    }
+    gameRoom.currentAction.claim = claim;
+
+    //Steps: Turn Current Player into the prevPlayer, targeted Player becomes currentPlayer, add currentPlayer to consipiracy.
+    gameRoom.currentAction.prevPlayer = gameRoom.currentAction.turnPlayer;
+    gameRoom.currentAction.turnPlayer = receiverId;
+
+    return gameRoom;
+  }
+
+  // resolveTurnEnd: gets a claim from the user and see's if it matches up with the previous person who made a claim
+  // If receiver correctly guesses if previous person lied, previous person gets the card in its pile, otherwise receiver gets the card in its pile
+  // returns the index of the losing player
+  resolveTurnEnd(roomCode, uuid, receiverClaim) {
+    const gameRoom = this.gameRoomMap.get(roomCode);
+    if (!gameRoom) {
+      throw new Error(`resolveTurnEnd(): GameRoom ${roomCode} not found.`);
+    }
+    // conspiracyTruth tells if previous claim was true or false
+    let conspiracyTruth =
+      gameRoom.currentAction.card === gameRoom.currentAction.claim;
+
+    let playerObject;
+    if (conspiracyTruth === receiverClaim) {
+      playerObject = this.getPlayerByUUID(
+        roomCode,
+        gameRoom.currentAction.prevPlayer
+      );
+    } else {
+      playerObject = this.getPlayerByUUID(roomCode, uuid);
+    }
+
+    if (!playerObject) {
+      throw new Error(
+        `Previous Player Not Found! couldn't find uuid for either ${gameRoom.currentAction.prevPlayer} or ${uuid}`
+      );
+    }
+
+    playerObject.pile.push(gameRoom.currentAction.card);
+    // Finds the player who lost and sets the turnPlayer to them
+    const index = gameRoom.players.findIndex(
+      (p) => p.uuid === playerObject.uuid
+    );
+    if (index !== -1) {
+      gameRoom.players[index] = playerObject;
+    }
+
+    // Sets the turn to whoever lost the claim
+    gameRoom.currentAction.turnPlayer = gameRoom.players[index].uuid;
+    gameRoom.currentAction.conspiracy = [];
+
+    return index;
+  }
+
+  checkForGameEnd(roomCode, index) {
+    const gameRoom = this.gameRoomMap.get(roomCode);
+    if (!gameRoom) {
+      throw new Error(`checkForGameEnd(): GameRoom ${roomCode} not found.`);
+    }
+
+    const countMap = {};
+    for (let numCard of gameRoom.players[index].pile) {
+      countMap[numCard] = (countMap[numCard] || 0) + 1;
+      if (countMap[numCard] === 4) {
+        // Four of the name number in the pile
+        console.log(
+          `Player ${gameRoom.players[index].nickname} has four of ${CardNumberToString[numCard]}. They lose!`
+        );
+        // TODO: THAT PLAYER HAS LOST!!
+      }
+    }
+  }
 }
