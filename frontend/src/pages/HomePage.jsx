@@ -20,8 +20,7 @@ import { Link } from 'react-router-dom';
 
 const socket = io('http://localhost:5000', { autoConnect: false });
 
-const LandingPage = () => {
-  const [gameRoom, setGameRoom] = useState(null);
+const HomePage = () => {
   const [message, setMessage] = useState('Connecting socket...');
   const navigate = useNavigate();
 
@@ -38,21 +37,15 @@ const LandingPage = () => {
 
     const handleReturnEmptyGameRoom = (gameRoom) => {
       console.log(gameRoom.roomCode);
-      navigate('/startboard', { state: { roomCode: gameRoom.roomCode } });
-    };
-
-    const handleReturnGameRoom = (room) => {
-      setGameRoom(room);
+      navigate('/host', { state: { roomCode: gameRoom.roomCode } });
     };
 
     socket.on('connect', handleConnect);
     socket.on('returnEmptyGameRoom', handleReturnEmptyGameRoom);
-    socket.on('returnGameRoom', handleReturnGameRoom);
 
     return () => {
       socket.off('connect', handleConnect);
       socket.off('returnEmptyGameRoom', handleReturnEmptyGameRoom);
-      socket.off('returnGameRoom', handleReturnGameRoom);
     };
   }, []);
 
@@ -207,4 +200,4 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage;
+export default HomePage;

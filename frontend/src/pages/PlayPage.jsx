@@ -41,8 +41,7 @@ const socket = io('http://localhost:5000', {
 
 const avatar = Cookies.get('avatar');
 
-
-const PlayerPlay = () => {
+const PlayPage = () => {
   const toast = useToast();
   const [message, setMessage] = useState('Connecting socket...');
   const [player, setPlayer] = useState(null);
@@ -128,13 +127,12 @@ const PlayerPlay = () => {
         console.error('Received player: null');
         return;
       }
-  
+
       const avatarName = Cookies.get('avatar');
       player.avatar = avatarMap[avatarName] || '/avatars/default.png';
       setPlayer(player);
     };
-    
-    
+
     const handleRecieveCard = (claim, conspiracyList) => {
       setReceivedCardData({ claim, conspiracyList });
       setCardModalOpen(true);
@@ -145,10 +143,9 @@ const PlayerPlay = () => {
         console.error('Received game room: null');
         return;
       }
-    
+
       setPlayers(gameRoom.players || []);
     };
-    
 
     socket.on('connect', handleConnect);
     socket.on('returnPlayer', handleReturnPlayer);
@@ -199,16 +196,15 @@ const PlayerPlay = () => {
 
   const avatarMap = {
     'baby-yoda': '/avatars/baby-yoda.png',
-    'bmo': '/avatars/bmo.png',
+    bmo: '/avatars/bmo.png',
     'cookie-monster': '/avatars/cookie-monster.png',
-    'finn': '/avatars/finn.png',
+    finn: '/avatars/finn.png',
     'genie-lamp': '/avatars/genie-lamp.png',
-    'jake': '/avatars/jake.png',
-    'mermaid': '/avatars/mermaid.png',
+    jake: '/avatars/jake.png',
+    mermaid: '/avatars/mermaid.png',
     'navi-avatar': '/avatars/navi-avatar.png',
     'wonder-woman': '/avatars/wonder-woman.png',
   };
-  
 
   useEffect(() => {
     const handleTurnPlayerUpdate = (turnPlayerId) => {
@@ -287,7 +283,7 @@ const PlayerPlay = () => {
         overflowY='auto'
       >
         {!uuid ? (
-          <Navigate to='/Rejoin' replace />
+          <Navigate to='/rejoin' replace />
         ) : player ? (
           <Stack spacing={3} width='100%'>
             {player && (
@@ -300,8 +296,8 @@ const PlayerPlay = () => {
               >
                 <Button
                   onClick={() => setShowPile((prev) => !prev)}
-                  variant="outline"
-                  colorScheme="teal"
+                  variant='outline'
+                  colorScheme='teal'
                 >
                   Show {showPile ? 'Hand' : 'Pile'}
                 </Button>
@@ -322,45 +318,48 @@ const PlayerPlay = () => {
             )}
             <Card>
               <CardHeader bg='#FBC02D' borderTopRadius='md'>
-              <Heading size='md' textAlign='center'>
-                {showPile ? 'Your Pile' : 'Your Hand'}
-              </Heading>
-
+                <Heading size='md' textAlign='center'>
+                  {showPile ? 'Your Pile' : 'Your Hand'}
+                </Heading>
               </CardHeader>
               <CardBody maxHeight='300px' overflowY='auto' p={4}>
                 <SimpleGrid columns={2} spacing={4}>
-                {(showPile ? player?.pile || [] : player?.hand || []).map((card, index) => (
-                    <Box
-                      key={`${card}-${index}`}
-                      bg='white'
-                      height='140px'
-                      border='2px solid'
-                      borderColor={
-                        selectedCard === card ? 'teal.500' : 'gray.200'
-                      }
-                      borderRadius='md'
-                      display='flex'
-                      justifyContent='center'
-                      alignItems='center'
-                      flexDirection='column'
-                      _hover={{
-                        borderColor: 'teal.300',
-                        transform: 'scale(1.05)',
-                      }}
-                      transition='all 0.2s'
-                      cursor='pointer'
-                      onClick={() => handleCardSelection(card)}
-                    >
-                      <Image
-                        src={CardNumberToImage[card]}
-                        alt={CardNumberToString[card]}
-                        height='80px'
-                        objectFit="contain"
-                        mb={2}
-                      />
-                      <Text fontWeight='bold'>{CardNumberToString[card]}</Text>
-                    </Box>
-                  ))}
+                  {(showPile ? player?.pile || [] : player?.hand || []).map(
+                    (card, index) => (
+                      <Box
+                        key={`${card}-${index}`}
+                        bg='white'
+                        height='140px'
+                        border='2px solid'
+                        borderColor={
+                          selectedCard === card ? 'teal.500' : 'gray.200'
+                        }
+                        borderRadius='md'
+                        display='flex'
+                        justifyContent='center'
+                        alignItems='center'
+                        flexDirection='column'
+                        _hover={{
+                          borderColor: 'teal.300',
+                          transform: 'scale(1.05)',
+                        }}
+                        transition='all 0.2s'
+                        cursor='pointer'
+                        onClick={() => handleCardSelection(card)}
+                      >
+                        <Image
+                          src={CardNumberToImage[card]}
+                          alt={CardNumberToString[card]}
+                          height='80px'
+                          objectFit='contain'
+                          mb={2}
+                        />
+                        <Text fontWeight='bold'>
+                          {CardNumberToString[card]}
+                        </Text>
+                      </Box>
+                    )
+                  )}
                 </SimpleGrid>
               </CardBody>
             </Card>
@@ -470,7 +469,10 @@ const PlayerPlay = () => {
                         >
                           <Avatar
                             size='md'
-                            src={avatarMap[otherPlayer.playerIcon] || '/avatars/default.png'}
+                            src={
+                              avatarMap[otherPlayer.playerIcon] ||
+                              '/avatars/default.png'
+                            }
                             name={otherPlayer.nickname}
                           />
                           <Text fontWeight='bold'>{otherPlayer.nickname}</Text>
@@ -529,19 +531,22 @@ const PlayerPlay = () => {
                       </Text>
                       <SimpleGrid columns={2} spacing={3}>
                         {Object.entries(CardNumberToString)
-                          .filter(([key]) => key !== "0")
+                          .filter(([key]) => key !== '0')
                           .map(([num, label]) => (
                             <Button
                               key={num}
-                              colorScheme={statement === label ? 'teal' : 'gray'}
-                              variant={statement === label ? 'solid' : 'outline'}
+                              colorScheme={
+                                statement === label ? 'teal' : 'gray'
+                              }
+                              variant={
+                                statement === label ? 'solid' : 'outline'
+                              }
                               onClick={() => setStatement(label)}
                             >
                               {label}
                             </Button>
                           ))}
                       </SimpleGrid>
-
                     </Box>
                   </VStack>
                 </DrawerBody>
@@ -565,8 +570,7 @@ const PlayerPlay = () => {
           </Stack>
         ) : (
           <Text>
-            GameRoom {roomCode} or Player UUID {uuid} does not
-            exist.
+            GameRoom {roomCode} or Player UUID {uuid} does not exist.
           </Text>
         )}
       </Box>
@@ -574,4 +578,4 @@ const PlayerPlay = () => {
   );
 };
 
-export default PlayerPlay;
+export default PlayPage;

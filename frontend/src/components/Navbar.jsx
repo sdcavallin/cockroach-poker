@@ -20,17 +20,16 @@ function Navbar() {
   const navLinks = [
     { to: '/', label: 'Home' },
     { to: '/host', label: 'Host' },
-    { to: '/player', label: 'Player' },
-    { to: '/gameboard', label: 'Gameboard' },
+    { to: '/game', label: 'Game' },
+    { to: '/join', label: 'Join' },
+    { to: '/play', label: 'Play' },
+    { to: '/rejoin', label: 'Rejoin' },
     { to: '/dummyplayer', label: 'DummyPlayer' },
     { to: '/dummyhost', label: 'DummyHost' },
     { to: '/dummyjoin', label: 'DummyJoin' },
     { to: '/dummyplay', label: 'DummyPlay' },
-    { to: '/playerinit', label: 'PlayerInit' },
     { to: '/dummysetup', label: 'DummySetup' },
     { to: '/dummyjoinsetup', label: 'DummyJoinSetup' },
-    { to: '/rejoin', label: 'Rejoin' },
-    { to: '/playerplay', label: 'PlayerPlay'},
   ];
 
   return (

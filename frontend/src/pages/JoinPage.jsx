@@ -26,7 +26,7 @@ const avatars = [
   { name: 'wonder-woman', src: '/avatars/wonder-woman.png' },
 ];
 
-const PlayerInit = () => {
+const JoinPage = () => {
   const [isDesktop] = useMediaQuery('(min-width: 768px)');
   const [roomCode, setRoomCode] = useState('');
   const [nickname, setNickname] = useState('');
@@ -43,7 +43,7 @@ const PlayerInit = () => {
         Cookies.set('uuid', uuid, { expires: 2 });
         Cookies.set('avatar', selectedAvatar, { expires: 2 });
 
-        navigate('/playerplay', {
+        navigate('/play', {
           state: {
             uuid: uuid,
             roomCode: returnedRoomCode,
@@ -188,4 +188,4 @@ const PlayerInit = () => {
   );
 };
 
-export default PlayerInit;
+export default JoinPage;
