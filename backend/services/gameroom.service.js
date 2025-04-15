@@ -201,20 +201,20 @@ export class GameRoomService {
   startConspiracy(roomCode, senderId, receiverId, card, claim) {
     const gameRoom = this.gameRoomMap.get(roomCode);
     if (!gameRoom) {
-      throw new Error(`getConspiracyCard(): GameRoom ${roomCode} not found.`);
+      throw new Error(`startConspiracy(): GameRoom ${roomCode} not found.`);
     }
 
     if (gameRoom.currentAction.turnPlayer != senderId) {
       //If the player tries to send without it being its turn then it fails,
       console.log(`startConspiracy(): not current player ${senderId}'s turn`);
-      return;
+      return gameRoom;
     }
 
     gameRoom.currentAction.conspiracy = [gameRoom.currentAction.turnPlayer];
     gameRoom.currentAction.card = card;
     gameRoom.currentAction.claim = claim;
 
-    //Steps: Turn Current Player into the prevPlayer, targeted Player becomes currentPlayer, add currentPlayer to consipiracy.
+    //Steps: Turn Current Player into the prevPlayer, targeted Player becomes currentPlayer, add currentPlayer to conspiracy.
     gameRoom.currentAction.prevPlayer = gameRoom.currentAction.turnPlayer;
     gameRoom.currentAction.turnPlayer = receiverId;
 
@@ -241,7 +241,7 @@ export class GameRoomService {
     return;
   }
 
-  // updates claim and sends card while returning the gameRoom
+  // updates claim and sends card while returning the gameRoom, should always be run after addConspiracy
   sendCard(roomCode, receiverId, claim) {
     const gameRoom = this.gameRoomMap.get(roomCode);
     if (!gameRoom) {
@@ -249,7 +249,7 @@ export class GameRoomService {
     }
     gameRoom.currentAction.claim = claim;
 
-    //Steps: Turn Current Player into the prevPlayer, targeted Player becomes currentPlayer, add currentPlayer to consipiracy.
+    //Steps: Turn Current Player into the prevPlayer, targeted Player becomes currentPlayer, add currentPlayer to conspiracy.
     gameRoom.currentAction.prevPlayer = gameRoom.currentAction.turnPlayer;
     gameRoom.currentAction.turnPlayer = receiverId;
 
@@ -264,7 +264,7 @@ export class GameRoomService {
     if (!gameRoom) {
       throw new Error(`resolveTurnEnd(): GameRoom ${roomCode} not found.`);
     }
-    // conspiracyTruth tells if previous claim was true or false
+    // conspiracyTruth is true if the claimed card matches the actual card
     let conspiracyTruth =
       gameRoom.currentAction.card === gameRoom.currentAction.claim;
 
@@ -280,7 +280,7 @@ export class GameRoomService {
 
     if (!playerObject) {
       throw new Error(
-        `Previous Player Not Found! couldn't find uuid for either ${gameRoom.currentAction.prevPlayer} or ${uuid}`
+        `resolveTurnEnd(): player object is null`
       );
     }
 
@@ -296,6 +296,8 @@ export class GameRoomService {
     // Sets the turn to whoever lost the claim
     gameRoom.currentAction.turnPlayer = gameRoom.players[index].uuid;
     gameRoom.currentAction.conspiracy = [];
+    gameRoom.currentAction.card = null;
+    gameRoom.currentAction.claim = null;
 
     return index;
   }
