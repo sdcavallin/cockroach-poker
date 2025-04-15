@@ -470,8 +470,8 @@ const PlayerPlay = () => {
                         >
                           <Avatar
                             size='md'
-                            src={player.avatar}
-                            name={player.nickname}
+                            src={avatarMap[otherPlayer.playerIcon] || '/avatars/default.png'}
+                            name={otherPlayer.nickname}
                           />
                           <Text fontWeight='bold'>{otherPlayer.nickname}</Text>
                         </Box>
