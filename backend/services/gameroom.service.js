@@ -322,7 +322,6 @@ export class GameRoomService {
 
     if (!playerObject) {
       throw new Error(`resolveTurnEnd(): player object is null`);
-      throw new Error(`resolveTurnEnd(): player object is null`);
     }
 
     playerObject.pile.push(gameRoom.currentAction.card);
