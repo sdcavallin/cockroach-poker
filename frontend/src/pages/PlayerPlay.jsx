@@ -63,6 +63,7 @@ const PlayerPlay = () => {
   const mainActionDrawer = useDisclosure();
   const [receivedCardData, setReceivedCardData] = useState(null);
   // const [cardModalOpen, setCardModalOpen] = useState(false);
+  const [showPile, setShowPile] = useState(false);
 
   const handleCardSelection = (card) => {
     setSelectedCard(card);
@@ -286,6 +287,13 @@ const PlayerPlay = () => {
                 justifyContent='space-between'
                 mb={4}
               >
+                <Button
+                  onClick={() => setShowPile((prev) => !prev)}
+                  variant="outline"
+                  colorScheme="teal"
+                >
+                  Show {showPile ? 'Hand' : 'Pile'}
+                </Button>
                 <HStack spacing={3}>
                   <Avatar
                     size='md'
@@ -303,13 +311,14 @@ const PlayerPlay = () => {
             )}
             <Card>
               <CardHeader bg='#FBC02D' borderTopRadius='md'>
-                <Heading size='md' textAlign='center'>
-                  Your Hand
-                </Heading>
+              <Heading size='md' textAlign='center'>
+                {showPile ? 'Your Pile' : 'Your Hand'}
+              </Heading>
+
               </CardHeader>
               <CardBody maxHeight='300px' overflowY='auto' p={4}>
                 <SimpleGrid columns={2} spacing={4}>
-                  {player?.hand?.map((card, index) => (
+                {(showPile ? player?.pile : player?.hand)?.map((card, index) => (
                     <Box
                       key={`${card}-${index}`}
                       bg='white'
@@ -507,13 +516,21 @@ const PlayerPlay = () => {
                       <Text mb={2} fontWeight='bold'>
                         This card is a:
                       </Text>
-                      <Textarea
-                        value={statement}
-                        onChange={(e) => setStatement(e.target.value)}
-                        placeholder='Enter your statement or claim about this card...'
-                        bg='white'
-                        rows={4}
-                      />
+                      <SimpleGrid columns={2} spacing={3}>
+                        {Object.entries(CardNumberToString)
+                          .filter(([key]) => key !== "0")
+                          .map(([num, label]) => (
+                            <Button
+                              key={num}
+                              colorScheme={statement === label ? 'teal' : 'gray'}
+                              variant={statement === label ? 'solid' : 'outline'}
+                              onClick={() => setStatement(label)}
+                            >
+                              {label}
+                            </Button>
+                          ))}
+                      </SimpleGrid>
+
                     </Box>
                   </VStack>
                 </DrawerBody>
