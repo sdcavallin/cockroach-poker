@@ -148,7 +148,7 @@ export class GameRoomService {
 
     // Deal cards evenly (just divide all cards among players, its fin eif theres hella cards)
     const numPlayers = gameRoom.players.length;
-    const cardsPerPlayer = Math.floor(deck.length / numPlayers);
+    const cardsPerPlayer = Math.floor(numCards / numPlayers);
 
     gameRoom.players.forEach((player, index) => {
       const start = index * cardsPerPlayer;
