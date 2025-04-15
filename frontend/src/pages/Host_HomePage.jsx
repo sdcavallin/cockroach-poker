@@ -1,8 +1,16 @@
-import { useEffect, useState } from 'react';
-import { Box, Text, Grid, Button, Container } from '@chakra-ui/react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  Box,
+  Text,
+  Grid,
+  Button,
+  Container,
+  IconButton,
+} from '@chakra-ui/react';
 import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate from react-router-dom
 import FlippingCard from './FlippingCard.jsx';
 import { io } from 'socket.io-client';
+import AudioPlayer from '../components/AudioPlayer.jsx';
 
 // Initialize socket connection
 const socket = io('http://localhost:5000', { autoConnect: false });
@@ -16,6 +24,7 @@ const StartBoard = () => {
 
   const navigate = useNavigate(); // Initialize the navigate function
 
+  // Text Glow
   const glowAnimation = `
     @keyframes glow {
       0%, 100% {
@@ -86,6 +95,7 @@ const StartBoard = () => {
       alignItems='center'
       height='100vh'
     >
+      <AudioPlayer />
       {/* Top Row of Cards */}
       <Grid
         templateColumns='repeat(3, 1fr)'
