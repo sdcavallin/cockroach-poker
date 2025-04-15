@@ -16,17 +16,48 @@ const CardNumberToImage = {
   7: '/cards/scorpion.png',
 };
 
-const getPilePosition = (img) => {
-  if (img.top && img.left) return { top: '5%', left: '15%' };
-  if (img.top && img.right) return { top: '5%', right: '15%' };
-  if (img.bottom && img.left) return { bottom: '5%', left: '15%' };
-  if (img.bottom && img.right) return { bottom: '5%', right: '15%' };
-  if (img.top && img.left === '50%')
-    return { top: '10%', left: '50%', transform: 'translateX(-50%)' };
-  if (img.bottom && img.left === '50%')
-    return { bottom: '10%', left: '50%', transform: 'translateX(-50%)' };
-  return {};
+const getPilePosition = (position, index) => {
+  const base = {};
+
+  // Top left
+  if (position.top === '5%' && position.left === '5%') {
+    return { top: '10%', left: '15%' };
+  }
+  // Top right
+  if (position.top === '5%' && position.right === '5%') {
+    return { top: '10%', right: '15%' };
+  }
+  // Bottom left
+  if (position.bottom === '5%' && position.left === '5%') {
+    return { bottom: '10%', left: '15%' };
+  }
+  // Bottom right
+  if (position.bottom === '5%' && position.right === '5%') {
+    return { bottom: '10%', right: '15%' };
+  }
+  // Top center
+  if (position.top === '5%' && position.left === '50%') {
+    return {
+      top: '20%',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      flexDirection: 'row',
+    };
+  }
+  // Bottom center
+  if (position.bottom === '5%' && position.left === '50%') {
+    return {
+      bottom: '20%',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      flexDirection: 'row',
+    };
+  }
+
+  return base;
 };
+
+
 
 const images = [
   { src: 'avatars/bmo.png', right: '5%', bottom: '5%' },
@@ -191,7 +222,7 @@ const GameBoard = () => {
                   <Box
                     position='absolute'
                     display='flex'
-                    flexDirection='column'
+                    // flexDirection='column'
                     gap='4px'
                     p={1}
                     bg='rgba(0,0,0,0.4)'
