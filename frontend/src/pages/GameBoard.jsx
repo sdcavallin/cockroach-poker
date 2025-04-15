@@ -46,6 +46,20 @@ const CardNumberToString = {
   7: 'Scorpion',
 };
 
+const avatarMap = {
+  'baby-yoda': '/avatars/baby-yoda.png',
+  'bmo': '/avatars/bmo.png',
+  'cookie-monster': '/avatars/cookie-monster.png',
+  'finn': '/avatars/finn.png',
+  'genie-lamp': '/avatars/genie-lamp.png',
+  'harry-potter': '/avatars/harry-potter.png',
+  'jake': '/avatars/jake.png',
+  'mermaid': '/avatars/mermaid.png',
+  'navi-avatar': '/avatars/navi-avatar.png',
+  'wonder-woman': '/avatars/wonder-woman.png',
+};
+
+
 const GameBoard = () => {
   const location = useLocation(); 
   const { roomCode } = location.state || {};
@@ -118,7 +132,7 @@ const GameBoard = () => {
             >
               Room Code: {roomCode}
             </Text>
-
+  
             <Text
               position="absolute"
               top="50%"
@@ -132,60 +146,67 @@ const GameBoard = () => {
             >
               Cockroach Poker
             </Text>
-
-            {visibleImages.map((img, i) => {
-              const player = gameRoom.players[i];
+  
+            {gameRoom.players.map((player, index) => {
               const pileCounts = player?.pile?.reduce((acc, card) => {
                 acc[card] = (acc[card] || 0) + 1;
                 return acc;
               }, {});
-
+  
+              const positions = [
+                { top: '5%', left: '5%' },
+                { top: '5%', right: '5%' },
+                { bottom: '5%', left: '5%' },
+                { bottom: '5%', right: '5%' },
+                { top: '5%', left: '50%', transform: 'translateX(-50%)' },
+                { bottom: '5%', left: '50%', transform: 'translateX(-50%)' },
+              ];
+  
+              const avatarSrc = avatarMap[player.playerIcon] || '/avatars/default.png';
+  
               return (
-                
-                <Box key={`player-${i}`}>
+                <Box key={`player-${index}`}>
                   <Image
-                    position="absolute"
-                    src={img.src}
+                    src={avatarSrc}
                     width={['50px', '65px', '80px']}
-                    {...img}
+                    position="absolute"
                     zIndex={2}
+                    {...positions[index % positions.length]}
                   />
-                    <Box
-                      position="absolute"
-                      display="flex"
-                      flexDirection="column"
-                      gap="4px"
-                      p={1}
-                      bg="rgba(0,0,0,0.4)"
-                      borderRadius="md"
-                      {...getPilePosition(img)}
-                      zIndex={1}
-                    >
-
+                  <Box
+                    position="absolute"
+                    display="flex"
+                    flexDirection="column"
+                    gap="4px"
+                    p={1}
+                    bg="rgba(0,0,0,0.4)"
+                    borderRadius="md"
+                    zIndex={1}
+                    {...getPilePosition(positions[index % positions.length])}
+                  >
                     {pileCounts &&
                       Object.entries(pileCounts).map(([cardNum, count]) => {
                         const card = parseInt(cardNum);
                         const imageSrc = CardNumberToImage[card];
                         const label = CardNumberToString[card];
-
+  
                         return (
-                        <Box
-                          key={`pile-${i}-${card}`}
-                          display="flex"
-                          alignItems="center"
-                          gap="6px"
-                        >
-                        <Image
-                          src={imageSrc}
-                          alt={label}
-                          height="30px"  
-                          objectFit="contain" // maintain aspect ratio
-                        />
-                          <Text fontSize="sm" color="white" whiteSpace="nowrap">
-                            ×{count}
-                          </Text>
-                        </Box>
-
+                          <Box
+                            key={`pile-${index}-${card}`}
+                            display="flex"
+                            alignItems="center"
+                            gap="6px"
+                          >
+                            <Image
+                              src={imageSrc}
+                              alt={label}
+                              height="30px"
+                              objectFit="contain"
+                            />
+                            <Text fontSize="sm" color="white" whiteSpace="nowrap">
+                              ×{count}
+                            </Text>
+                          </Box>
                         );
                       })}
                   </Box>
@@ -197,6 +218,7 @@ const GameBoard = () => {
       )}
     </Container>
   );
+  
 };
 
 export default GameBoard;
