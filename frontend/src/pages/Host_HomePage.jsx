@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Box, Text, Grid, Button, Container, Icon } from '@chakra-ui/react';
+import { Box, Text, Grid, Button, Container } from '@chakra-ui/react';
 import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate from react-router-dom
 import FlippingCard from './FlippingCard.jsx';
 import { io } from 'socket.io-client';
-import { CiLink } from 'react-icons/ci';
 
 // Initialize socket connection
 const socket = io('http://localhost:5000', { autoConnect: false });
@@ -24,16 +23,14 @@ const StartBoard = () => {
         opacity: 0.7; /* Slightly dim when not glowing */
       }
       50% {
-        /* You can customize the glow color and intensity here */
-        /* Using multiple shadows creates a softer, more glow-like effect */
         text-shadow:
-           0 0 5px #fff, /* Inner white core */
+        0 0 5px #fff, /* Inner white core */
         0 0 10px #fff,
-        0 0 17px #FBC02D, /* <<< CHANGED COLOR HERE */
-        0 0 19px #FBC02D, /* <<< CHANGED COLOR HERE */
-        0 0 21px #FBC02D, /* <<< CHANGED COLOR HERE */
-        0 0 23px #FBC02D, /* <<< CHANGED COLOR HERE */
-        0 0 25px #FBC02D; /* <<< CHANGED COLOR HERE */
+        0 0 17px #FBC02D,
+        0 0 19px #FBC02D,
+        0 0 21px #FBC02D,
+        0 0 23px #FBC02D,
+        0 0 25px #FBC02D;
         opacity: 1; /* Full opacity at peak glow */
       }
     }
