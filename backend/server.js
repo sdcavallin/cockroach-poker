@@ -324,7 +324,7 @@ io.on('connection', (socket) => {
       card,
       claim
     );
-    if (!gameRoom) {
+    if (!gameRoom || gameRoom == -1) {
       console.warn(`No game room found for room code: ${roomCode}`);
       return;
     }
@@ -397,6 +397,9 @@ io.on('connection', (socket) => {
 
   // Card Resolution: at the end of a turn a player makes a claim if the player who sent them the card is telling the truth or not
   socket.on('cardResolution', (uuid, receiverClaim) => {
+    console.log(
+      `cardResolution called for uuid ${uuid}, receiverClaim ${receiverClaim}`
+    );
     const roomCode = gameRoomService.getRoomCodeByPlayerUUID(uuid);
     if (!roomCode) {
       console.warn(`No room found for player UUID: ${uuid}`);
@@ -410,6 +413,10 @@ io.on('connection', (socket) => {
       console.warn(`No game room found for room code: ${roomCode}`);
       return;
     }
+
+    //TODO: PURELY FOR PROOF IT WORKS!!!
+    console.log(`Loser Pile: ${gameRoom.currentAction.turnPlayer}'s pile: ${gameRoom.players[index].pile}
+      Current Status: Card ${gameRoom.currentAction.card}, Claim ${gameRoom.currentAction.claim}, Conspiracy ${gameRoom.currentAction.conspiracy}`);
 
     io.to(GAME_ROOM_PREFIX + roomCode).emit(
       'turnPlayerUpdated',

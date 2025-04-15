@@ -100,9 +100,7 @@ const DummyPlayPage = () => {
 
     const handleReceiveCard = ({ claim, conspiracyList }) => {
       console.log(
-        `The Claim is ${claim} and the list of other who already have seen the card is ${conspiracyList.join(
-          ', '
-        )}`
+        `The Claim is ${claim} and the list of other who already have seen the card is ${conspiracyList}`
       );
       //TODO: The Player is then prompted to either choose to look at or contest the claim.
       // Simulate prompting the p layer to accept or contest (replace with real UI later)
@@ -115,9 +113,9 @@ const DummyPlayPage = () => {
           'Do you think the claim is true or false? Click "OK" for true or "Cancel" for false.'
         );
 
-        socket.emit('cardResolution', player.uuid, callBoolean);
+        socket.emit('cardResolution', Cookies.get('uuid'), callBoolean);
       } else {
-        socket.emit('playerCheckCard', player.uuid);
+        socket.emit('playerCheckCard', Cookies.get('uuid'));
 
         const handleCheckedCard = (card) => {
           console.log(`It turns out the card was actually ${card}`);

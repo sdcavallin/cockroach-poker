@@ -146,9 +146,9 @@ export class GameRoomService {
       [deck[i], deck[j]] = [deck[j], deck[i]];
     }
 
-    // Deal cards evenly (just divide all cards among players, its fine if theres hella cards)
+    // Deal cards evenly (just divide all cards among players, its fin eif theres hella cards)
     const numPlayers = gameRoom.players.length;
-    const cardsPerPlayer = Math.floor(numCards / numPlayers);
+    const cardsPerPlayer = Math.floor(deck.length / numPlayers);
 
     gameRoom.players.forEach((player, index) => {
       const start = index * cardsPerPlayer;
@@ -239,7 +239,7 @@ export class GameRoomService {
     return player;
   }
 
-  // starts a new conspiracy and returns the gameRoom for that conspiracy
+  // starts a new conspiracy and returns the gameRoom for that conspiracy or a -1 if it failed on turn
   startConspiracy(roomCode, senderId, receiverId, card, claim) {
     const gameRoom = this.gameRoomMap.get(roomCode);
     if (!gameRoom) {
@@ -249,7 +249,7 @@ export class GameRoomService {
     if (gameRoom.currentAction.turnPlayer != senderId) {
       //If the player tries to send without it being its turn then it fails,
       console.log(`startConspiracy(): not current player ${senderId}'s turn`);
-      return gameRoom;
+      return -1;
     }
 
     gameRoom.currentAction.conspiracy = [gameRoom.currentAction.turnPlayer];
@@ -321,6 +321,7 @@ export class GameRoomService {
     }
 
     if (!playerObject) {
+      throw new Error(`resolveTurnEnd(): player object is null`);
       throw new Error(`resolveTurnEnd(): player object is null`);
     }
 

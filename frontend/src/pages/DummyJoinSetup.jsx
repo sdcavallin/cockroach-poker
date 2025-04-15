@@ -55,6 +55,9 @@ const DummyJoinSetupPage = () => {
 
     const handleReturnJoinPlayerToRoom = (success, roomCode, uuid) => {
       if (success) {
+        Cookies.set('roomCode', roomCode, { expires: 2 });
+        Cookies.set('uuid', uuid, { expires: 2 });
+
         navigate('/DummyPlay', { state: { roomCode: roomCode, uuid: uuid } });
       } else {
         alert('Could not join room');
