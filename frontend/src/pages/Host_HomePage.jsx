@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Box, Text, Grid, Button, Container } from '@chakra-ui/react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
+import { Box, Text, Grid, Button, Container, Icon } from '@chakra-ui/react';
+import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate from react-router-dom
 import FlippingCard from './FlippingCard.jsx';
 import { io } from 'socket.io-client';
+import { CiLink } from 'react-icons/ci';
 
 // Initialize socket connection
 const socket = io('http://localhost:5000', { autoConnect: false });
-
-import { useLocation } from 'react-router-dom';
 
 const StartBoard = () => {
   const location = useLocation();
@@ -17,6 +16,28 @@ const StartBoard = () => {
   const [isGameStarted, setIsGameStarted] = useState(false); // Track if the game has started
 
   const navigate = useNavigate(); // Initialize the navigate function
+
+  const glowAnimation = `
+    @keyframes glow {
+      0%, 100% {
+        text-shadow: none;
+        opacity: 0.7; /* Slightly dim when not glowing */
+      }
+      50% {
+        /* You can customize the glow color and intensity here */
+        /* Using multiple shadows creates a softer, more glow-like effect */
+        text-shadow:
+           0 0 5px #fff, /* Inner white core */
+        0 0 10px #fff,
+        0 0 17px #FBC02D, /* <<< CHANGED COLOR HERE */
+        0 0 19px #FBC02D, /* <<< CHANGED COLOR HERE */
+        0 0 21px #FBC02D, /* <<< CHANGED COLOR HERE */
+        0 0 23px #FBC02D, /* <<< CHANGED COLOR HERE */
+        0 0 25px #FBC02D; /* <<< CHANGED COLOR HERE */
+        opacity: 1; /* Full opacity at peak glow */
+      }
+    }
+  `;
 
   // Connect to the socket and get the number of players from the backend
   useEffect(() => {
@@ -53,9 +74,9 @@ const StartBoard = () => {
   // Start Game button functionality
   const handleStartGame = () => {
     setIsGameStarted(true);
-    navigate('/gameboard', { state: { roomCode } }); 
+    navigate('/gameboard', { state: { roomCode } });
   };
-  
+
   return (
     <Container
       maxW='100vw'
@@ -70,23 +91,22 @@ const StartBoard = () => {
     >
       {/* Top Row of Cards */}
       <Grid
-  templateColumns="repeat(3, 1fr)" 
-  gap="4"
-  mt="4"
-  justifyItems="center"
-  width="80%"
->
-  {[...Array(3)].map((_, index) => (
-    <FlippingCard
-      key={index}
-      isFlipped={index < playerCount}
-      width="10vw"
-      height="15vw"
-      backImage="/cards/back.png"
-    />
-  ))}
-</Grid>
-
+        templateColumns='repeat(3, 1fr)'
+        gap='4'
+        mt='4'
+        justifyItems='center'
+        width='80%'
+      >
+        {[...Array(3)].map((_, index) => (
+          <FlippingCard
+            key={index}
+            isFlipped={index < playerCount}
+            width='10vw'
+            height='15vw'
+            backImage='/cards/back.png'
+          />
+        ))}
+      </Grid>
 
       {/* Center Section */}
       <Box
@@ -103,7 +123,15 @@ const StartBoard = () => {
           fontWeight='bold'
           mb={4}
         >
-          Cockroach Poker
+          <Text as='span'>🔗</Text>
+          <style>{glowAnimation}</style>
+          <Text
+            as='span'
+            textDecoration='underline'
+            sx={{ animation: `glow 5s ease-in-out infinite` }}
+          >
+            cockroach.poker
+          </Text>
         </Text>
 
         <Button
@@ -113,41 +141,39 @@ const StartBoard = () => {
           fontSize={{ base: '4vw', md: '2vw' }}
           _hover={{ bg: '#E76F51' }}
           px='6'
-          py='4'
+          py='7'
           mb={4}
         >
-          Start Game
+          Start Game (N players)
         </Button>
 
         <Text
-  fontSize={{ base: '5vw', md: '2vw' }}
-  color='#264653'
-  fontWeight='bold'
->
-  Room Code: {roomCode || 'N/A'}
-</Text>
-
+          fontSize={{ base: '5vw', md: '2vw' }}
+          color='#264653'
+          fontWeight='bold'
+        >
+          Room Code: {roomCode || 'N/A'}
+        </Text>
       </Box>
 
       {/* Bottom Row of Cards */}
       <Grid
-  templateColumns="repeat(3, 1fr)" 
-  gap="4"
-  mb="4"
-  justifyItems="center"
-  width="80%"
->
-  {[...Array(3)].map((_, index) => (
-    <FlippingCard
-      key={index + 3} 
-      isFlipped={index + 3 < playerCount}
-      width="10vw"
-      height="15vw"
-      backImage="/cards/back.png"
-    />
-  ))}
-</Grid>
-
+        templateColumns='repeat(3, 1fr)'
+        gap='4'
+        mb='4'
+        justifyItems='center'
+        width='80%'
+      >
+        {[...Array(3)].map((_, index) => (
+          <FlippingCard
+            key={index + 3}
+            isFlipped={index + 3 < playerCount}
+            width='10vw'
+            height='15vw'
+            backImage='/cards/back.png'
+          />
+        ))}
+      </Grid>
     </Container>
   );
 };
