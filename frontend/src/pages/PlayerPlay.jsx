@@ -124,10 +124,16 @@ const PlayerPlay = () => {
     };
 
     const handleReturnPlayer = (player) => {
+      if (!player) {
+        console.error('Received player: null');
+        return;
+      }
+  
       const avatarName = Cookies.get('avatar');
       player.avatar = avatarMap[avatarName] || '/avatars/default.png';
       setPlayer(player);
     };
+    
     
     const handleRecieveCard = (claim, conspiracyList) => {
       setReceivedCardData({ claim, conspiracyList });
@@ -135,9 +141,14 @@ const PlayerPlay = () => {
     };
 
     const handleReturnGameRoom = (gameRoom) => {
-      console.log('Received game room:', gameRoom);
+      if (!gameRoom) {
+        console.error('Received game room: null');
+        return;
+      }
+    
       setPlayers(gameRoom.players || []);
     };
+    
 
     socket.on('connect', handleConnect);
     socket.on('returnPlayer', handleReturnPlayer);
@@ -318,7 +329,7 @@ const PlayerPlay = () => {
               </CardHeader>
               <CardBody maxHeight='300px' overflowY='auto' p={4}>
                 <SimpleGrid columns={2} spacing={4}>
-                {(showPile ? player?.pile : player?.hand)?.map((card, index) => (
+                {(showPile ? player?.pile || [] : player?.hand || []).map((card, index) => (
                     <Box
                       key={`${card}-${index}`}
                       bg='white'

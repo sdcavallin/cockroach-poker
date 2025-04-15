@@ -79,9 +79,11 @@ const StartBoard = () => {
 
   // Start Game button functionality
   const handleStartGame = () => {
+    socket.emit('requestStartGame', roomCode); // actually start game & hopefully deal cards
     setIsGameStarted(true);
     navigate('/gameboard', { state: { roomCode } });
   };
+  
 
   return (
     <Container
