@@ -127,41 +127,42 @@ export class GameRoomService {
     if (!gameRoom) {
       throw new Error(`startGame(): GameRoom ${roomCode} not found.`);
     }
-  
+
     // Set game status to ONGOING
     gameRoom.gameStatus = GameStatus.ONGOING;
-  
+
     // Create the deck (8 of each card type 1–8)
     const deck = [];
+    const numCards = 64;
     for (let cardType = 1; cardType <= 8; cardType++) {
       for (let i = 0; i < 8; i++) {
         deck.push(cardType);
       }
     }
-  
+
     // Shuffle
     for (let i = deck.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [deck[i], deck[j]] = [deck[j], deck[i]];
     }
-  
-    // Deal cards evenly (just divide all cards among players, its fin eif theres hella cards)
+
+    // Deal cards evenly (just divide all cards among players, its fine if theres hella cards)
     const numPlayers = gameRoom.players.length;
-    const cardsPerPlayer = Math.floor(deck.length / numPlayers);
-  
+    const cardsPerPlayer = Math.floor(numCards / numPlayers);
+
     gameRoom.players.forEach((player, index) => {
       const start = index * cardsPerPlayer;
       const end = start + cardsPerPlayer;
       player.hand = deck.slice(start, end);
       player.handSize = player.hand.length;
     });
-   
+
     // Debug prints
     // console.log("Dealt hands:");
     // gameRoom.players.forEach((player) => {
     //   console.log(`${player.nickname}: ${player.hand}`);
     // });
-  
+
     // Set the first turn player to whoever joined first
     gameRoom.currentAction = {
       turnPlayer: gameRoom.players[0].uuid,
@@ -171,8 +172,7 @@ export class GameRoomService {
       claim: null,
     };
   }
-  
-  
+
   // Save GameRoom contents to database.
   async saveGameRoom(roomCode) {
     const gameRoom = this.gameRoomMap.get(roomCode);
@@ -321,9 +321,7 @@ export class GameRoomService {
     }
 
     if (!playerObject) {
-      throw new Error(
-        `resolveTurnEnd(): player object is null`
-      );
+      throw new Error(`resolveTurnEnd(): player object is null`);
     }
 
     playerObject.pile.push(gameRoom.currentAction.card);

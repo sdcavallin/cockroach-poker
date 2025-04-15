@@ -157,11 +157,19 @@ const StartBoard = () => {
         </Button>
 
         <Text
-          fontSize={{ base: '5vw', md: '2vw' }}
+          fontSize={{ base: '5vw', md: '2.2vw' }}
           color='#264653'
           fontWeight='bold'
         >
-          Room Code: {roomCode || 'N/A'}
+          Room Code:{' '}
+          <Text
+            as='span'
+            //textShadow={'0 0 2px #d9a118, 0 0 3px #fff, 0 0 15px #FBC02D;'}
+            color='#FBC02D'
+            textShadow={'0 0 1px #264653, 0 0 3px #000000, 0 0 15px #264653;'}
+          >
+            {roomCode || 'N/A'}
+          </Text>
         </Text>
       </Box>
 

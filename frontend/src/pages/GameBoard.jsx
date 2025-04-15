@@ -89,6 +89,7 @@ const GameBoard = () => {
 
     socket.on('returnGameRoom', (room) => {
       console.log('Received returnGameRoom', room);
+      console.log(gameRoom);
       setGameRoom(room);
     });
 
