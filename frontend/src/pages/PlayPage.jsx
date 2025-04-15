@@ -25,8 +25,15 @@ import {
   Avatar,
   VStack,
   Textarea,
-  // Modal
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  ModalFooter,  // ← Add this!
 } from '@chakra-ui/react';
+
 import { Navigate, useLocation } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
@@ -43,12 +50,12 @@ const avatar = Cookies.get('avatar');
 
 const PlayPage = () => {
   const toast = useToast();
+  const turnPlayerModal = useDisclosure();
   const [message, setMessage] = useState('Connecting socket...');
   const [player, setPlayer] = useState(null);
   const [socketReady, setSocketReady] = useState(false);
   const roomCode = Cookies.get('roomCode');
   const uuid = Cookies.get('uuid');
-
   const [selectedCard, setSelectedCard] = useState(null);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [statement, setStatement] = useState('');
@@ -208,17 +215,13 @@ const PlayPage = () => {
 
   useEffect(() => {
     const handleTurnPlayerUpdate = (turnPlayerId) => {
+      console.log('[TURN EVENT]', { turnPlayerId, playerId: player?.uuid });
       if (turnPlayerId === player?.uuid) {
-        toast({
-          title: 'Your Turn!',
-          description: 'Another player has sent you a card',
-          status: 'info',
-          duration: 5000,
-          isClosable: true,
-          position: 'top',
-        });
+        console.log('MATCHING TURN PLAYER');
+        turnPlayerModal.onOpen();
       }
     };
+    
 
     socket.on('turnPlayerUpdated', handleTurnPlayerUpdate);
 
@@ -237,36 +240,24 @@ const PlayPage = () => {
       alignItems='center'
       p='5%'
     >
-      {/* <Modal isOpen={cardModalOpen} onClose={() => setCardModalOpen(false)} isCentered>
-  <ModalOverlay />
-  <ModalContent bg="#fff7d6" p={6} borderRadius="md">
-    <ModalHeader textAlign="center">You Received a Card!</ModalHeader>
-    <ModalCloseButton />
-    <ModalBody textAlign="center">
-      <Text fontSize="lg" mb={3}>
-        The other player claimed: <strong>{receivedCardData?.claim}</strong>
-      </Text>
-      <Text fontSize="md" color="gray.500" mb={4}>
-        Conspiracy path: {receivedCardData?.conspiracyList?.join(', ') || 'None'}
-      </Text>
-      <Button
-        colorScheme="green"
-        onClick={() => {
-          setCardModalOpen(false);
-          const accepted = window.confirm('Do you accept the claim? Click "Cancel" to contest.');
-          if (accepted) {
-            const callBoolean = window.confirm('Do you think the claim is TRUE?');
-            socket.emit('cardResolution', player.uuid, callBoolean);
-          } else {
-            socket.emit('playerCheckCard', player.uuid);
-          }
-        }}
-      >
-        Respond to Claim
-      </Button>
-    </ModalBody>
-  </ModalContent>
-</Modal> */}
+      <Modal isOpen={turnPlayerModal.isOpen} onClose={turnPlayerModal.onClose} isCentered>
+        <ModalOverlay />
+        <ModalContent bg="#FFF7D6" borderRadius="md" p={6}>
+          <ModalHeader textAlign="center">Your Turn!</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody textAlign="center">
+            <Text fontSize="lg" mb={3}>
+              It's your turn to make a move.
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="teal" onClick={turnPlayerModal.onClose}>
+              Let’s Go!
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
 
       <Box
         width={{ base: '90%', md: '70%', lg: '50%', xl: '40%' }}
@@ -514,7 +505,7 @@ const PlayPage = () => {
                 <DrawerBody>
                   <VStack spacing={4} align='stretch'>
                     <Text>
-                      You're sending card {selectedCard} to{' '}
+                    You're sending a {CardNumberToString[selectedCard]} card to {selectedPlayer?.nickname}
                       {selectedPlayer?.nickname}
                     </Text>
                     <Text fontWeight='bold'>
