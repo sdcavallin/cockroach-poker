@@ -302,6 +302,7 @@ export class GameRoomService {
     return index;
   }
 
+  // checkForGameEnd: checks if a player has 4 of a kind of card in their pile, if so then they lose
   checkForGameEnd(roomCode, index) {
     const gameRoom = this.gameRoomMap.get(roomCode);
     if (!gameRoom) {
