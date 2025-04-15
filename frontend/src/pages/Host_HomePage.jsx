@@ -83,7 +83,6 @@ const StartBoard = () => {
     setIsGameStarted(true);
     navigate('/gameboard', { state: { roomCode } });
   };
-  
 
   return (
     <Container
@@ -152,7 +151,7 @@ const StartBoard = () => {
           px='6'
           py='7'
           mb={4}
-          disabled={true /*Copy functionality from DummySetup*/}
+          //disabled={true /*Copy functionality from DummySetup*/}
         >
           Start Game (N players)
         </Button>
