@@ -43,7 +43,7 @@ const PlayerInit = () => {
         Cookies.set('uuid', uuid, { expires: 2 });
         Cookies.set('avatar', selectedAvatar, { expires: 2 });
 
-        navigate('/dummyplay', {
+        navigate('/playerplay', {
           state: {
             uuid: uuid,
             roomCode: returnedRoomCode,

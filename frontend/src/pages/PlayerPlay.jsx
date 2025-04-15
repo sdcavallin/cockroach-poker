@@ -39,13 +39,16 @@ const socket = io('http://localhost:5000', {
   autoConnect: false,
 });
 
+const avatar = Cookies.get('avatar');
+
+
 const PlayerPlay = () => {
   const toast = useToast();
   const [message, setMessage] = useState('Connecting socket...');
   const [player, setPlayer] = useState(null);
   const [socketReady, setSocketReady] = useState(false);
-  const location = useLocation();
-  const state = location.state || {};
+  const roomCode = Cookies.get('roomCode');
+  const uuid = Cookies.get('uuid');
 
   const [selectedCard, setSelectedCard] = useState(null);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
@@ -120,8 +123,11 @@ const PlayerPlay = () => {
     };
 
     const handleReturnPlayer = (player) => {
+      const avatarName = Cookies.get('avatar');
+      player.avatar = avatarMap[avatarName] || '/avatars/default.png';
       setPlayer(player);
     };
+    
     const handleRecieveCard = (claim, conspiracyList) => {
       setReceivedCardData({ claim, conspiracyList });
       setCardModalOpen(true);
@@ -178,6 +184,19 @@ const PlayerPlay = () => {
     7: '/cards/spider.png',
     8: '/cards/stinkbug.png',
   };
+
+  const avatarMap = {
+    'baby-yoda': '/avatars/baby-yoda.png',
+    'bmo': '/avatars/bmo.png',
+    'cookie-monster': '/avatars/cookie-monster.png',
+    'finn': '/avatars/finn.png',
+    'genie-lamp': '/avatars/genie-lamp.png',
+    'jake': '/avatars/jake.png',
+    'mermaid': '/avatars/mermaid.png',
+    'navi-avatar': '/avatars/navi-avatar.png',
+    'wonder-woman': '/avatars/wonder-woman.png',
+  };
+  
 
   useEffect(() => {
     const handleTurnPlayerUpdate = (turnPlayerId) => {
@@ -255,7 +274,7 @@ const PlayerPlay = () => {
         textAlign='center'
         overflowY='auto'
       >
-        {!state.uuid ? (
+        {!uuid ? (
           <Navigate to='/Rejoin' replace />
         ) : player ? (
           <Stack spacing={3} width='100%'>
@@ -518,7 +537,7 @@ const PlayerPlay = () => {
           </Stack>
         ) : (
           <Text>
-            GameRoom {state.roomCode} or Player UUID {state.uuid} does not
+            GameRoom {roomCode} or Player UUID {uuid} does not
             exist.
           </Text>
         )}
