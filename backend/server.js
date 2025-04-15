@@ -317,7 +317,13 @@ io.on('connection', (socket) => {
       return;
     }
     //Uses startConspiracy rather than get gameRoom, also updates turn player
-    const gameRoom = gameRoomService.startConspiracy(roomCode, senderId);
+    const gameRoom = gameRoomService.startConspiracy(
+      roomCode,
+      senderId,
+      receiverId,
+      card,
+      claim
+    );
     if (!gameRoom) {
       console.warn(`No game room found for room code: ${roomCode}`);
       return;

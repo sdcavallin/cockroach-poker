@@ -198,7 +198,7 @@ export class GameRoomService {
   }
 
   // starts a new conspiracy and returns the gameRoom for that conspiracy
-  startConspiracy(roomCode, uuid) {
+  startConspiracy(roomCode, senderId, receiverId, card, claim) {
     const gameRoom = this.gameRoomMap.get(roomCode);
     if (!gameRoom) {
       throw new Error(`getConspiracyCard(): GameRoom ${roomCode} not found.`);
@@ -206,7 +206,7 @@ export class GameRoomService {
 
     if (gameRoom.currentAction.turnPlayer != senderId) {
       //If the player tries to send without it being its turn then it fails,
-      console.log(`getConspiracyCard(): not current player ${uuid} Id`);
+      console.log(`startConspiracy(): not current player ${senderId}'s turn`);
       return;
     }
 

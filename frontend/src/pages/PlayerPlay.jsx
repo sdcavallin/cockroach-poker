@@ -146,12 +146,15 @@ const PlayerPlay = () => {
   }, []);
 
   useEffect(() => {
-    if (socketReady && state.roomCode && state.uuid) {
-      socket.emit('getPlayer', state.roomCode, state.uuid);
-      socket.emit('setSocketId', state.roomCode, state.uuid, socket.id);
-      socket.emit('requestGameRoom', state.roomCode);
+    const roomCode = Cookies.get('roomCode');
+    const uuid = Cookies.get('uuid');
+
+    if (socketReady && roomCode && uuid) {
+      socket.emit('getPlayer', roomCode, uuid);
+      socket.emit('setSocketId', roomCode, uuid, socket.id);
+      socket.emit('requestGameRoom', roomCode);
     }
-  }, [socketReady, state.roomCode, state.uuid]);
+  }, [socketReady]);
 
   const CardNumberToString = {
     0: 'Unknown',

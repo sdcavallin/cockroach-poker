@@ -145,10 +145,15 @@ const DummyPlayPage = () => {
   }, []);
 
   useEffect(() => {
-    if (socket.id != undefined) {
-      socket.emit('getPlayer', Cookies.get('roomCode'), Cookies.get('uuid'));
+    const roomCode = Cookies.get('roomCode');
+    const uuid = Cookies.get('uuid');
+
+    if (socketReady && roomCode && uuid) {
+      socket.emit('getPlayer', roomCode, uuid);
+      socket.emit('setSocketId', roomCode, uuid, socket.id);
+      socket.emit('requestGameRoom', roomCode);
     }
-  }, [socket.id]);
+  }, [socketReady]);
 
   return (
     <Container>

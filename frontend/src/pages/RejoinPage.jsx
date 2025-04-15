@@ -1,11 +1,4 @@
-import {
-  Box,
-  Button,
-  Text,
-  Input,
-  useToast,
-  Heading,
-} from '@chakra-ui/react';
+import { Box, Button, Text, Input, useToast, Heading } from '@chakra-ui/react';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -34,7 +27,15 @@ const RejoinPage = () => {
       return;
     }
 
-    navigate('/PlayerPlay', { state: { roomCode: roomCode, uuid: uuid } });
+    Cookies.set('roomCode', returnedRoomCode, { expires: 2 });
+    Cookies.set('uuid', uuid, { expires: 2 });
+
+    navigate('/playerplay', {
+      state: {
+        uuid: uuid,
+        roomCode: returnedRoomCode,
+      },
+    });
   };
 
   const handleRoomCodeChange = (event) => {
@@ -54,6 +55,7 @@ const RejoinPage = () => {
 
     const handleConnect = () => {
       setMessage(`Connected with id ${socket.id}`);
+      setUUID(Cookies.get('uuid'));
     };
 
     socket.on('connect', handleConnect);
@@ -93,7 +95,14 @@ const RejoinPage = () => {
           Socket status: {message}
         </Text>
 
-        <Text fontSize='md' fontWeight='bold' color='#264653' alignSelf='flex-start' ml='10%' mb='1'>
+        <Text
+          fontSize='md'
+          fontWeight='bold'
+          color='#264653'
+          alignSelf='flex-start'
+          ml='10%'
+          mb='1'
+        >
           Room Code:
         </Text>
         <Input
@@ -108,7 +117,14 @@ const RejoinPage = () => {
           mb='4'
         />
 
-        <Text fontSize='md' fontWeight='bold' color='#264653' alignSelf='flex-start' ml='10%' mb='1'>
+        <Text
+          fontSize='md'
+          fontWeight='bold'
+          color='#264653'
+          alignSelf='flex-start'
+          ml='10%'
+          mb='1'
+        >
           UUID:
         </Text>
         <Input
@@ -123,12 +139,7 @@ const RejoinPage = () => {
           mb='6'
         />
 
-        <Button
-          colorScheme='teal'
-          size='lg'
-          fontSize='xl'
-          onClick={handleJoin}
-        >
+        <Button colorScheme='teal' size='lg' fontSize='xl' onClick={handleJoin}>
           Join Game
         </Button>
       </Box>

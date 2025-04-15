@@ -40,7 +40,7 @@ const PlayerInit = () => {
     const handleReturnJoinPlayerToRoom = (success, returnedRoomCode, uuid) => {
       if (success) {
         Cookies.set('roomCode', returnedRoomCode, { expires: 2 });
-        Cookies.set('uuid', uuid, { expires: 2 }); // ✅ This comes from the server
+        Cookies.set('uuid', uuid, { expires: 2 });
         Cookies.set('avatar', selectedAvatar, { expires: 2 });
 
         navigate('/dummyplay', {

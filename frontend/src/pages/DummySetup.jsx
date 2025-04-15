@@ -13,6 +13,7 @@ import {
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 const socket = io('http://localhost:5000', { autoConnect: false });
 
@@ -49,6 +50,7 @@ const DummySetupPage = () => {
     };
 
     const handleReturnStartGame = (roomCode) => {
+      Cookies.set('roomCodeHost', roomCode, { expires: 2 });
       navigate('/DummyHost', { state: { roomCode: roomCode } });
     };
 
