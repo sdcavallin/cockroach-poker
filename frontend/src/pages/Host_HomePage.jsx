@@ -7,22 +7,23 @@ import {
   Container,
   IconButton,
 } from '@chakra-ui/react';
-import { useNavigate, useLocation } from 'react-router-dom'; // Import useNavigate from react-router-dom
+import { useNavigate, useLocation, Navigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 import FlippingCard from './FlippingCard.jsx';
 import { io } from 'socket.io-client';
 import AudioPlayer from '../components/AudioPlayer.jsx';
+import Cookies from 'js-cookie';
 
 // Initialize socket connection
 const socket = io('http://localhost:5000', { autoConnect: false });
 
 const StartBoard = () => {
+  const [message, setMessage] = useState('Connecting socket...');
+  const [gameRoom, setGameRoom] = useState(null);
+
   const location = useLocation();
   const { roomCode } = location.state || {};
-  const [message, setMessage] = useState('Connecting socket...');
-  const [playerCount, setPlayerCount] = useState(0); // Store the number of players
-  const [isGameStarted, setIsGameStarted] = useState(false); // Track if the game has started
 
-  const navigate = useNavigate(); // Initialize the navigate function
+  const navigate = useNavigate();
 
   // Text Glow
   const glowAnimation = `
@@ -45,7 +46,15 @@ const StartBoard = () => {
     }
   `;
 
-  // Connect to the socket and get the number of players from the backend
+  const handleJoinRoom = (roomCode) => {
+    socket.emit('joinSocketRoom', roomCode);
+  };
+
+  // Start Game button functionality
+  const handleStartGame = () => {
+    socket.emit('requestStartGame', roomCode); // actually start game & hopefully deal cards
+  };
+
   useEffect(() => {
     if (!socket.connected) {
       socket.connect();
@@ -55,34 +64,40 @@ const StartBoard = () => {
 
     const handleConnect = () => {
       setMessage(`Connected with id ${socket.id}`);
-      socket.emit('getPlayerCount'); // Emit event to get the current player count
     };
 
-    const handlePlayerCount = (count) => {
-      setPlayerCount(count); // Update player count with the data received from the server
+    const handleReturnGameRoom = (gameRoom) => {
+      console.log(gameRoom);
+      setGameRoom(gameRoom);
+    };
+
+    const handleReturnStartGame = (roomCode) => {
+      //Cookies.set('roomCodeHost', roomCode, { expires: 2 });
+      navigate('/gameboard', { state: { roomCode } });
     };
 
     socket.on('connect', handleConnect);
-    socket.on('playerCount', handlePlayerCount); // Listen for the player count update from the server
+    socket.on('returnGameRoom', handleReturnGameRoom);
+    socket.on('returnStartGame', handleReturnStartGame);
 
-    // Cleanup on unmount
     return () => {
       socket.off('connect', handleConnect);
-      socket.off('playerCount', handlePlayerCount);
+      socket.off('returnGameRoom', handleReturnGameRoom);
+      socket.off('returnStartGame', handleReturnStartGame);
     };
   }, []);
 
-  // Check if the player count is loaded
-  if (playerCount === null) {
-    return <Text>Loading player count...</Text>;
-  }
+  useEffect(() => {
+    if (roomCode) {
+      handleJoinRoom(roomCode);
+    }
+  }, [roomCode]);
 
-  // Start Game button functionality
-  const handleStartGame = () => {
-    socket.emit('requestStartGame', roomCode); // actually start game & hopefully deal cards
-    setIsGameStarted(true);
-    navigate('/gameboard', { state: { roomCode } });
-  };
+  useEffect(() => {
+    if (gameRoom && gameRoom.numPlayers > 0) {
+      alert(gameRoom.players[gameRoom.numPlayers - 1].nickname + ' joined!');
+    }
+  }, [gameRoom]);
 
   return (
     <Container
@@ -96,6 +111,7 @@ const StartBoard = () => {
       alignItems='center'
       height='100vh'
     >
+      {roomCode ? '' : <Navigate to='/' replace />}
       <AudioPlayer filePath={'music/FunkInTheTrunk.mp3'} />
       {/* Top Row of Cards */}
       <Grid
@@ -108,7 +124,7 @@ const StartBoard = () => {
         {[...Array(3)].map((_, index) => (
           <FlippingCard
             key={index}
-            isFlipped={index < playerCount}
+            //isFlipped={index < playerCount}
             width='10vw'
             height='15vw'
             backImage='/cards/back.png'
@@ -151,9 +167,9 @@ const StartBoard = () => {
           px='6'
           py='7'
           mb={4}
-          //disabled={true /*Copy functionality from DummySetup*/}
+          disabled={(gameRoom?.numPlayers ?? 0) < 2}
         >
-          Start Game (N players)
+          Start Game ({gameRoom?.numPlayers ?? 0} players)
         </Button>
 
         <Text
@@ -184,7 +200,7 @@ const StartBoard = () => {
         {[...Array(3)].map((_, index) => (
           <FlippingCard
             key={index + 3}
-            isFlipped={index + 3 < playerCount}
+            //isFlipped={index + 3 < playerCount}
             width='10vw'
             height='15vw'
             backImage='/cards/back.png'

@@ -36,40 +36,28 @@ const LandingPage = () => {
       setMessage(`Connected with id ${socket.id}`);
     };
 
-    const handleReturnEmptyGameRoom = (room) => {
-      socket.emit('joinSocketRoom', room.roomCode);
-      navigate('/startboard', { state: { roomCode: room.roomCode } });
+    const handleReturnEmptyGameRoom = (gameRoom) => {
+      console.log(gameRoom.roomCode);
+      navigate('/startboard', { state: { roomCode: gameRoom.roomCode } });
     };
 
     const handleReturnGameRoom = (room) => {
       setGameRoom(room);
     };
 
-    const handleReturnStartGame = (roomCode) => {
-      navigate('/host', { state: { roomCode } });
-    };
-
     socket.on('connect', handleConnect);
     socket.on('returnEmptyGameRoom', handleReturnEmptyGameRoom);
     socket.on('returnGameRoom', handleReturnGameRoom);
-    socket.on('returnStartGame', handleReturnStartGame);
 
     return () => {
       socket.off('connect', handleConnect);
       socket.off('returnEmptyGameRoom', handleReturnEmptyGameRoom);
       socket.off('returnGameRoom', handleReturnGameRoom);
-      socket.off('returnStartGame', handleReturnStartGame);
     };
   }, []);
 
   const handleCreate = () => {
     socket.emit('requestCreateEmptyGameRoom');
-  };
-
-  const handleStartGame = () => {
-    if (gameRoom) {
-      socket.emit('requestStartGame', gameRoom.roomCode);
-    }
   };
 
   // === Waiting Room ===

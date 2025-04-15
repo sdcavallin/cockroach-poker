@@ -189,7 +189,10 @@ const GameBoard = () => {
               textAlign='center'
               opacity={0.2}
             >
-              🔗cockroach.poker
+              🔗
+              <Text as='span' textDecoration='underline'>
+                cockroach.poker
+              </Text>
             </Text>
 
             {gameRoom.players.map((player, index) => {

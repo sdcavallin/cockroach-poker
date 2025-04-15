@@ -181,7 +181,7 @@ const PlayerInit = () => {
           fontSize='lg'
           onClick={handleNext}
         >
-          Next
+          Join
         </Button>
       </Box>
     </Box>
