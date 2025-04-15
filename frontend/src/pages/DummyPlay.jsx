@@ -77,6 +77,7 @@ const DummyPlayPage = () => {
       socket.connect();
     } else {
       setMessage(`Connected with id ${socket.id}`);
+      setSocketReady(true);
     }
 
     const handleConnect = () => {
