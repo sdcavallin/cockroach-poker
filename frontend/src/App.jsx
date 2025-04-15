@@ -15,14 +15,14 @@ import DummySetupPage from './pages/DummySetup.jsx';
 import DummyJoinSetupPage from './pages/DummyJoinSetup.jsx';
 import RejoinPage from './pages/RejoinPage.jsx';
 import PlayerPlay from './pages/PlayerPlay.jsx';
-import StartBoard from './pages/Host_HomePage.jsx'; 
+import StartBoard from './pages/Host_HomePage.jsx';
 
 function App() {
   return (
     <Box>
       <Navbar />
       <Routes>
-        <Route path='/' element={<h1>Welcome! Select a page.</h1>} />
+        <Route path='/' element={<Player_HomePage />} />
         <Route path='/host' element={<Host_HomePage />} />
         <Route path='/player' element={<Player_HomePage />} />
         <Route path='/gameboard' element={<GameBoard />} />
@@ -36,8 +36,8 @@ function App() {
         <Route path='/dummysetup' element={<DummySetupPage />} />
         <Route path='/dummyjoinsetup' element={<DummyJoinSetupPage />} />
         <Route path='/rejoin' element={<RejoinPage />} />
-        <Route path='/playerplay' element={<PlayerPlay/>} />
-        <Route path='/startboard' element={<StartBoard/>} />
+        <Route path='/playerplay' element={<PlayerPlay />} />
+        <Route path='/startboard' element={<StartBoard />} />
       </Routes>
     </Box>
   );

@@ -155,7 +155,7 @@ const LandingPage = () => {
               textAlign='center'
               color='#264653'
             >
-              COCKROACH <br /> POKER
+              COCKROACH <br /> POKER🪳
             </Text>
 
             <Box width='100%'>
