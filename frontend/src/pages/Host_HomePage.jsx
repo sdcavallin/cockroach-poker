@@ -95,7 +95,7 @@ const StartBoard = () => {
       alignItems='center'
       height='100vh'
     >
-      <AudioPlayer />
+      <AudioPlayer filePath={'music/FunkInTheTrunk.mp3'} />
       {/* Top Row of Cards */}
       <Grid
         templateColumns='repeat(3, 1fr)'

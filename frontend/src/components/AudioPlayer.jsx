@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { IconButton } from '@chakra-ui/react';
 import { FaVolumeUp, FaVolumeMute } from 'react-icons/fa'; // Using react-icons
 
-function AudioPlayer() {
+function AudioPlayer({ filePath }) {
   // State to track whether audio is muted
   const [isMuted, setIsMuted] = useState(true);
   // Ref to access the audio element directly
@@ -49,7 +49,7 @@ function AudioPlayer() {
   return (
     <>
       {/* The hidden audio element */}
-      <audio ref={audioRef} src='/music/FunkInTheTrunk.mp3' loop preload='auto'>
+      <audio ref={audioRef} src={filePath} loop preload='auto'>
         Your browser does not support audio.
       </audio>
 
