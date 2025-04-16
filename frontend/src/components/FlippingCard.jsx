@@ -1,47 +1,60 @@
-import { useState } from 'react';
 import { Box, Image, Text } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 
 const MotionBox = motion(Box);
 
 const FlippingCard = ({
-  frontColor = '#F4A261',
-  backImage = '/cards/back.png',
   isFlipped = false,
+  backImage = '/cards/back.png',
+  frontContent = null,
   width = '100px',
   height = '150px',
 }) => {
   return (
-    <Box
-      width={width}
-      height={height}
-      borderRadius="md"
-      boxShadow="md"
-      overflow="hidden"
-      bg={frontColor}
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      transform={isFlipped ? 'rotateY(180deg)' : 'none'}
-      transition="transform 0.4s"
-    >
-      {/* BACK */}
-      {!isFlipped && (
-        <Image
-          src={backImage}
-          alt="Card Back"
-          objectFit="cover"
+    <Box width={width} height={height} perspective="1000px">
+      <MotionBox
+        position="relative"
+        width="100%"
+        height="100%"
+        animate={{ rotateY: isFlipped ? 180 : 0 }}
+        transition={{ duration: 0.6 }}
+        style={{
+          transformStyle: 'preserve-3d',
+        }}
+      >
+        {/* Back Side */}
+        <Box
+          position="absolute"
           width="100%"
           height="100%"
-        />
-      )}
+          sx={{ backfaceVisibility: 'hidden' }}
+        >
+          <Image
+            src={backImage}
+            alt="Card Back"
+            objectFit="cover"
+            width="100%"
+            height="100%"
+            borderRadius="md"
+          />
+        </Box>
 
-      {/* FRONT (placeholder) */}
-      {isFlipped && (
-        <Text color="white" fontWeight="bold">
-          Flipped! 
-        </Text>
-      )}
+        {/* Front Side */}
+        <Box
+          position="absolute"
+          width="100%"
+          height="100%"
+          sx={{ backfaceVisibility: 'hidden' }}
+          transform="rotateY(180deg)"
+          bg="#F4A261"
+          borderRadius="md"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          {frontContent}
+        </Box>
+      </MotionBox>
     </Box>
   );
 };

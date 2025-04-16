@@ -163,7 +163,7 @@ const HomePage = () => {
             <Box width='100%' mt={{ base: 0, md: 1 }}>
               <Button
                 as={Link}
-                to='/playerinit'
+                to='/join'
                 bg='#E9C46A'
                 color='#264653'
                 _hover={{ bg: '#F4A261' }}
