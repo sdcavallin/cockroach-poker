@@ -31,7 +31,7 @@ import {
   ModalHeader,
   ModalBody,
   ModalCloseButton,
-  ModalFooter,  // ← Add this!
+  ModalFooter, // ← Add this!
 } from '@chakra-ui/react';
 
 import { Navigate, useLocation } from 'react-router-dom';
@@ -221,7 +221,6 @@ const PlayPage = () => {
         turnPlayerModal.onOpen();
       }
     };
-    
 
     socket.on('turnPlayerUpdated', handleTurnPlayerUpdate);
 
@@ -240,24 +239,27 @@ const PlayPage = () => {
       alignItems='center'
       p='5%'
     >
-      <Modal isOpen={turnPlayerModal.isOpen} onClose={turnPlayerModal.onClose} isCentered>
+      <Modal
+        isOpen={turnPlayerModal.isOpen}
+        onClose={turnPlayerModal.onClose}
+        isCentered
+      >
         <ModalOverlay />
-        <ModalContent bg="#FFF7D6" borderRadius="md" p={6}>
-          <ModalHeader textAlign="center">Your Turn!</ModalHeader>
+        <ModalContent bg='#FFF7D6' borderRadius='md' p={6}>
+          <ModalHeader textAlign='center'>Your Turn!</ModalHeader>
           <ModalCloseButton />
-          <ModalBody textAlign="center">
-            <Text fontSize="lg" mb={3}>
+          <ModalBody textAlign='center'>
+            <Text fontSize='lg' mb={3}>
               It's your turn to make a move.
             </Text>
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="teal" onClick={turnPlayerModal.onClose}>
+            <Button colorScheme='teal' onClick={turnPlayerModal.onClose}>
               Let’s Go!
             </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
-
 
       <Box
         width={{ base: '90%', md: '70%', lg: '50%', xl: '40%' }}
@@ -505,7 +507,8 @@ const PlayPage = () => {
                 <DrawerBody>
                   <VStack spacing={4} align='stretch'>
                     <Text>
-                    You're sending a {CardNumberToString[selectedCard]} card to {selectedPlayer?.nickname}
+                      You're sending a {CardNumberToString[selectedCard]} card
+                      to {selectedPlayer?.nickname}
                       {selectedPlayer?.nickname}
                     </Text>
                     <Text fontWeight='bold'>
