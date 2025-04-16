@@ -11,11 +11,11 @@ const FlippingCard = ({
   height = '150px',
 }) => {
   return (
-    <Box width={width} height={height} perspective="1000px">
+    <Box width={width} height={height} perspective='1000px'>
       <MotionBox
-        position="relative"
-        width="100%"
-        height="100%"
+        position='relative'
+        width='100%'
+        height='100%'
         animate={{ rotateY: isFlipped ? 180 : 0 }}
         transition={{ duration: 0.6 }}
         style={{
@@ -24,33 +24,34 @@ const FlippingCard = ({
       >
         {/* Back Side */}
         <Box
-          position="absolute"
-          width="100%"
-          height="100%"
+          position='absolute'
+          width='100%'
+          height='100%'
           sx={{ backfaceVisibility: 'hidden' }}
         >
           <Image
             src={backImage}
-            alt="Card Back"
-            objectFit="cover"
-            width="100%"
-            height="100%"
-            borderRadius="md"
+            alt='Card Back'
+            objectFit='cover'
+            width='100%'
+            height='100%'
+            borderRadius='md'
           />
         </Box>
 
         {/* Front Side */}
         <Box
-          position="absolute"
-          width="100%"
-          height="100%"
+          position='absolute'
+          width='100%'
+          height='100%'
           sx={{ backfaceVisibility: 'hidden' }}
-          transform="rotateY(180deg)"
-          bg="#F4A261"
-          borderRadius="md"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
+          transform='rotateY(180deg)'
+          bg='#F4A261'
+          borderRadius='md'
+          border='4px solid black'
+          display='flex'
+          alignItems='center'
+          justifyContent='center'
         >
           {frontContent}
         </Box>
