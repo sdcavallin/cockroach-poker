@@ -1,6 +1,6 @@
 import GameRoom from '../models/gameroom.model.js';
 import Player from '../models/player.model.js';
-import { GameStatus } from '../utilities/constants.js';
+import { CardNumberToString, GameStatus } from '../utilities/constants.js';
 import { v4 as uuidv4 } from 'uuid';
 
 // Manages GameRoom instances for you.
