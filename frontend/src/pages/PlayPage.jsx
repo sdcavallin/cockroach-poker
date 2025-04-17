@@ -60,6 +60,7 @@ const PlayPage = () => {
   const [selectedCard, setSelectedCard] = useState(null);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [statement, setStatement] = useState('');
+  const [callMode, setCallMode] = useState(false);
 
   const [players, setPlayers] = useState([]);
   const [cards, setCards] = useState([1, 2, 3, 4, 5, 6, 7, 8]);
@@ -69,7 +70,7 @@ const PlayPage = () => {
   const makeStatementDrawer = useDisclosure();
   const mainActionDrawer = useDisclosure();
   const [receivedCardData, setReceivedCardData] = useState(null);
-  // const [cardModalOpen, setCardModalOpen] = useState(false);
+  const [cardModalOpen, setCardModalOpen] = useState(false);
   const [showPile, setShowPile] = useState(false);
 
   const handleCardSelection = (card) => {
@@ -238,27 +239,70 @@ const PlayPage = () => {
       alignItems='center'
       p='5%'
     >
-      <Modal
-        isOpen={turnPlayerModal.isOpen}
-        onClose={turnPlayerModal.onClose}
-        isCentered
-      >
-        <ModalOverlay />
-        <ModalContent bg='#FFF7D6' borderRadius='md' p={6}>
-          <ModalHeader textAlign='center'>Your Turn!</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody textAlign='center'>
-            <Text fontSize='lg' mb={3}>
-              It's your turn to make a move.
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <Button colorScheme='teal' onClick={turnPlayerModal.onClose}>
-              Let’s Go!
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+    <Modal isOpen={turnPlayerModal.isOpen} onClose={turnPlayerModal.onClose} isCentered>
+      <ModalOverlay />
+      <ModalContent bg='#FFF7D6' borderRadius='md' p={6}>
+        <ModalHeader textAlign='center'>Your Turn!</ModalHeader>
+        <ModalCloseButton />
+        <ModalBody textAlign='center'>
+          <Text fontSize='lg' mb={3}>
+            {callMode ? "Do you believe the claim?" : "It's your turn to make a move."}
+          </Text>
+        </ModalBody>
+
+        <ModalFooter display="flex" justifyContent="center" gap={4}>
+          {callMode ? (
+            <>
+              <Button
+                colorScheme="green"
+                onClick={() => {
+                  console.log('Player thinks the claim is TRUE');
+                  socket.emit('cardResolution', player.uuid, true);
+                  setCallMode(false);
+                  turnPlayerModal.onClose();
+                }}
+              >
+                True
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={() => {
+                  console.log('Player thinks the claim is FALSE');
+                  socket.emit('cardResolution', player.uuid, false);
+                  setCallMode(false);
+                  turnPlayerModal.onClose();
+                }}
+              >
+                False
+              </Button>
+            </>
+          ) : (
+            // === First layer options ===
+            <>
+              <Button
+                colorScheme="green"
+                onClick={() => {
+                  console.log('Player chose to CALL IT');
+                  setCallMode(true);
+                }}
+              >
+                Call It
+              </Button>
+              <Button
+                colorScheme="yellow"
+                onClick={() => {
+                  console.log('Player chose to PASS IT');
+                  setCallMode(false);
+                  turnPlayerModal.onClose();
+                }}
+              >
+                Pass It
+              </Button>
+            </>
+          )}
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
 
       <Box
         width={{ base: '90%', md: '70%', lg: '50%', xl: '40%' }}
