@@ -306,7 +306,7 @@ const PlayPage = () => {
 
       <Box
         width={{ base: '90%', md: '70%', lg: '50%', xl: '40%' }}
-        maxHeight={{ base: '85vh', md: '90vh' }}
+        maxHeight={{ base: '90vh', md: '90vh' }}
         bg='#FFF9C4'
         border='2px solid #FBC02D'
         borderRadius='md'
@@ -369,19 +369,19 @@ const PlayPage = () => {
                       <Box
                         key={`${card}-${index}`}
                         bg='white'
-                        height='140px'
-                        border='2px solid'
-                        borderColor={
-                          selectedCard === card ? 'teal.500' : 'gray.200'
-                        }
+                        height='200'
+                        // // border='2px solid'
+                        // borderColor={
+                        //   selectedCard === card ? 'teal.500' : 'gray.200'
+                        // }
                         borderRadius='md'
                         display='flex'
                         justifyContent='center'
                         alignItems='center'
                         flexDirection='column'
                         _hover={{
-                          borderColor: 'teal.300',
-                          transform: 'scale(1.05)',
+                          // borderColor: 'teal.300',
+                          // transform: 'scale(1.05)',
                         }}
                         transition='all 0.2s'
                         cursor='pointer'
@@ -390,13 +390,13 @@ const PlayPage = () => {
                         <Image
                           src={CardNumberToImage[card]}
                           alt={CardNumberToString[card]}
-                          height='80px'
+                          height='200'
                           objectFit='contain'
                           mb={2}
                         />
-                        <Text fontWeight='bold'>
+                        {/* <Text fontWeight='bold'>
                           {CardNumberToString[card]}
-                        </Text>
+                        </Text> */}
                       </Box>
                     )
                   )}
@@ -428,12 +428,12 @@ const PlayPage = () => {
                     {player?.hand?.map((card) => (
                       <Box
                         key={card}
-                        bg='white'
-                        height='140px'
-                        border='2px solid'
-                        borderColor={
-                          selectedCard === card ? 'teal.500' : 'gray.200'
-                        }
+                        // bg='white'
+                        height='200'
+                        // border='2px solid'
+                        // borderColor={
+                        //   selectedCard === card ? 'teal.500' : 'gray.200'
+                        // }
                         borderRadius='md'
                         display='flex'
                         justifyContent='center'
@@ -450,13 +450,13 @@ const PlayPage = () => {
                         <Image
                           src={CardNumberToImage[card]}
                           alt={CardNumberToString[card]}
-                          boxSize='80px'
+                          boxSize='200'
                           objectFit='contain'
                           mb={2}
                         />
-                        <Text fontWeight='bold'>
+                        {/* <Text fontWeight='bold'>
                           {CardNumberToString[card]}
-                        </Text>
+                        </Text> */}
                       </Box>
                     ))}
                   </SimpleGrid>
