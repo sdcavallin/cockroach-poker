@@ -404,6 +404,7 @@ const PlayPage = () => {
                           src={CardNumberToImage[card]}
                           alt={CardNumberToString[card]}
                           boxSize='80px'
+                          objectFit="contain"
                           mb={2}
                         />
                         <Text fontWeight='bold'>
