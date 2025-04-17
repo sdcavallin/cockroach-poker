@@ -12,7 +12,6 @@ const pulseGlow = keyframes`
   100% { box-shadow: 0 0 10px 4px rgba(233, 196, 106, 0.6); }
 `;
 
-
 const CardNumberToImage = {
   0: '/cards/rat.png',
   1: '/cards/fly.png',
@@ -65,8 +64,6 @@ const getPilePosition = (position, index) => {
   return base;
 };
 
-
-
 const images = [
   { src: 'avatars/bmo.png', right: '5%', bottom: '5%' },
   { src: 'avatars/finn.png', right: '5%', top: '5%' },
@@ -110,7 +107,6 @@ const avatarMap = {
   'wonder-woman': '/avatars/wonder-woman.png',
 };
 
-
 const GamePage = () => {
   const location = useLocation();
   const { roomCode } = location.state || {};
@@ -120,35 +116,35 @@ const GamePage = () => {
 
   useEffect(() => {
     if (!socket.connected) socket.connect();
-  
+
     socket.on('connect', () => {
       console.log(`Connected with id ${socket.id}`);
       if (roomCode) {
         socket.emit('requestGameRoom', roomCode);
       }
     });
-  
+
     socket.on('returnGameRoom', (room) => {
       console.log('Received returnGameRoom', room);
       setGameRoom(room);
     });
-  
+
     return () => {
       socket.off('connect');
       socket.off('returnGameRoom');
     };
   }, [roomCode]);
-  
+
   useEffect(() => {
     socket.on('turnPlayerUpdated', (uuid) => {
       setTurnPlayerId(uuid);
     });
-  
+
     return () => {
       socket.off('turnPlayerUpdated');
     };
   }, []);
-  
+
   const visibleImages = images.slice(
     0,
     gameRoom ? Math.min(gameRoom.players.length, 6) : 0
@@ -230,8 +226,9 @@ const GamePage = () => {
               const avatarSrc =
                 avatarMap[player.playerIcon] || '/avatars/default.png';
 
-              const isInConspiracy = gameRoom?.currentAction?.conspiracy?.includes(player.uuid);
-              
+              const isInConspiracy =
+                gameRoom?.currentAction?.conspiracy?.includes(player.uuid);
+
               return (
                 <Box key={`player-${index}`}>
                   <Image
@@ -246,10 +243,14 @@ const GamePage = () => {
                         ? `${pulseGlow} 1.5s ease-in-out infinite`
                         : 'none'
                     }
-                    filter={isInConspiracy ? 'grayscale(100%) brightness(0.5)' : 'none'}
+                    filter={
+                      isInConspiracy
+                        ? 'grayscale(100%) brightness(0.5)'
+                        : 'none'
+                    }
                     opacity={isInConspiracy ? 0.5 : 1}
                     transition='filter 0.5s ease, opacity 0.5s ease'
-                    {...positions[index % positions.length]} 
+                    {...positions[index % positions.length]}
                   />
                   <Box
                     position='absolute'
@@ -295,6 +296,35 @@ const GamePage = () => {
                 </Box>
               );
             })}
+
+            {gameRoom.currentAction &&
+              gameRoom.currentAction.conspiracy.length === 1 && ( // THIS PART CONTROLS CENTER CARD APPEAR/DISAPPEAR
+                <Box
+                  position='absolute'
+                  top='50%'
+                  left='50%'
+                  transform='translate(-50%, -50%)'
+                  width={['80px', '100px', '120px']}
+                  height={['120px', '140px', '160px']}
+                  backgroundColor='#264653'
+                  border='4px solid white'
+                  borderRadius='md'
+                  display='flex'
+                  justifyContent='center'
+                  alignItems='center'
+                  boxShadow='0 0 20px rgba(0,0,0,0.5)'
+                  zIndex='3'
+                >
+                  <Image
+                    src='/cards/back.png'
+                    alt='Facedown Card'
+                    objectFit='cover'
+                    width='100%'
+                    height='100%'
+                    borderRadius='md'
+                  />
+                </Box>
+              )}
           </Box>
         </Box>
       )}
