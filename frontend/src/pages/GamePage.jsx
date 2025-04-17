@@ -238,9 +238,9 @@ const GamePage = () => {
                   src={avatarSrc}
                   alt={player.nickname}
                   width={['50px', '65px', '80px']}
-                  position="absolute"
+                  position='absolute'
                   zIndex={2}
-                  borderRadius="full"
+                  borderRadius='full'
                   animation={
                     player.uuid === turnPlayerId
                       ? `${pulseGlow} 1.5s ease-in-out infinite`
@@ -248,7 +248,7 @@ const GamePage = () => {
                   }
                   filter={isInConspiracy ? 'grayscale(100%) brightness(0.5)' : 'none'}
                   opacity={isInConspiracy ? 0.5 : 1}
-                  transition="filter 0.5s ease, opacity 0.5s ease"
+                  transition='filter 0.5s ease, opacity 0.5s ease'
                 />
 
                   <Box

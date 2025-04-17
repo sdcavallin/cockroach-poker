@@ -108,7 +108,7 @@ const PlayPage = () => {
     setSelectedPlayer(null);
     setStatement('');
     alert(
-      `Card ${selectedCard} sent to ${selectedPlayer.nickname} with statement: "${statement}"`
+      `Card ${selectedCard} sent to ${selectedPlayer.nickname} with statement: '${statement}'`
     );
   };
 
@@ -404,7 +404,7 @@ const PlayPage = () => {
                           src={CardNumberToImage[card]}
                           alt={CardNumberToString[card]}
                           boxSize='80px'
-                          objectFit="contain"
+                          objectFit='contain'
                           mb={2}
                         />
                         <Text fontWeight='bold'>
@@ -437,41 +437,51 @@ const PlayPage = () => {
                     Select a player to send card {selectedCard} to:
                   </Text>
                   <VStack spacing={4} align='stretch'>
-                    {players
-                      .filter((p) => p.uuid !== player?.uuid)
-                      .map((otherPlayer) => (
+                  {players
+                    .filter((p) => p.uuid !== player?.uuid)
+                    .map((otherPlayer) => {
+                      const isInConspiracy = receivedCardData?.conspiracyList?.includes(otherPlayer.uuid);
+
+                      return (
                         <Box
                           key={otherPlayer.uuid}
                           bg='white'
                           p={4}
                           border='2px solid'
                           borderColor={
-                            selectedPlayer?.uuid === otherPlayer.uuid
-                              ? 'teal.500'
-                              : 'gray.200'
+                            selectedPlayer?.uuid === otherPlayer.uuid ? 'teal.500' : 'gray.200'
                           }
                           borderRadius='md'
                           display='flex'
                           alignItems='center'
-                          cursor='pointer'
-                          onClick={() => handlePlayerSelection(otherPlayer)}
-                          _hover={{
-                            borderColor: 'teal.300',
-                            transform: 'translateX(5px)',
-                          }}
+                          opacity={isInConspiracy ? 0.5 : 1}   // grey out if in conspiracy list 
+                          pointerEvents={isInConspiracy ? 'none' : 'auto'} // unclickable 
+                          cursor={isInConspiracy ? 'not-allowed' : 'pointer'} // change curson to cancel
+                          onClick={() => !isInConspiracy && handlePlayerSelection(otherPlayer)}
+                          _hover={
+                            !isInConspiracy
+                              ? {
+                                  borderColor: 'teal.300',
+                                  transform: 'translateX(5px)',
+                                }
+                              : {}
+                          }
                           transition='all 0.2s'
                         >
                           <Avatar
                             size='md'
                             src={
-                              avatarMap[otherPlayer.playerIcon] ||
-                              '/avatars/default.png'
+                              avatarMap[otherPlayer.playerIcon] || '/avatars/default.png'
                             }
                             name={otherPlayer.nickname}
                           />
-                          <Text fontWeight='bold'>{otherPlayer.nickname}</Text>
+                          <Text fontWeight='bold' ml={3}>
+                            {otherPlayer.nickname}
+                          </Text>
                         </Box>
-                      ))}
+                      );
+                    })}
+
                   </VStack>
                 </DrawerBody>
                 <DrawerFooter>
