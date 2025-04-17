@@ -234,23 +234,23 @@ const GamePage = () => {
               
               return (
                 <Box key={`player-${index}`}>
-                <Image
-                  src={avatarSrc}
-                  alt={player.nickname}
-                  width={['50px', '65px', '80px']}
-                  position='absolute'
-                  zIndex={2}
-                  borderRadius='full'
-                  animation={
-                    player.uuid === turnPlayerId
-                      ? `${pulseGlow} 1.5s ease-in-out infinite`
-                      : 'none'
-                  }
-                  filter={isInConspiracy ? 'grayscale(100%) brightness(0.5)' : 'none'}
-                  opacity={isInConspiracy ? 0.5 : 1}
-                  transition='filter 0.5s ease, opacity 0.5s ease'
-                />
-
+                  <Image
+                    src={avatarSrc}
+                    alt={player.nickname}
+                    width={['50px', '65px', '80px']}
+                    position='absolute'
+                    zIndex={2}
+                    borderRadius='full'
+                    animation={
+                      player.uuid === turnPlayerId
+                        ? `${pulseGlow} 1.5s ease-in-out infinite`
+                        : 'none'
+                    }
+                    filter={isInConspiracy ? 'grayscale(100%) brightness(0.5)' : 'none'}
+                    opacity={isInConspiracy ? 0.5 : 1}
+                    transition='filter 0.5s ease, opacity 0.5s ease'
+                    {...positions[index % positions.length]} 
+                  />
                   <Box
                     position='absolute'
                     display='flex'
