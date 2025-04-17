@@ -27,7 +27,7 @@ const RejoinPage = () => {
       return;
     }
 
-    Cookies.set('roomCode', returnedRoomCode, { expires: 2 });
+    Cookies.set('roomCode', roomCode, { expires: 2 });
     Cookies.set('uuid', uuid, { expires: 2 });
 
     navigate('/playerplay', {
