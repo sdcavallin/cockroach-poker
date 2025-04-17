@@ -1,25 +1,25 @@
 import { Box, Button, Text, Input, useToast, Heading } from '@chakra-ui/react';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
 const socket = io('http://localhost:5000', {
   autoConnect: false,
 });
 
-const RejoinPage = () => {
+const RejoinHost = () => {
   const [message, setMessage] = useState('Connecting socket...');
   const [roomCode, setRoomCode] = useState('123B');
-  const [uuid, setUUID] = useState('12345');
   const navigate = useNavigate();
+  const location = useLocation();
   const toast = useToast();
 
   const handleJoin = () => {
-    if (!roomCode.trim() || !uuid.trim()) {
+    if (!roomCode.trim()) {
       toast({
         title: 'Missing Info',
-        description: 'Please enter both a room code and your UUID.',
+        description: 'Please enter a room code to rejoin',
         status: 'warning',
         duration: 3000,
         isClosable: true,
@@ -28,22 +28,16 @@ const RejoinPage = () => {
     }
 
     Cookies.set('roomCode', roomCode, { expires: 2 });
-    Cookies.set('uuid', uuid, { expires: 2 });
 
-    navigate('/playerplay', {
+    navigate('/host', {
       state: {
-        uuid: uuid,
-        roomCode: returnedRoomCode,
+        roomCode: roomCode,
       },
     });
   };
 
   const handleRoomCodeChange = (event) => {
     setRoomCode(event.target.value);
-  };
-
-  const handleUUIDChange = (event) => {
-    setUUID(event.target.value);
   };
 
   useEffect(() => {
@@ -55,7 +49,6 @@ const RejoinPage = () => {
 
     const handleConnect = () => {
       setMessage(`Connected with id ${socket.id}`);
-      setUUID(Cookies.get('uuid'));
     };
 
     socket.on('connect', handleConnect);
@@ -64,6 +57,12 @@ const RejoinPage = () => {
       socket.off('connect', handleConnect);
     };
   }, []);
+
+  useEffect(() => {
+    if (location.state && location.state.roomCode) {
+      setUUID(location.state.roomCode);
+    }
+  }, [location]);
 
   return (
     <Box
@@ -117,28 +116,6 @@ const RejoinPage = () => {
           mb='4'
         />
 
-        <Text
-          fontSize='md'
-          fontWeight='bold'
-          color='#264653'
-          alignSelf='flex-start'
-          ml='10%'
-          mb='1'
-        >
-          UUID:
-        </Text>
-        <Input
-          placeholder='Enter Your UUID'
-          value={uuid}
-          onChange={handleUUIDChange}
-          textAlign='center'
-          fontSize='lg'
-          width='80%'
-          border='2px solid #2A9D8F'
-          bg='#f4f1de'
-          mb='6'
-        />
-
         <Button colorScheme='teal' size='lg' fontSize='xl' onClick={handleJoin}>
           Join Game
         </Button>
@@ -147,4 +124,4 @@ const RejoinPage = () => {
   );
 };
 
-export default RejoinPage;
+export default RejoinHost;

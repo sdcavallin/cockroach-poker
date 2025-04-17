@@ -24,6 +24,7 @@ function Navbar() {
     { to: '/join', label: 'Join' },
     { to: '/play', label: 'Play' },
     { to: '/rejoin', label: 'Rejoin' },
+    { to: '/rejoinhost', label: 'RejoinHost' },
     { to: '/dummyplayer', label: 'DummyPlayer' },
     { to: '/dummyhost', label: 'DummyHost' },
     { to: '/dummyjoin', label: 'DummyJoin' },

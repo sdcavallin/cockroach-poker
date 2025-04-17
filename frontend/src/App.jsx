@@ -17,7 +17,8 @@ import DummyPlayPage from './pages/DummyPlay.jsx';
 
 import DummySetupPage from './pages/DummySetup.jsx';
 import DummyJoinSetupPage from './pages/DummyJoinSetup.jsx';
-import RejoinPage from './pages/RejoinPage.jsx';
+import RejoinPage from './pages/RejoinPlayer.jsx';
+import RejoinHost from './pages/RejoinHost.jsx';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path='/join' element={<JoinPage />} />
         <Route path='/play' element={<PlayPage />} />
         <Route path='/rejoin' element={<RejoinPage />} />
+        <Route path='/rejoinhost' element={<RejoinHost />} />
         <Route path='/dummyplayer' element={<DummyPlayerPage />} />
         <Route path='/dummyhost' element={<DummyHostPage />} />
         <Route path='/dummyplayerjoin' element={<DummyPlayerJoinPage />} />

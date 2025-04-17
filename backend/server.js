@@ -305,7 +305,7 @@ io.on('connection', (socket) => {
       );
     }
   });
-  // initPlayerSendCard
+
   // initPlayerSendCard: starts a turn of players sending a card, only run once and can only run after a resolution is called.
   socket.on('initPlayerSendCard', (senderId, receiverId, card, claim) => {
     console.log(

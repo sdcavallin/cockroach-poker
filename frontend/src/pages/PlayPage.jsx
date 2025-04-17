@@ -54,8 +54,9 @@ const PlayPage = () => {
   const [message, setMessage] = useState('Connecting socket...');
   const [player, setPlayer] = useState(null);
   const [socketReady, setSocketReady] = useState(false);
-  const roomCode = Cookies.get('roomCode');
-  const uuid = Cookies.get('uuid');
+  const location = useLocation();
+  const roomCode = location.state?.roomCode;
+  const uuid = location.state?.uuid;
   const [selectedCard, setSelectedCard] = useState(null);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [statement, setStatement] = useState('');
@@ -168,15 +169,13 @@ const PlayPage = () => {
   }, []);
 
   useEffect(() => {
-    const roomCode = Cookies.get('roomCode');
-    const uuid = Cookies.get('uuid');
-
+    //Numbers and strings are truthy so it should show as true
     if (socketReady && roomCode && uuid) {
       socket.emit('getPlayer', roomCode, uuid);
       socket.emit('setSocketId', roomCode, uuid, socket.id);
       socket.emit('requestGameRoom', roomCode);
     }
-  }, [socketReady]);
+  }, [socketReady, location]);
 
   const CardNumberToString = {
     0: 'Unknown',
@@ -276,7 +275,11 @@ const PlayPage = () => {
         overflowY='auto'
       >
         {!uuid ? (
-          <Navigate to='/rejoin' replace />
+          <Navigate
+            to='/rejoin'
+            replace
+            state={{ uuid: uuid, roomCode: roomCode }}
+          />
         ) : player ? (
           <Stack spacing={3} width='100%'>
             {player && (
@@ -437,51 +440,59 @@ const PlayPage = () => {
                     Select a player to send card {selectedCard} to:
                   </Text>
                   <VStack spacing={4} align='stretch'>
-                  {players
-                    .filter((p) => p.uuid !== player?.uuid)
-                    .map((otherPlayer) => {
-                      const isInConspiracy = receivedCardData?.conspiracyList?.includes(otherPlayer.uuid);
+                    {players
+                      .filter((p) => p.uuid !== player?.uuid)
+                      .map((otherPlayer) => {
+                        const isInConspiracy =
+                          receivedCardData?.conspiracyList?.includes(
+                            otherPlayer.uuid
+                          );
 
-                      return (
-                        <Box
-                          key={otherPlayer.uuid}
-                          bg='white'
-                          p={4}
-                          border='2px solid'
-                          borderColor={
-                            selectedPlayer?.uuid === otherPlayer.uuid ? 'teal.500' : 'gray.200'
-                          }
-                          borderRadius='md'
-                          display='flex'
-                          alignItems='center'
-                          opacity={isInConspiracy ? 0.5 : 1}   // grey out if in conspiracy list 
-                          pointerEvents={isInConspiracy ? 'none' : 'auto'} // unclickable 
-                          cursor={isInConspiracy ? 'not-allowed' : 'pointer'} // change curson to cancel
-                          onClick={() => !isInConspiracy && handlePlayerSelection(otherPlayer)}
-                          _hover={
-                            !isInConspiracy
-                              ? {
-                                  borderColor: 'teal.300',
-                                  transform: 'translateX(5px)',
-                                }
-                              : {}
-                          }
-                          transition='all 0.2s'
-                        >
-                          <Avatar
-                            size='md'
-                            src={
-                              avatarMap[otherPlayer.playerIcon] || '/avatars/default.png'
+                        return (
+                          <Box
+                            key={otherPlayer.uuid}
+                            bg='white'
+                            p={4}
+                            border='2px solid'
+                            borderColor={
+                              selectedPlayer?.uuid === otherPlayer.uuid
+                                ? 'teal.500'
+                                : 'gray.200'
                             }
-                            name={otherPlayer.nickname}
-                          />
-                          <Text fontWeight='bold' ml={3}>
-                            {otherPlayer.nickname}
-                          </Text>
-                        </Box>
-                      );
-                    })}
-
+                            borderRadius='md'
+                            display='flex'
+                            alignItems='center'
+                            opacity={isInConspiracy ? 0.5 : 1} // grey out if in conspiracy list
+                            pointerEvents={isInConspiracy ? 'none' : 'auto'} // unclickable
+                            cursor={isInConspiracy ? 'not-allowed' : 'pointer'} // change curson to cancel
+                            onClick={() =>
+                              !isInConspiracy &&
+                              handlePlayerSelection(otherPlayer)
+                            }
+                            _hover={
+                              !isInConspiracy
+                                ? {
+                                    borderColor: 'teal.300',
+                                    transform: 'translateX(5px)',
+                                  }
+                                : {}
+                            }
+                            transition='all 0.2s'
+                          >
+                            <Avatar
+                              size='md'
+                              src={
+                                avatarMap[otherPlayer.playerIcon] ||
+                                '/avatars/default.png'
+                              }
+                              name={otherPlayer.nickname}
+                            />
+                            <Text fontWeight='bold' ml={3}>
+                              {otherPlayer.nickname}
+                            </Text>
+                          </Box>
+                        );
+                      })}
                   </VStack>
                 </DrawerBody>
                 <DrawerFooter>

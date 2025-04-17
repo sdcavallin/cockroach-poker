@@ -254,7 +254,7 @@ const HostPage = () => {
           </Grid>
         </Container>
       ) : (
-        <Navigate to='/' replace />
+        <Navigate to='/rejoinhost' replace state={{ roomCode: roomCode }} />
       )}
     </>
   );
