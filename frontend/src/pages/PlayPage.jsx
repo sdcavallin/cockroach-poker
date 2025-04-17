@@ -37,7 +37,6 @@ import {
 import { Navigate, useLocation } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
-import Cookies from 'js-cookie';
 import { useToast } from '@chakra-ui/react';
 
 // const toast = useToast();
@@ -46,7 +45,6 @@ const socket = io('http://localhost:5000', {
   autoConnect: false,
 });
 
-const avatar = Cookies.get('avatar');
 
 const PlayPage = () => {
   const toast = useToast();
@@ -57,6 +55,7 @@ const PlayPage = () => {
   const location = useLocation();
   const roomCode = location.state?.roomCode;
   const uuid = location.state?.uuid;
+  const avatar = location.state?.avatar;
   const [selectedCard, setSelectedCard] = useState(null);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [statement, setStatement] = useState('');
@@ -137,7 +136,7 @@ const PlayPage = () => {
         return;
       }
 
-      const avatarName = Cookies.get('avatar');
+      const avatarName = location.state?.avatar;
       player.avatar = avatarMap[avatarName] || '/avatars/default.png';
       setPlayer(player);
     };

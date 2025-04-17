@@ -12,7 +12,6 @@ import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import FlippingCard from '../components/FlippingCard.jsx';
 import { io } from 'socket.io-client';
 import AudioPlayer from '../components/AudioPlayer.jsx';
-import Cookies from 'js-cookie';
 
 // Initialize socket connection
 const socket = io('http://localhost:5000', { autoConnect: false });
@@ -81,7 +80,6 @@ const HostPage = () => {
     };
 
     const handleReturnStartGame = (roomCode) => {
-      //Cookies.set('roomCodeHost', roomCode, { expires: 2 });
       navigate('/game', { state: { roomCode } });
     };
 

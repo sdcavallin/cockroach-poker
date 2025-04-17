@@ -8,7 +8,6 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
-import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
@@ -39,14 +38,11 @@ const JoinPage = () => {
 
     const handleReturnJoinPlayerToRoom = (success, returnedRoomCode, uuid) => {
       if (success) {
-        Cookies.set('roomCode', returnedRoomCode, { expires: 2 });
-        Cookies.set('uuid', uuid, { expires: 2 });
-        Cookies.set('avatar', selectedAvatar, { expires: 2 });
-
         navigate('/play', {
           state: {
             uuid: uuid,
             roomCode: returnedRoomCode,
+            avatar: selectedAvatar
           },
         });
       } else {

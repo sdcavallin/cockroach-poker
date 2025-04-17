@@ -2,7 +2,6 @@ import { Box, Button, Text, Input, useToast, Heading } from '@chakra-ui/react';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Cookies from 'js-cookie';
 
 const socket = io('http://localhost:5000', {
   autoConnect: false,
@@ -26,8 +25,6 @@ const RejoinHost = () => {
       });
       return;
     }
-
-    Cookies.set('roomCode', roomCode, { expires: 2 });
 
     navigate('/host', {
       state: {
