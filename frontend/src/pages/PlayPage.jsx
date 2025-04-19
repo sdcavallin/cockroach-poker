@@ -45,7 +45,6 @@ const socket = io('http://localhost:5000', {
   autoConnect: false,
 });
 
-
 const PlayPage = () => {
   const toast = useToast();
   const turnPlayerModal = useDisclosure();
@@ -238,70 +237,76 @@ const PlayPage = () => {
       alignItems='center'
       p='5%'
     >
-    <Modal isOpen={turnPlayerModal.isOpen} onClose={turnPlayerModal.onClose} isCentered>
-      <ModalOverlay />
-      <ModalContent bg='#FFF7D6' borderRadius='md' p={6}>
-        <ModalHeader textAlign='center'>Your Turn!</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody textAlign='center'>
-          <Text fontSize='lg' mb={3}>
-            {callMode ? "Do you believe the claim?" : "It's your turn to make a move."}
-          </Text>
-        </ModalBody>
+      <Modal
+        isOpen={turnPlayerModal.isOpen}
+        onClose={turnPlayerModal.onClose}
+        isCentered
+      >
+        <ModalOverlay />
+        <ModalContent bg='#FFF7D6' borderRadius='md' p={6}>
+          <ModalHeader textAlign='center'>Your Turn!</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody textAlign='center'>
+            <Text fontSize='lg' mb={3}>
+              {callMode
+                ? 'Do you believe the claim?'
+                : "It's your turn to make a move."}
+            </Text>
+          </ModalBody>
 
-        <ModalFooter display="flex" justifyContent="center" gap={4}>
-          {callMode ? (
-            <>
-              <Button
-                colorScheme="green"
-                onClick={() => {
-                  console.log('Player thinks the claim is TRUE');
-                  socket.emit('cardResolution', player.uuid, true);
-                  setCallMode(false);
-                  turnPlayerModal.onClose();
-                }}
-              >
-                True
-              </Button>
-              <Button
-                colorScheme="red"
-                onClick={() => {
-                  console.log('Player thinks the claim is FALSE');
-                  socket.emit('cardResolution', player.uuid, false);
-                  setCallMode(false);
-                  turnPlayerModal.onClose();
-                }}
-              >
-                False
-              </Button>
-            </>
-          ) : (
-            // === First layer options ===
-            <>
-              <Button
-                colorScheme="green"
-                onClick={() => {
-                  console.log('Player chose to CALL IT');
-                  setCallMode(true);
-                }}
-              >
-                Call It
-              </Button>
-              <Button
-                colorScheme="yellow"
-                onClick={() => {
-                  console.log('Player chose to PASS IT');
-                  setCallMode(false);
-                  turnPlayerModal.onClose();
-                }}
-              >
-                Pass It
-              </Button>
-            </>
-          )}
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
+          <ModalFooter display='flex' justifyContent='center' gap={4}>
+            {callMode ? (
+              <>
+                <Button
+                  colorScheme='green'
+                  onClick={() => {
+                    console.log('Player thinks the claim is TRUE');
+                    socket.emit('cardResolution', player.uuid, true);
+                    setCallMode(false);
+                    turnPlayerModal.onClose();
+                  }}
+                >
+                  True
+                </Button>
+                <Button
+                  colorScheme='red'
+                  onClick={() => {
+                    console.log('Player thinks the claim is FALSE');
+                    socket.emit('cardResolution', player.uuid, false);
+                    setCallMode(false);
+                    turnPlayerModal.onClose();
+                  }}
+                >
+                  False
+                </Button>
+              </>
+            ) : (
+              // === First layer options ===
+              <>
+                <Button
+                  colorScheme='green'
+                  onClick={() => {
+                    console.log('Player chose to CALL IT');
+                    setCallMode(true);
+                  }}
+                >
+                  Call It
+                </Button>
+                <Button
+                  colorScheme='yellow'
+                  onClick={() => {
+                    console.log('Player chose to PASS IT');
+                    setCallMode(false);
+                    turnPlayerModal.onClose();
+                  }}
+                >
+                  Pass It
+                </Button>
+              </>
+            )}
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       <Box
         width={{ base: '90%', md: '70%', lg: '50%', xl: '40%' }}
@@ -378,10 +383,12 @@ const PlayPage = () => {
                         justifyContent='center'
                         alignItems='center'
                         flexDirection='column'
-                        _hover={{
-                          // borderColor: 'teal.300',
-                          // transform: 'scale(1.05)',
-                        }}
+                        _hover={
+                          {
+                            // borderColor: 'teal.300',
+                            // transform: 'scale(1.05)',
+                          }
+                        }
                         transition='all 0.2s'
                         cursor='pointer'
                         onClick={() => handleCardSelection(card)}
@@ -568,25 +575,38 @@ const PlayPage = () => {
               <DrawerOverlay />
               <DrawerContent bg='#F4A261'>
                 <DrawerCloseButton />
-                <DrawerHeader bg='#E76F51'>Make a Statement</DrawerHeader>
+                <DrawerHeader bg='#E76F51'>Make a Claim</DrawerHeader>
                 <DrawerBody>
                   <VStack spacing={4} align='stretch'>
                     <Text>
-                      You're sending a {CardNumberToString[selectedCard]} card
-                      to {selectedPlayer?.nickname}
-                      {selectedPlayer?.nickname}
+                      You're sending a{' '}
+                      <Text fontWeight={'bold'} as={'span'}>
+                        {CardNumberToString[selectedCard]}
+                      </Text>{' '}
+                      card to{' '}
+                      <Text fontWeight={'bold'} as={'span'}>
+                        {selectedPlayer?.nickname}
+                      </Text>
+                      .
                     </Text>
                     <Text fontWeight='bold'>
-                      What statement will you make about this card?
+                      What will you claim this card is?
                     </Text>
                     <Text fontSize='sm' color='gray.600'>
-                      Your statement can be truthful or a bluff. Other players
-                      will decide whether to believe you or challenge your
-                      claim.
+                      Your statement can be{' '}
+                      <Text as='span' color='green.600' fontWeight='bold'>
+                        the truth
+                      </Text>{' '}
+                      or{' '}
+                      <Text as='span' color='gray.800' fontWeight='bold'>
+                        a lie
+                      </Text>
+                      . Other players will decide whether to believe you or
+                      challenge your claim.
                     </Text>
                     <Box bg='#FFF9C4' p={4} borderRadius='md'>
                       <Text mb={2} fontWeight='bold'>
-                        This card is a:
+                        This card is a...
                       </Text>
                       <SimpleGrid columns={2} spacing={3}>
                         {Object.entries(CardNumberToString)
@@ -594,12 +614,17 @@ const PlayPage = () => {
                           .map(([num, label]) => (
                             <Button
                               key={num}
-                              colorScheme={
-                                statement === label ? 'teal' : 'gray'
+                              bg={statement === label ? '#f2ecb8' : ''}
+                              color={
+                                CardNumberToString[selectedCard] === label
+                                  ? 'green.600'
+                                  : ''
                               }
-                              variant={
-                                statement === label ? 'solid' : 'outline'
+                              borderColor={
+                                statement === label ? 'gray.600' : 'gray.300'
                               }
+                              variant={'outline'}
+                              borderWidth={statement === label ? '2px' : '1px'}
                               onClick={() => setStatement(label)}
                             >
                               {label}

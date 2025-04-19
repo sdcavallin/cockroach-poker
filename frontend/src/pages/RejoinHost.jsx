@@ -26,7 +26,7 @@ const RejoinHost = () => {
       return;
     }
 
-    navigate('/host', {
+    navigate('/game', {
       state: {
         roomCode: roomCode,
       },
