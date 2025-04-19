@@ -19,6 +19,7 @@ import DummySetupPage from './pages/DummySetup.jsx';
 import DummyJoinSetupPage from './pages/DummyJoinSetup.jsx';
 import RejoinPage from './pages/RejoinPlayer.jsx';
 import RejoinHost from './pages/RejoinHost.jsx';
+import Credits from './pages/Credits.jsx';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path='/game' element={<GamePage />} />
         <Route path='/join' element={<JoinPage />} />
         <Route path='/play' element={<PlayPage />} />
+        <Route path='/credits' element={<Credits />} />
         <Route path='/rejoin' element={<RejoinPage />} />
         <Route path='/rejoinhost' element={<RejoinHost />} />
         <Route path='/dummyplayer' element={<DummyPlayerPage />} />
