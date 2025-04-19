@@ -119,9 +119,6 @@ const GamePage = () => {
 
     socket.on('connect', () => {
       console.log(`Connected with id ${socket.id}`);
-      if (roomCode) {
-        socket.emit('requestGameRoom', roomCode);
-      }
     });
 
     socket.on('returnGameRoom', (room) => {
@@ -133,6 +130,12 @@ const GamePage = () => {
       socket.off('connect');
       socket.off('returnGameRoom');
     };
+  }, []);
+
+  useEffect(() => {
+    if (roomCode) {
+      socket.emit('requestGameRoom', roomCode);
+    }
   }, [roomCode]);
 
   useEffect(() => {
