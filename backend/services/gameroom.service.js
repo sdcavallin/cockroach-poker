@@ -127,6 +127,7 @@ export class GameRoomService {
     if (!gameRoom) {
       throw new Error(`startGame(): GameRoom ${roomCode} not found.`);
     }
+    if (gameRoom.gameStatus === GameStatus.ONGOING) return;
 
     // Set game status to ONGOING
     gameRoom.gameStatus = GameStatus.ONGOING;
@@ -146,7 +147,7 @@ export class GameRoomService {
       [deck[i], deck[j]] = [deck[j], deck[i]];
     }
 
-    // Deal cards evenly (just divide all cards among players, its fin eif theres hella cards)
+    // Deal cards evenly (just divide all cards among players)
     const numPlayers = gameRoom.players.length;
     const cardsPerPlayer = Math.floor(numCards / numPlayers);
 
@@ -166,7 +167,7 @@ export class GameRoomService {
     // Set the first turn player to whoever joined first
     gameRoom.currentAction = {
       turnPlayer: gameRoom.players[0].uuid,
-      prevPlayer: null,
+      prevPlayer: gameRoom.players[0].uuid,
       conspiracy: [],
       card: null,
       claim: null,
