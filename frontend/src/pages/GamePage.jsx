@@ -114,6 +114,10 @@ const GamePage = () => {
 
   const [gameRoom, setGameRoom] = useState(null);
 
+  const handleJoinRoom = (roomCode) => {
+    socket.emit('joinSocketRoom', roomCode);
+  };
+
   useEffect(() => {
     if (!socket.connected) socket.connect();
 
@@ -134,7 +138,7 @@ const GamePage = () => {
 
   useEffect(() => {
     if (roomCode) {
-      socket.emit('requestGameRoom', roomCode);
+      handleJoinRoom(roomCode);
     }
   }, [roomCode]);
 

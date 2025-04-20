@@ -59,6 +59,7 @@ const PlayPage = () => {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [statement, setStatement] = useState('');
   const [callMode, setCallMode] = useState(false);
+  const [gameRoom, setGameRoom] = useState(null);
 
   const [players, setPlayers] = useState([]);
   const [cards, setCards] = useState([1, 2, 3, 4, 5, 6, 7, 8]);
@@ -70,6 +71,10 @@ const PlayPage = () => {
   const [receivedCardData, setReceivedCardData] = useState(null);
   const [cardModalOpen, setCardModalOpen] = useState(false);
   const [showPile, setShowPile] = useState(false);
+
+  const handleJoinRoom = (roomCode) => {
+    socket.emit('joinSocketRoom', roomCode);
+  };
 
   const handleCardSelection = (card) => {
     setSelectedCard(card);
@@ -152,6 +157,14 @@ const PlayPage = () => {
       }
 
       setPlayers(gameRoom.players || []);
+      setGameRoom(gameRoom);
+
+      for (const p of gameRoom.players) {
+        if (p.uuid === uuid) {
+          setPlayer(p);
+          break;
+        }
+      }
     };
 
     socket.on('connect', handleConnect);
@@ -175,6 +188,28 @@ const PlayPage = () => {
       socket.emit('requestGameRoom', roomCode);
     }
   }, [socketReady, location]);
+
+  useEffect(() => {
+    const handleTurnPlayerUpdate = (turnPlayerId) => {
+      console.log('[TURN EVENT]', { turnPlayerId, playerId: player?.uuid });
+      if (turnPlayerId === player?.uuid) {
+        console.log('MATCHING TURN PLAYER');
+        turnPlayerModal.onOpen();
+      }
+    };
+
+    socket.on('turnPlayerUpdated', handleTurnPlayerUpdate);
+
+    return () => {
+      socket.off('turnPlayerUpdated', handleTurnPlayerUpdate);
+    };
+  }, [player, toast]);
+
+  useEffect(() => {
+    if (uuid) {
+      handleJoinRoom(roomCode);
+    }
+  }, [uuid]);
 
   const CardNumberToString = {
     0: 'Unknown',
@@ -210,22 +245,6 @@ const PlayPage = () => {
     'navi-avatar': '/avatars/navi-avatar.png',
     'wonder-woman': '/avatars/wonder-woman.png',
   };
-
-  useEffect(() => {
-    const handleTurnPlayerUpdate = (turnPlayerId) => {
-      console.log('[TURN EVENT]', { turnPlayerId, playerId: player?.uuid });
-      if (turnPlayerId === player?.uuid) {
-        console.log('MATCHING TURN PLAYER');
-        turnPlayerModal.onOpen();
-      }
-    };
-
-    socket.on('turnPlayerUpdated', handleTurnPlayerUpdate);
-
-    return () => {
-      socket.off('turnPlayerUpdated', handleTurnPlayerUpdate);
-    };
-  }, [player, toast]);
 
   return (
     <Box

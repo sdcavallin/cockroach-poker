@@ -82,6 +82,11 @@ setTimeout(() => {
 io.on('connection', (socket) => {
   console.log(`Socket ${socket.id} connected.`);
 
+  const sendGameRoomToEveryoneInRoom = (roomCode) => {
+    const gameRoom = gameRoomService.getGameRoom(roomCode);
+    io.to(GAME_ROOM_PREFIX + roomCode).emit('returnGameRoom', gameRoom);
+  };
+
   // connectToRoom: an individual player connects to a gameroom to input their data. Occurs whenever a player socket is connected
   socket.on('connectToRoom', async (roomCode, name) => {
     //const userUUID = getUserUUID(socket.handshake);
@@ -169,8 +174,9 @@ io.on('connection', (socket) => {
   socket.on('requestStartGame', async (roomCode) => {
     console.log(`Socket ${socket.id} requested to start game ${roomCode}`);
     gameRoomService.startGame(roomCode);
-    console.log(`Emitting returnStartGame`);
+    console.log(`Emitting returnStartGame for room ${roomCode}`);
     socket.emit('returnStartGame', roomCode);
+    sendGameRoomToEveryoneInRoom(roomCode);
   });
 
   // requestJoinPlayerToRoom: request to create a new player in a GameRoom that is in SETUP
