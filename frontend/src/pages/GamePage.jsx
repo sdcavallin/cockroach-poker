@@ -287,7 +287,7 @@ const GamePage = () => {
                       whiteSpace='nowrap'
                       textOverflow='ellipsis'
                     >
-                      hand size: {player.hand.length}
+                      hand size: {player?.hand?.length}
                     </Text>
                   </Box>
 
