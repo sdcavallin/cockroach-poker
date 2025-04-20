@@ -194,7 +194,9 @@ const GamePage = () => {
               fontWeight='bold'
               color='#264653'
             >
-              Room Code: {roomCode}
+              Room Code: {roomCode} <br />
+              Turn player: {gameRoom?.currentAction?.turnPlayer}{' '}
+              {/* TODO: Delete this and show in a cooler way */}
             </Text>
 
             <Text
