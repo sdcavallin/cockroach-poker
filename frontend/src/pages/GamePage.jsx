@@ -195,7 +195,7 @@ const GamePage = () => {
               color='#264653'
             >
               Room Code: {roomCode} <br />
-              Turn player: {gameRoom?.currentAction?.turnPlayer}{' '}
+              Turn player: {gameRoom?.currentAction?.turnPlayer.nickname}{' '}
               {/* TODO: Delete this and show in a cooler way */}
             </Text>
 
@@ -236,27 +236,61 @@ const GamePage = () => {
 
               return (
                 <Box key={`player-${index}`}>
-                  <Image
-                    src={avatarSrc}
-                    alt={player.nickname}
-                    width={['50px', '65px', '80px']}
+                  <Box
                     position='absolute'
+                    display='flex'
+                    flexDirection='column'
+                    alignItems='center'
                     zIndex={2}
-                    borderRadius='full'
-                    animation={
-                      player.uuid === turnPlayerId
-                        ? `${pulseGlow} 1.5s ease-in-out infinite`
-                        : 'none'
-                    }
-                    filter={
-                      isInConspiracy
-                        ? 'grayscale(100%) brightness(0.5)'
-                        : 'none'
-                    }
-                    opacity={isInConspiracy ? 0.5 : 1}
-                    transition='filter 0.5s ease, opacity 0.5s ease'
                     {...positions[index % positions.length]}
-                  />
+                  >
+                    <Image
+                      src={avatarSrc}
+                      alt={player.nickname}
+                      width={['50px', '65px', '80px']}
+                      borderRadius='full'
+                      animation={
+                        player.uuid === turnPlayerId
+                          ? `${pulseGlow} 1.5s ease-in-out infinite`
+                          : 'none'
+                      }
+                      filter={
+                        isInConspiracy
+                          ? 'grayscale(100%) brightness(0.5)'
+                          : 'none'
+                      }
+                      opacity={isInConspiracy ? 0.5 : 1}
+                      transition='filter 0.5s ease, opacity 0.5s ease'
+                    />
+                    <Text
+                      mt='2px'
+                      fontSize={['xs', 'sm']}
+                      color='white'
+                      fontWeight='bold'
+                      textShadow='0 0 3px black'
+                      textAlign='center'
+                      maxW='80px'
+                      overflow='hidden'
+                      whiteSpace='nowrap'
+                      textOverflow='ellipsis'
+                    >
+                      {player.nickname}
+                    </Text>
+                    <Text
+                      mt='1px'
+                      fontSize={['2xs', 'xs']}
+                      color='white'
+                      textShadow='0 0 3px black'
+                      textAlign='center'
+                      maxW='80px'
+                      overflow='hidden'
+                      whiteSpace='nowrap'
+                      textOverflow='ellipsis'
+                    >
+                      hand size: {player.hand.length}
+                    </Text>
+                  </Box>
+
                   <Box
                     position='absolute'
                     display='flex'
