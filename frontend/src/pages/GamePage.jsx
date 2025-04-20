@@ -1,8 +1,10 @@
-import { Box, Text, Container, Image } from '@chakra-ui/react';
+import { Box, Text, Container, Image, HStack, VStack } from '@chakra-ui/react';
 import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { keyframes } from '@emotion/react';
+import { Link as ReactRouterLink } from 'react-router-dom';
+import { Link as ChakraLink } from '@chakra-ui/react';
 
 const socket = io('http://localhost:5000', { autoConnect: false });
 
@@ -158,17 +160,17 @@ const GamePage = () => {
   );
 
   return (
-    <Container
-      maxW='100vw'
-      maxH='100vh'
-      display='flex'
-      justifyContent='center'
-      alignItems='center'
-      bg='#2A9D8F'
-      p={0}
-      flexDirection='column'
-    >
-      {gameRoom && (
+    <>
+      <Container
+        maxW='100vw'
+        maxH='100vh'
+        display='flex'
+        justifyContent='center'
+        alignItems='center'
+        bg='#2A9D8F'
+        p={0}
+        flexDirection='column'
+      >
         <Box
           display='flex'
           justifyContent='center'
@@ -179,200 +181,220 @@ const GamePage = () => {
           position='relative'
           width='100%'
         >
-          <Box
-            width='90%'
-            height='90%'
-            bg='#F4A261'
-            p={4}
-            display='flex'
-            flexDirection='column'
-            alignItems='center'
-            justifyContent='center'
-            position='relative'
-            borderRadius='md'
-          >
-            <Text
-              position='absolute'
-              top='4'
-              fontSize='xl'
-              fontWeight='bold'
-              color='#264653'
+          {gameRoom ? (
+            <Box
+              width='90%'
+              height='90%'
+              bg='#F4A261'
+              p={4}
+              display='flex'
+              flexDirection='column'
+              alignItems='center'
+              justifyContent='center'
+              position='relative'
+              borderRadius='md'
             >
-              {/* TODO: Delete both of these and show in a cooler way */}
-              Room Code: {roomCode} <br />
-              Turn player: {gameRoom?.currentAction?.turnPlayer}{' '}
-            </Text>
+              <Text
+                position='absolute'
+                top='4'
+                fontSize='xl'
+                fontWeight='bold'
+                color='#264653'
+              >
+                {/* TODO: Delete both of these and show in a cooler way */}
+                Room Code: {roomCode} <br />
+                Turn player: {gameRoom?.currentAction?.turnPlayer}{' '}
+              </Text>
 
-            <Text
-              position='absolute'
-              top='50%'
-              left='50%'
-              transform='translate(-50%, -50%)'
-              fontSize={['30px', '40px', '50px']}
-              fontWeight='bold'
-              color='#264653'
-              textAlign='center'
-              opacity={0.2}
-            >
-              {/*TODO: Change this from low opacity in the center to normal opacity on top somewhere, optionally with glow*/}
-              🔗cockroach.poker
-            </Text>
+              <Text
+                position='absolute'
+                top='50%'
+                left='50%'
+                transform='translate(-50%, -50%)'
+                fontSize={['30px', '40px', '50px']}
+                fontWeight='bold'
+                color='#264653'
+                textAlign='center'
+                opacity={0.2}
+              >
+                {/*TODO: Change this from low opacity in the center to normal opacity on top somewhere, optionally with glow*/}
+                🔗cockroach.poker
+              </Text>
 
-            {gameRoom.players.map((player, index) => {
-              const pileCounts = player?.pile?.reduce((acc, card) => {
-                acc[card] = (acc[card] || 0) + 1;
-                return acc;
-              }, {});
+              {gameRoom.players.map((player, index) => {
+                const pileCounts = player?.pile?.reduce((acc, card) => {
+                  acc[card] = (acc[card] || 0) + 1;
+                  return acc;
+                }, {});
 
-              const positions = [
-                { top: '5%', left: '5%' },
-                { top: '5%', right: '5%' },
-                { bottom: '5%', left: '5%' },
-                { bottom: '5%', right: '5%' },
-                { top: '5%', left: '50%', transform: 'translateX(-50%)' },
-                { bottom: '5%', left: '50%', transform: 'translateX(-50%)' },
-              ];
+                const positions = [
+                  { top: '5%', left: '5%' },
+                  { top: '5%', right: '5%' },
+                  { bottom: '5%', left: '5%' },
+                  { bottom: '5%', right: '5%' },
+                  { top: '5%', left: '50%', transform: 'translateX(-50%)' },
+                  { bottom: '5%', left: '50%', transform: 'translateX(-50%)' },
+                ];
 
-              const avatarSrc =
-                avatarMap[player.playerIcon] || '/avatars/default.png';
+                const avatarSrc =
+                  avatarMap[player.playerIcon] || '/avatars/default.png';
 
-              const isInConspiracy =
-                gameRoom?.currentAction?.conspiracy?.includes(player.uuid);
+                const isInConspiracy =
+                  gameRoom?.currentAction?.conspiracy?.includes(player.uuid);
 
-              return (
-                <Box key={`player-${index}`}>
+                return (
+                  <Box key={`player-${index}`}>
+                    <Box
+                      position='absolute'
+                      display='flex'
+                      flexDirection='column'
+                      alignItems='center'
+                      zIndex={2}
+                      {...positions[index % positions.length]}
+                    >
+                      <Image
+                        src={avatarSrc}
+                        alt={player.nickname}
+                        width={['50px', '65px', '80px']}
+                        borderRadius='full'
+                        animation={
+                          player.uuid === turnPlayerId
+                            ? `${pulseGlow} 1.5s ease-in-out infinite`
+                            : 'none'
+                        }
+                        filter={
+                          isInConspiracy
+                            ? 'grayscale(100%) brightness(0.5)'
+                            : 'none'
+                        }
+                        opacity={isInConspiracy ? 0.5 : 1}
+                        transition='filter 0.5s ease, opacity 0.5s ease'
+                      />
+                      <Text
+                        mt='2px'
+                        fontSize={['xs', 'sm']}
+                        color='white'
+                        fontWeight='bold'
+                        textShadow='0 0 3px black'
+                        textAlign='center'
+                        maxW='80px'
+                        overflow='hidden'
+                        whiteSpace='nowrap'
+                        textOverflow='ellipsis'
+                      >
+                        {player.nickname}
+                      </Text>
+                      <Text
+                        mt='1px'
+                        fontSize={['2xs', 'xs']}
+                        color='white'
+                        textShadow='0 0 3px black'
+                        textAlign='center'
+                        maxW='80px'
+                        overflow='hidden'
+                        whiteSpace='nowrap'
+                        textOverflow='ellipsis'
+                      >
+                        hand size: {player?.hand?.length}
+                      </Text>
+                    </Box>
+
+                    <Box
+                      position='absolute'
+                      display='flex'
+                      // flexDirection='column'
+                      gap='4px'
+                      p={1}
+                      bg='rgba(0,0,0,0.4)'
+                      borderRadius='md'
+                      zIndex={1}
+                      {...getPilePosition(positions[index % positions.length])}
+                    >
+                      {pileCounts &&
+                        Object.entries(pileCounts).map(([cardNum, count]) => {
+                          const card = parseInt(cardNum);
+                          const imageSrc = CardNumberToImage[card];
+                          const label = CardNumberToString[card];
+
+                          return (
+                            <Box
+                              key={`pile-${index}-${card}`}
+                              display='flex'
+                              alignItems='center'
+                              gap='6px'
+                            >
+                              <Image
+                                src={imageSrc}
+                                alt={label}
+                                height='30px'
+                                objectFit='contain'
+                              />
+                              <Text
+                                fontSize='sm'
+                                color='white'
+                                whiteSpace='nowrap'
+                              >
+                                ×{count}
+                              </Text>
+                            </Box>
+                          );
+                        })}
+                    </Box>
+                  </Box>
+                );
+              })}
+
+              {gameRoom.currentAction &&
+                gameRoom.currentAction.conspiracy.length === 1 && ( // THIS PART CONTROLS CENTER CARD APPEAR/DISAPPEAR
                   <Box
                     position='absolute'
+                    top='50%'
+                    left='50%'
+                    transform='translate(-50%, -50%)'
+                    width={['80px', '100px', '120px']}
+                    height={['120px', '140px', '160px']}
+                    backgroundColor='#264653'
+                    border='4px solid white'
+                    borderRadius='md'
                     display='flex'
-                    flexDirection='column'
+                    justifyContent='center'
                     alignItems='center'
-                    zIndex={2}
-                    {...positions[index % positions.length]}
+                    boxShadow='0 0 20px rgba(0,0,0,0.5)'
+                    zIndex='3'
                   >
                     <Image
-                      src={avatarSrc}
-                      alt={player.nickname}
-                      width={['50px', '65px', '80px']}
-                      borderRadius='full'
-                      animation={
-                        player.uuid === turnPlayerId
-                          ? `${pulseGlow} 1.5s ease-in-out infinite`
-                          : 'none'
-                      }
-                      filter={
-                        isInConspiracy
-                          ? 'grayscale(100%) brightness(0.5)'
-                          : 'none'
-                      }
-                      opacity={isInConspiracy ? 0.5 : 1}
-                      transition='filter 0.5s ease, opacity 0.5s ease'
+                      src='/cards/back.png'
+                      alt='Facedown Card'
+                      objectFit='cover'
+                      width='100%'
+                      height='100%'
+                      borderRadius='md'
                     />
-                    <Text
-                      mt='2px'
-                      fontSize={['xs', 'sm']}
-                      color='white'
-                      fontWeight='bold'
-                      textShadow='0 0 3px black'
-                      textAlign='center'
-                      maxW='80px'
-                      overflow='hidden'
-                      whiteSpace='nowrap'
-                      textOverflow='ellipsis'
-                    >
-                      {player.nickname}
-                    </Text>
-                    <Text
-                      mt='1px'
-                      fontSize={['2xs', 'xs']}
-                      color='white'
-                      textShadow='0 0 3px black'
-                      textAlign='center'
-                      maxW='80px'
-                      overflow='hidden'
-                      whiteSpace='nowrap'
-                      textOverflow='ellipsis'
-                    >
-                      hand size: {player?.hand?.length}
-                    </Text>
                   </Box>
-
-                  <Box
-                    position='absolute'
-                    display='flex'
-                    // flexDirection='column'
-                    gap='4px'
-                    p={1}
-                    bg='rgba(0,0,0,0.4)'
-                    borderRadius='md'
-                    zIndex={1}
-                    {...getPilePosition(positions[index % positions.length])}
+                )}
+            </Box>
+          ) : (
+            <>
+              <VStack>
+                <Text fontSize={'2xl'}>Loading game...</Text>
+                <Text fontSize={'lg'}>
+                  If this doesn't load,{' '}
+                  <Text
+                    as={'span'}
+                    color={'teal.500'}
+                    textDecoration={'underline'}
                   >
-                    {pileCounts &&
-                      Object.entries(pileCounts).map(([cardNum, count]) => {
-                        const card = parseInt(cardNum);
-                        const imageSrc = CardNumberToImage[card];
-                        const label = CardNumberToString[card];
-
-                        return (
-                          <Box
-                            key={`pile-${index}-${card}`}
-                            display='flex'
-                            alignItems='center'
-                            gap='6px'
-                          >
-                            <Image
-                              src={imageSrc}
-                              alt={label}
-                              height='30px'
-                              objectFit='contain'
-                            />
-                            <Text
-                              fontSize='sm'
-                              color='white'
-                              whiteSpace='nowrap'
-                            >
-                              ×{count}
-                            </Text>
-                          </Box>
-                        );
-                      })}
-                  </Box>
-                </Box>
-              );
-            })}
-
-            {gameRoom.currentAction &&
-              gameRoom.currentAction.conspiracy.length === 1 && ( // THIS PART CONTROLS CENTER CARD APPEAR/DISAPPEAR
-                <Box
-                  position='absolute'
-                  top='50%'
-                  left='50%'
-                  transform='translate(-50%, -50%)'
-                  width={['80px', '100px', '120px']}
-                  height={['120px', '140px', '160px']}
-                  backgroundColor='#264653'
-                  border='4px solid white'
-                  borderRadius='md'
-                  display='flex'
-                  justifyContent='center'
-                  alignItems='center'
-                  boxShadow='0 0 20px rgba(0,0,0,0.5)'
-                  zIndex='3'
-                >
-                  <Image
-                    src='/cards/back.png'
-                    alt='Facedown Card'
-                    objectFit='cover'
-                    width='100%'
-                    height='100%'
-                    borderRadius='md'
-                  />
-                </Box>
-              )}
-          </Box>
+                    <ChakraLink as={ReactRouterLink} to='/'>
+                      try again.
+                    </ChakraLink>
+                  </Text>
+                </Text>
+              </VStack>
+            </>
+          )}
         </Box>
-      )}
-    </Container>
+      </Container>
+    </>
   );
 };
 

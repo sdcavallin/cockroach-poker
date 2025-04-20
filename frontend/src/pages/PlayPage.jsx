@@ -57,7 +57,7 @@ const PlayPage = () => {
   const avatar = location.state?.avatar;
   const [selectedCard, setSelectedCard] = useState(null);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
-  const [statement, setStatement] = useState('');
+  const [claim, setClaim] = useState(0);
   const [callMode, setCallMode] = useState(false);
   const [gameRoom, setGameRoom] = useState(null);
   const [isMyTurn, setIsMyTurn] = useState(false);
@@ -91,15 +91,15 @@ const PlayPage = () => {
   };
 
   const handleStatementSubmit = () => {
-    if (!statement.trim()) {
-      alert('Please enter a statement');
+    if (claim === 0) {
+      alert('Please make a claim');
       return;
     }
 
     console.log('Sending card:', {
       card: selectedCard,
       player: selectedPlayer,
-      statement: statement,
+      claim: claim,
     });
 
     socket.emit(
@@ -107,15 +107,15 @@ const PlayPage = () => {
       player?.uuid,
       selectedPlayer.uuid,
       selectedCard,
-      statement
+      claim
     );
 
     makeStatementDrawer.onClose();
     setSelectedCard(null);
     setSelectedPlayer(null);
-    setStatement('');
+    setClaim(0);
     alert(
-      `Card ${selectedCard} sent to ${selectedPlayer.nickname} with statement: '${statement}'`
+      `Card ${selectedCard} sent to ${selectedPlayer.nickname} with claim: '${claim}'`
     );
   };
 
@@ -649,7 +649,7 @@ const PlayPage = () => {
                       What will you claim this card is?
                     </Text>
                     <Text fontSize='sm' color='gray.600'>
-                      Your statement can be{' '}
+                      Your claim can be{' '}
                       <Text as='span' color='green.600' fontWeight='bold'>
                         the truth
                       </Text>{' '}
@@ -670,18 +670,18 @@ const PlayPage = () => {
                           .map(([num, label]) => (
                             <Button
                               key={num}
-                              bg={statement === label ? '#f2ecb8' : ''}
+                              bg={claim === label ? '#f2ecb8' : ''}
                               color={
                                 CardNumberToString[selectedCard] === label
                                   ? 'green.600'
                                   : ''
                               }
                               borderColor={
-                                statement === label ? 'gray.600' : 'gray.300'
+                                claim === label ? 'gray.600' : 'gray.300'
                               }
                               variant={'outline'}
-                              borderWidth={statement === label ? '2px' : '1px'}
-                              onClick={() => setStatement(label)}
+                              borderWidth={claim === label ? '2px' : '1px'}
+                              onClick={() => setClaim(key)}
                             >
                               {label}
                             </Button>
