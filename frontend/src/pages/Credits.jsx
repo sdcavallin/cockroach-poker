@@ -7,7 +7,7 @@ const Credits = () => {
       <Heading mb={6}>Credits</Heading>
 
       {/* Devs */}
-      <Heading size='md' mt={4}>
+      <Heading size='md' mt={4} mb={2}>
         Developed By
       </Heading>
       <VStack align='start'>
@@ -17,14 +17,14 @@ const Credits = () => {
       </VStack>
 
       {/* Assets */}
-      <Heading size='md' mt={6}>
+      <Heading size='md' mt={6} mb={2}>
         Assets
       </Heading>
       <VStack align='start'>
-        <Text>Card images by Lindsey Seay</Text>
+        <Text>Card designs by Lindsey Seay</Text>
         <Text>
-          Avatar images by{' '}
-          <Link href='https://icons8.com/' isExternal>
+          Avatars by{' '}
+          <Link href='https://icons8.com/' color='teal.300' isExternal>
             Icons8↗
           </Link>
         </Text>
@@ -40,7 +40,9 @@ const Credits = () => {
       </VStack>
 
       {/* Tools */}
-      <Heading size='lg'>Built With</Heading>
+      <Heading size='md' mt={6} mb={2}>
+        Built With
+      </Heading>
       <VStack align='start' spacing={2}>
         <Text>
           <Link href='https://chakra-ui.com/' isExternal color='teal.300'>
