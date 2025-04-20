@@ -32,10 +32,10 @@ const Credits = () => {
           <strong>"Justice"</strong> by <em>Sonda</em>
         </Text>
         <Text>
-          <strong>"Drives Me Nuts"</strong> by <em>PATTERSTTV</em>
+          <strong>"Drives Me Nuts"</strong> by <em>A.T.M.</em>
         </Text>
         <Text>
-          <strong>"Funk in the Trunk"</strong> by <em>PATTERSTTV</em>
+          <strong>"Funk in the Trunk"</strong> by <em>Trinity</em>
         </Text>
       </VStack>
 

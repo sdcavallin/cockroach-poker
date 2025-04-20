@@ -28,23 +28,27 @@ const renderWithProviders = (ui) => {
 describe('HomePage component', () => {
   test('renders the title', () => {
     renderWithProviders(<HomePage />);
-    expect(screen.getByText(/COCKROACH\s+POKER🪳/i)).toBeInTheDocument();
+    const title = screen.getByText(/COCKROACH\s+POKER🪳/i);
+    expect(title).to.exist;
   });
 
   test('renders the CREATE button', () => {
     renderWithProviders(<HomePage />);
-    expect(screen.getByRole('button', { name: /create/i })).toBeInTheDocument();
+    const button = screen.getByRole('button', { name: /create/i });
+    expect(button).to.exist;
+    expect(button.textContent.toLowerCase()).to.include('create');
   });
 
   test('renders the JOIN button as a link', () => {
     renderWithProviders(<HomePage />);
-    const joinButton = screen.getByRole('button', { name: /join/i });
-    expect(joinButton).toBeInTheDocument();
-    expect(joinButton.closest('a')).toHaveAttribute('href', '/join');
+    const joinLink = screen.getByRole('link', { name: /join/i });
+    expect(joinLink).to.exist;
+    expect(joinLink.getAttribute('href')).to.equal('/join');
   });
 
   test('renders the image with alt text "Back"', () => {
     renderWithProviders(<HomePage />);
-    expect(screen.getByAltText(/back/i)).toBeInTheDocument();
+    const img = screen.getByAltText(/back/i);
+    expect(img).to.exist;
   });
 });
