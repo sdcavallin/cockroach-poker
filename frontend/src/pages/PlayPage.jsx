@@ -60,6 +60,8 @@ const PlayPage = () => {
   const [statement, setStatement] = useState('');
   const [callMode, setCallMode] = useState(false);
   const [gameRoom, setGameRoom] = useState(null);
+  const [isMyTurn, setIsMyTurn] = useState(false);
+  const [isFirstTurnInGameAction, setIsFirstTurnInGameAction] = useState(false);
 
   const [players, setPlayers] = useState([]);
   const [cards, setCards] = useState([1, 2, 3, 4, 5, 6, 7, 8]);
@@ -158,11 +160,20 @@ const PlayPage = () => {
 
       setPlayers(gameRoom.players || []);
       setGameRoom(gameRoom);
+      console.log(gameRoom);
 
       for (const p of gameRoom.players) {
         if (p.uuid === uuid) {
           setPlayer(p);
           break;
+        }
+      }
+
+      const gameAction = gameRoom.currentAction;
+      if (gameAction && gameAction.turnPlayer === uuid) {
+        setIsMyTurn(true);
+        if (gameAction.prevPlayer === uuid) {
+          setIsFirstTurnInGameAction(true);
         }
       }
     };
@@ -379,64 +390,92 @@ const PlayPage = () => {
                 </Text>
               </Box>
             )}
-            <Card>
-              <CardHeader bg='#FBC02D' borderTopRadius='md'>
-                <Heading size='md' textAlign='center'>
-                  {showPile ? 'Your Pile' : 'Your Hand'}
-                </Heading>
-              </CardHeader>
-              <CardBody maxHeight='300px' overflowY='auto' p={4}>
-                <SimpleGrid columns={2} spacing={4}>
-                  {(showPile ? player?.pile || [] : player?.hand || []).map(
-                    (card, index) => (
-                      <Box
-                        key={`${card}-${index}`}
-                        bg='white'
-                        height='200'
-                        // // border='2px solid'
-                        // borderColor={
-                        //   selectedCard === card ? 'teal.500' : 'gray.200'
-                        // }
-                        borderRadius='md'
-                        display='flex'
-                        justifyContent='center'
-                        alignItems='center'
-                        flexDirection='column'
-                        _hover={
-                          {
-                            // borderColor: 'teal.300',
-                            // transform: 'scale(1.05)',
-                          }
-                        }
-                        transition='all 0.2s'
-                        cursor='pointer'
-                        onClick={() => handleCardSelection(card)}
-                      >
-                        <Image
-                          src={CardNumberToImage[card]}
-                          alt={CardNumberToString[card]}
-                          height='200'
-                          objectFit='contain'
-                          mb={2}
-                        />
-                        {/* <Text fontWeight='bold'>
+            {gameRoom.gameStatus === 1 ? (
+              <>
+                <Card>
+                  <CardHeader bg='#FBC02D' borderTopRadius='md'>
+                    <Heading size='md' textAlign='center'>
+                      {showPile ? 'Your Pile' : 'Your Hand'}
+                    </Heading>
+                  </CardHeader>
+                  <CardBody maxHeight='300px' overflowY='auto' p={4}>
+                    <SimpleGrid columns={2} spacing={4}>
+                      {(showPile ? player?.pile || [] : player?.hand || []).map(
+                        (card, index) => (
+                          <Box
+                            key={`${card}-${index}`}
+                            bg='white'
+                            height='200'
+                            // // border='2px solid'
+                            // borderColor={
+                            //   selectedCard === card ? 'teal.500' : 'gray.200'
+                            // }
+                            borderRadius='md'
+                            display='flex'
+                            justifyContent='center'
+                            alignItems='center'
+                            flexDirection='column'
+                            _hover={
+                              {
+                                // borderColor: 'teal.300',
+                                // transform: 'scale(1.05)',
+                              }
+                            }
+                            transition='all 0.2s'
+                            //cursor='pointer'
+                            //onClick={() => handleCardSelection(card)}
+                          >
+                            <Image
+                              src={CardNumberToImage[card]}
+                              alt={CardNumberToString[card]}
+                              height='200'
+                              objectFit='contain'
+                              mb={2}
+                            />
+                            {/* <Text fontWeight='bold'>
                           {CardNumberToString[card]}
                         </Text> */}
-                      </Box>
-                    )
-                  )}
-                </SimpleGrid>
-              </CardBody>
-            </Card>
-
-            <Button
-              colorScheme='yellow'
-              onClick={selectCardDrawer.onOpen}
-              width='100%'
-            >
-              Play!
-            </Button>
-
+                          </Box>
+                        )
+                      )}
+                    </SimpleGrid>
+                  </CardBody>
+                </Card>
+                <Button
+                  colorScheme='yellow'
+                  onClick={selectCardDrawer.onOpen}
+                  width='100%'
+                  disabled={!(isMyTurn && isFirstTurnInGameAction)}
+                >
+                  {isMyTurn && isFirstTurnInGameAction
+                    ? 'Play!'
+                    : "It's not your turn yet."}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Text fontSize='xl'>
+                  Waiting for the host to start the game...
+                </Text>{' '}
+                <Text fontSize='xl'>
+                  Players:{' '}
+                  <Text as='span' fontWeight={'semibold'}>
+                    {gameRoom.numPlayers}
+                    /6
+                  </Text>
+                </Text>
+              </>
+            )}
+            {/*TODO: Replace this with a Toast and color change when its your turn and a Modal when you are NOT the first turn in gameAction (to select call or pass)*/}
+            {isMyTurn ? <Text size='lg'>It's your turn!</Text> : ''}
+            {isFirstTurnInGameAction ? (
+              <Text size='lg'>
+                You are starting the turn (e.g. you pick one of your own cards
+                and who to send it to)
+              </Text>
+            ) : (
+              ''
+            )}
             <Drawer
               isOpen={selectCardDrawer.isOpen}
               placement='right'
@@ -493,7 +532,6 @@ const PlayPage = () => {
                 </DrawerFooter>
               </DrawerContent>
             </Drawer>
-
             <Drawer
               isOpen={selectPlayerDrawer.isOpen}
               placement='right'
@@ -584,7 +622,6 @@ const PlayPage = () => {
                 </DrawerFooter>
               </DrawerContent>
             </Drawer>
-
             <Drawer
               isOpen={makeStatementDrawer.isOpen}
               placement='right'
