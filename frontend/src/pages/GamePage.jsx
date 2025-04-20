@@ -125,9 +125,9 @@ const GamePage = () => {
       console.log(`Connected with id ${socket.id}`);
     });
 
-    socket.on('returnGameRoom', (room) => {
-      console.log('Received returnGameRoom', room);
-      setGameRoom(room);
+    socket.on('returnGameRoom', (gameRoom) => {
+      console.log('Received returnGameRoom', gameRoom);
+      setGameRoom(gameRoom);
     });
 
     return () => {
@@ -198,9 +198,9 @@ const GamePage = () => {
               fontWeight='bold'
               color='#264653'
             >
+              {/* TODO: Delete both of these and show in a cooler way */}
               Room Code: {roomCode} <br />
-              Turn player: {gameRoom?.currentAction?.turnPlayer.nickname}{' '}
-              {/* TODO: Delete this and show in a cooler way */}
+              Turn player: {gameRoom?.currentAction?.turnPlayer}{' '}
             </Text>
 
             <Text
@@ -214,6 +214,7 @@ const GamePage = () => {
               textAlign='center'
               opacity={0.2}
             >
+              {/*TODO: Change this from low opacity in the center to normal opacity on top somewhere, optionally with glow*/}
               🔗cockroach.poker
             </Text>
 
