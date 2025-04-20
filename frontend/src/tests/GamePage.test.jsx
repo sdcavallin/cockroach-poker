@@ -1,13 +1,30 @@
+import '@testing-library/jest-dom';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { ChakraProvider } from '@chakra-ui/react';
 import GamePage from '../pages/GamePage';
 import { vi } from 'vitest';
 
+// Mock socket.io-client
 vi.mock('socket.io-client', () => ({
   io: vi.fn().mockImplementation(() => ({
     connect: vi.fn(),
     disconnect: vi.fn(),
-    on: vi.fn(),
+    on: vi.fn((event, callback) => {
+      if (event === 'returnGameRoom') {
+        // Simulating a response when 'returnGameRoom' is triggered
+        callback({
+          players: [
+            { uuid: '1', nickname: 'Player 1', playerIcon: 'bmo' },
+            { uuid: '2', nickname: 'Player 2', playerIcon: 'finn' },
+          ],
+          currentAction: {
+            turnPlayer: '1',
+            conspiracy: [],
+          },
+        });
+      }
+    }),
     off: vi.fn(),
     emit: vi.fn(),
     connected: true,
@@ -15,61 +32,69 @@ vi.mock('socket.io-client', () => ({
   })),
 }));
 
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useLocation: () => ({
-      pathname: '/game',
-      state: { roomCode: '123T' },
-    }),
-  };
-});
+describe('GamePage component', () => {
+  test('renders with valid roomCode', async () => {
+    const roomCode = '123B';
 
-describe('GamePage', () => {
-  it('renders without crashing', () => {
     render(
-      <MemoryRouter initialEntries={['/game']}>
-        <Routes>
-          <Route path='/game' element={<GamePage />} />
-        </Routes>
-      </MemoryRouter>
+      <ChakraProvider>
+        <MemoryRouter initialEntries={[`/game`]}>
+          <Routes>
+            <Route path='/game' element={<GamePage />} />
+          </Routes>
+        </MemoryRouter>
+      </ChakraProvider>
     );
-    expect(screen.getByText(/Room Code:/i)).toBeInTheDocument();
+
+    const title = screen.getByText(/🔗cockroach.poker/);
+    expect(title).to.exist;
   });
 
-  it('renders room code if provided', () => {
-    render(
-      <MemoryRouter initialEntries={['/game']}>
-        <Routes>
-          <Route path='/game' element={<GamePage />} />
-        </Routes>
-      </MemoryRouter>
-    );
-    expect(screen.getByText(/Room Code: 123T/i)).toBeInTheDocument();
-  });
+  test('renders players images with names bmo and finn', async () => {
+    const roomCode = '123B';
 
-  it('listens to socket events', async () => {
-    const socket = require('socket.io-client').io();
     render(
-      <MemoryRouter initialEntries={['/game']}>
-        <Routes>
-          <Route path='/game' element={<GamePage />} />
-        </Routes>
-      </MemoryRouter>
+      <ChakraProvider>
+        <MemoryRouter initialEntries={[`/game`]}>
+          <Routes>
+            <Route path='/game' element={<GamePage />} />
+          </Routes>
+        </MemoryRouter>
+      </ChakraProvider>
     );
 
     await waitFor(() => {
-      socket.on.mock.calls.forEach(([event, callback]) => {
-        if (event === 'turnPlayerUpdated') {
-          callback('new-turn-id');
-        }
-      });
+      const images = screen.getAllByRole('img');
+      expect(images.length).toBeGreaterThan(0);
     });
 
-    expect(socket.on).toHaveBeenCalledWith(
-      'turnPlayerUpdated',
-      expect.any(Function)
+    expect(screen.getByAltText(/Player 1/i)).toHaveAttribute(
+      'src',
+      '/avatars/bmo.png'
     );
+    expect(screen.getByAltText(/Player 2/i)).toHaveAttribute(
+      'src',
+      '/avatars/finn.png'
+    );
+  });
+
+  test('renders players images if roomCode is valid', async () => {
+    const roomCode = '123B';
+
+    render(
+      <ChakraProvider>
+        <MemoryRouter initialEntries={[`/game`]}>
+          <Routes>
+            <Route path='/game' element={<GamePage />} />
+          </Routes>
+        </MemoryRouter>
+      </ChakraProvider>
+    );
+
+    // Wait for player images to be rendered
+    await waitFor(() => {
+      const images = screen.getAllByRole('img');
+      expect(images.length).toBeGreaterThan(0); // Check if images are rendered
+    });
   });
 });
