@@ -147,8 +147,8 @@ const PlayPage = () => {
       setPlayer(player);
     };
 
-    const handleRecieveCard = (claim, conspiracyList) => {
-      setReceivedCardData({ claim, conspiracyList });
+    const handleRecieveCard = (claim, conspiracyList, prevPlayerId) => {
+      setReceivedCardData({ claim, conspiracyList, prevPlayerId });
       setCardModalOpen(true);
     };
 
@@ -201,7 +201,6 @@ const PlayPage = () => {
   }, [isMyTurn, isFirstTurnInGameAction]);
 
   useEffect(() => {
-    //Numbers and strings are truthy so it should show as true
     if (socketReady && roomCode && uuid) {
       socket.emit('getPlayer', roomCode, uuid);
       socket.emit('setSocketId', roomCode, uuid, socket.id);
@@ -210,11 +209,23 @@ const PlayPage = () => {
   }, [socketReady, location]);
 
   useEffect(() => {
-    const handleTurnPlayerUpdate = (turnPlayerId) => {
+    const handleTurnPlayerUpdate = ({ turnPlayerId, isFirstTurn }) => {
       console.log('[TURN EVENT]', { turnPlayerId, playerId: player?.uuid });
       if (turnPlayerId === player?.uuid) {
         console.log('MATCHING TURN PLAYER');
-        turnPlayerModal.onOpen();
+        setIsMyTurn(true);
+        setIsFirstTurnInGameAction(isFirstTurn);
+        if (isFirstTurn) {
+          toast({
+            title: 'You guessed incorrectly!',
+            description: 'Start a new round by picking a card.',
+            status: 'info',
+            duration: 4000,
+            isClosable: true,
+          });
+        } else {
+          turnPlayerModal.onOpen();
+        }
       }
     };
 
@@ -254,6 +265,11 @@ const PlayPage = () => {
     8: '/cards/stinkbug.png',
   };
 
+  const getPlayerName = (uuid) => {
+    const foundPlayer = players.find((p) => p.uuid === uuid);
+    return foundPlayer ? foundPlayer.nickname : 'Unknown Player';
+  };
+
   const avatarMap = {
     'baby-yoda': '/avatars/baby-yoda.png',
     bmo: '/avatars/bmo.png',
@@ -288,7 +304,13 @@ const PlayPage = () => {
           <ModalBody textAlign='center'>
             <Text fontSize='lg' mb={3}>
               {callMode
-                ? 'Do you believe the claim?'
+                ? receivedCardData?.prevPlayerId
+                  ? `${getPlayerName(
+                      receivedCardData.prevPlayerId
+                    )} sent you a card! They claim it is a ${
+                      CardNumberToString[receivedCardData.claim]
+                    }.`
+                  : 'Do you believe the claim?'
                 : "It's your turn to make a move."}
             </Text>
           </ModalBody>
@@ -671,18 +693,19 @@ const PlayPage = () => {
                           .map(([num, label]) => (
                             <Button
                               key={num}
-                              bg={claim === label ? '#f2ecb8' : ''}
-                              color={
-                                CardNumberToString[selectedCard] === label
-                                  ? 'green.600'
-                                  : ''
-                              }
+                              onClick={() => setClaim(Number(num))}
+                              bg={claim === Number(num) ? '#f2ecb8' : ''} // yellow background when selected
                               borderColor={
-                                claim === label ? 'gray.600' : 'gray.300'
+                                claim === Number(num) ? 'gray.600' : 'gray.300'
+                              } // thicker border when selected
+                              borderWidth={
+                                claim === Number(num) ? '2px' : '1px'
                               }
-                              variant={'outline'}
-                              borderWidth={claim === label ? '2px' : '1px'}
-                              onClick={() => setClaim(key)}
+                              variant='outline'
+                              _hover={{
+                                transform: 'scale(1.05)',
+                                boxShadow: 'md',
+                              }}
                             >
                               {label}
                             </Button>

@@ -347,10 +347,10 @@ io.on('connection', (socket) => {
       return;
     }
 
-    io.to(GAME_ROOM_PREFIX + roomCode).emit(
-      'turnPlayerUpdated',
-      gameRoom.currentAction.turnPlayer
-    );
+    io.to(GAME_ROOM_PREFIX + roomCode).emit('turnPlayerUpdated', {
+      turnPlayerId: gameRoom.currentAction.turnPlayer,
+      isFirstTurn: false,
+    });
     //That player can either decide to send back 'cardResolution' or 'playerPassCard'
     const conspiracyList = gameRoom.currentAction.conspiracy;
     console.log(
@@ -360,7 +360,8 @@ io.on('connection', (socket) => {
     );
     socket
       .to(gameRoomService.getPlayerByUUID(roomCode, receiverId).socketId)
-      .emit('playerReceiveCard', claim, conspiracyList);
+      .emit('playerReceiveCard', claim, conspiracyList, senderId);
+    io.to(GAME_ROOM_PREFIX + roomCode).emit('returnGameRoom', gameRoom);
   });
 
   // playerCheckCard: player gets sent back the actual card in the current Conspiracy
@@ -401,16 +402,21 @@ io.on('connection', (socket) => {
       return;
     }
 
-    io.to(GAME_ROOM_PREFIX + roomCode).emit(
-      'turnPlayerUpdated',
-      gameRoom.currentAction.turnPlayer
-    );
+    io.to(GAME_ROOM_PREFIX + roomCode).emit('turnPlayerUpdated', {
+      turnPlayerId: gameRoom.currentAction.turnPlayer,
+      isFirstTurn: false,
+    });
 
     //That player can either decide to send back 'cardResolution' or 'playerPassCard'
     const conspiracyList = gameRoom.currentAction.conspiracy;
     socket
       .to(gameRoomService.getPlayerByUUID(roomCode, receiverId).socketId)
-      .emit('playerReceiveCard', claim, conspiracyList);
+      .emit(
+        'playerReceiveCard',
+        claim,
+        conspiracyList,
+        gameRoom.currentAction.prevPlayer
+      );
   });
 
   // Card Resolution: at the end of a turn a player makes a claim if the player who sent them the card is telling the truth or not
@@ -436,10 +442,10 @@ io.on('connection', (socket) => {
     console.log(`Loser Pile: ${gameRoom.currentAction.turnPlayer}'s pile: ${gameRoom.players[index].pile}
       Current Status: Card ${gameRoom.currentAction.card}, Claim ${gameRoom.currentAction.claim}, Conspiracy ${gameRoom.currentAction.conspiracy}`);
 
-    io.to(GAME_ROOM_PREFIX + roomCode).emit(
-      'turnPlayerUpdated',
-      gameRoom.currentAction.turnPlayer
-    );
+    io.to(GAME_ROOM_PREFIX + roomCode).emit('turnPlayerUpdated', {
+      turnPlayerId: gameRoom.currentAction.turnPlayer,
+      isFirstTurn: true,
+    });
 
     gameRoomService.checkForGameEnd(roomCode, index);
   });
