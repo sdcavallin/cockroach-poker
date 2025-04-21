@@ -92,13 +92,18 @@ const PlayPage = () => {
 
   const handleStatementSubmit = () => {
     if (claim === 0) {
-      alert('Please make a claim');
+      toast({
+        title: 'Please pick a claim.',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+      });
       return;
     }
 
-    console.log('Sending card:', {
+    console.log('Requesting start round:', {
+      player: selectedPlayer.uuid,
       card: selectedCard,
-      player: selectedPlayer,
       claim: claim,
     });
 
@@ -530,9 +535,9 @@ const PlayPage = () => {
                 <DrawerBody>
                   <Text mb={4}>Choose one of your cards to send:</Text>
                   <SimpleGrid columns={2} spacing={4}>
-                    {player?.hand?.map((card) => (
+                    {player?.hand?.map((card, index) => (
                       <Box
-                        key={card}
+                        key={index}
                         height='200'
                         borderRadius='md'
                         display='flex'
@@ -676,7 +681,7 @@ const PlayPage = () => {
                       <Text fontWeight={'bold'} as={'span'}>
                         {CardNumberToString[selectedCard]}
                       </Text>{' '}
-                      card to{' '}
+                      to{' '}
                       <Text fontWeight={'bold'} as={'span'}>
                         {selectedPlayer?.nickname}
                       </Text>
