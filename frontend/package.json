@@ -16,6 +16,7 @@
     "@chakra-ui/react": "^2.8.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "cockroach_poker": "file:..",
     "cors": "^2.8.5",
     "framer-motion": "^12.4.2",
     "js-cookie": "^3.0.5",

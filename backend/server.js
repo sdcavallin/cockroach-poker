@@ -21,6 +21,8 @@ import cookie from 'cookie';
 import { v4 as uuidv4 } from 'uuid';
 import { GameRoomService } from './services/gameroom.service.js';
 import cors from 'cors';
+import path from 'path';
+
 dotenv.config();
 
 const app = express();
@@ -41,19 +43,29 @@ const io = new Server(server, {
 // Allows us to parse JSON data in request body
 app.use(express.json());
 
-app.use('/api/players', playerRoutes);
+// app.use('/api/players', playerRoutes);
 
-app.use('/api/gamerooms', gameRoomRoutes);
+// app.use('/api/gamerooms', gameRoomRoutes);
 
-app.get('/', (req, res) => {
-  const card = Math.floor(Math.random() * 9);
-  const message = `I thought it was a ${
-    CardNumberToString[Cards.COCKROACH]
-  } but it was actually a ${CardNumberToString[card]}!`;
-  res.send(message);
-  // Example of using addCardToHand()
-  //addCardToHand('67ad6bd71b76340c29212842', card);
-});
+// app.get('/', (req, res) => {
+//   const card = Math.floor(Math.random() * 9);
+//   const message = `I thought it was a ${
+//     CardNumberToString[Cards.COCKROACH]
+//   } but it was actually a ${CardNumberToString[card]}!`;
+//   res.send(message);
+//   // Example of using addCardToHand()
+//   //addCardToHand('67ad6bd71b76340c29212842', card);
+// });
+
+const __dirname = path.resolve();
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '/frontend/dist')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'frontend', 'dist', 'index.html'));
+  });
+}
 
 const gameRoomService = new GameRoomService();
 
