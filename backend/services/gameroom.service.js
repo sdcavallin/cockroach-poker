@@ -158,20 +158,130 @@ export class GameRoomService {
       player.handSize = player.hand.length;
     });
 
-    // Debug prints
-    // console.log("Dealt hands:");
-    // gameRoom.players.forEach((player) => {
-    //   console.log(`${player.nickname}: ${player.hand}`);
-    // });
-
     // Set the first turn player to whoever joined first
     gameRoom.currentAction = {
       turnPlayer: gameRoom.players[0].uuid,
       prevPlayer: gameRoom.players[0].uuid,
       conspiracy: [],
-      card: null,
-      claim: null,
+      card: 0,
+      claim: 0,
     };
+  }
+
+  // Starts a round of play.
+  startRound(roomCode, fromPlayer, toPlayer, card, claim) {
+    const gameRoom = this.gameRoomMap.get(roomCode);
+    const currentAction = gameRoom.currentAction;
+
+    // Make sure fromPlayer is the first player in a round
+    if (
+      fromPlayer != currentAction.turnPlayer ||
+      currentAction.turnPlayer != currentAction.prevPlayer
+    ) {
+      console.warn(
+        `Error: startRound: Only the turnPlayer at the start of a round can start a round`
+      );
+      return false;
+    }
+
+    // Remove the card from fromPlayer hand
+    this.removeCardFromHand(roomCode, fromPlayer, card);
+
+    // Update currentAction
+    gameRoom.currentAction = {
+      turnPlayer: toPlayer,
+      prevPlayer: fromPlayer,
+      conspiracy: [fromPlayer],
+      card: card,
+      claim: claim,
+    };
+
+    // Return (send this update to everyone)
+    return true;
+  }
+
+  // Player looks at the current card and passes it to someone else.
+  passCard(roomCode, fromPlayer, toPlayer, claim) {
+    const gameRoom = this.gameRoomMap.get(roomCode);
+    const currentAction = gameRoom.currentAction;
+
+    // Make sure fromPlayer is the turn player
+    if (fromPlayer != currentAction.turnPlayer) {
+      console.warn(`Error: passCard: Only the turnPlayer can pass a card.`);
+      return false;
+    }
+
+    // Make sure toPlayer has not seen the card
+    if (currentAction.conspiracy.includes(toPlayer)) {
+      console.warn(
+        `Error: passCard: Can't pass a card to someone in conspiracy.`
+      );
+      return false;
+    }
+
+    // Pass card
+    gameRoom.currentAction = {
+      turnPlayer: toPlayer,
+      prevPlayer: fromPlayer,
+      conspiracy: [...currentAction.conspiracy, fromPlayer],
+      card: currentAction.card,
+      claim: claim,
+    };
+
+    return true;
+  }
+
+  // Player calls the current card as true or false.
+  callCard(roomCode, fromPlayer, callAs) {
+    const gameRoom = this.gameRoomMap.get(roomCode);
+    const currentAction = gameRoom.currentAction;
+
+    // Make sure playerId is the turn player
+    if (fromPlayer != currentAction.turnPlayer) {
+      console.warn(`Error: callCard: Only the turnPlayer can call a card.`);
+      return false;
+    }
+
+    // Whether the previous player's claim was true or false
+    const reality = currentAction.card === currentAction.claim;
+
+    // Determine who lost the round
+    const loser =
+      callAs === reality ? currentAction.prevPlayer : currentAction.turnPlayer;
+
+    // Add the card to the loser's pile
+    this.addCardToPile(roomCode, loser, currentAction.card);
+
+    // Update currentAction to start a new round
+    gameRoom.currentAction = {
+      turnPlayer: loser,
+      prevPlayer: loser,
+      conspiracy: [],
+      card: 0,
+      claim: 0,
+    };
+
+    return true;
+  }
+
+  // Check loss condition and end the game if player lost.
+  endGameIfLossCondition(roomCode, playerId) {
+    const player = this.getPlayerByUUID(roomCode, playerId);
+    const pile = player.pile;
+
+    let freq = Array.from({ length: 9 }, () => 0);
+    for (const card in pile) {
+      freq[card]++;
+    }
+    for (const num in freq) {
+      // Loss Condition
+      if (num >= 4) {
+        this.terminateGameRoomAndSave(roomCode);
+        return true;
+      }
+    }
+
+    return false;
   }
 
   // Save GameRoom contents to database.
@@ -197,6 +307,34 @@ export class GameRoomService {
     gameRoom.save();
 
     this.gameRoomMap.delete(roomCode);
+  }
+
+  // Add a card of a certain type to a player's pile
+  addCardToPile(roomCode, playerId, card) {
+    const player = this.getPlayerByUUID(roomCode, playerId);
+
+    let pile = player.pile;
+
+    pile.push(card);
+
+    player.pileSize++;
+  }
+
+  // Remove card of a certain type from player's hand
+  removeCardFromHand(roomCode, playerId, card) {
+    const player = this.getPlayerByUUID(roomCode, playerId);
+
+    let hand = player.hand;
+
+    const index = hand.indexOf(card);
+    if (index > -1) {
+      hand.splice(index, 1);
+    } else {
+      console.warn('Error: removeCardFromHand: no such card in hand.');
+      return;
+    }
+
+    player.handSize--;
   }
 
   // Generates a roomCode that is not used by any other room.

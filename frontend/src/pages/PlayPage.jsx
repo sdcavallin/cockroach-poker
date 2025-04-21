@@ -103,8 +103,9 @@ const PlayPage = () => {
     });
 
     socket.emit(
-      'initPlayerSendCard',
-      player?.uuid,
+      'requestPlayerStartRound',
+      roomCode,
+      uuid,
       selectedPlayer.uuid,
       selectedCard,
       claim
@@ -168,6 +169,7 @@ const PlayPage = () => {
 
       setPlayers(gameRoom.players || []);
       setGameRoom(gameRoom);
+      console.log('Received GameRoom:');
       console.log(gameRoom);
 
       for (const p of gameRoom.players) {
@@ -356,6 +358,7 @@ const PlayPage = () => {
                 >
                   Call It
                 </Button>
+                {/* TODO: Gray out Pass button if final player (conspiracy size == numPlayers - 1) */}
                 <Button
                   colorScheme='yellow'
                   onClick={() => {
@@ -429,7 +432,11 @@ const PlayPage = () => {
                 <Card>
                   <CardHeader bg='#FBC02D' borderTopRadius='md'>
                     <Heading size='md' textAlign='center'>
-                      {showPile ? 'Your Pile' : 'Your Hand'}
+                      {showPile ? (
+                        <Text>Your Pile ({player.pileSize})</Text>
+                      ) : (
+                        <Text>Your Hand ({player.handSize})</Text>
+                      )}
                     </Heading>
                   </CardHeader>
                   <CardBody maxHeight='300px' overflowY='auto' p={4}>
@@ -570,7 +577,11 @@ const PlayPage = () => {
                 <DrawerHeader bg='#E76F51'>Choose a Player</DrawerHeader>
                 <DrawerBody>
                   <Text mb={4}>
-                    Select a player to send card {selectedCard} to:
+                    Select a player to send a{' '}
+                    <Text as={'span'} fontWeight={'bold'}>
+                      {CardNumberToString[selectedCard]}
+                    </Text>{' '}
+                    to:
                   </Text>
                   <VStack spacing={4} align='stretch'>
                     {players
@@ -671,6 +682,13 @@ const PlayPage = () => {
                       </Text>
                       .
                     </Text>
+                    <Image
+                      src={CardNumberToImage[selectedCard]}
+                      alt={CardNumberToString[selectedCard]}
+                      height='200'
+                      objectFit='contain'
+                      mb={2}
+                    />
                     <Text fontWeight='bold'>
                       What will you claim this card is?
                     </Text>
