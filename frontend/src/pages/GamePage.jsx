@@ -47,7 +47,7 @@ const getPilePosition = (position, index) => {
   // Top center
   if (position.top === '5%' && position.left === '50%') {
     return {
-      top: '20%',
+      top: '30%',
       left: '50%',
       transform: 'translateX(-50%)',
       flexDirection: 'row',
@@ -56,7 +56,7 @@ const getPilePosition = (position, index) => {
   // Bottom center
   if (position.bottom === '5%' && position.left === '50%') {
     return {
-      bottom: '20%',
+      bottom: '30%',
       left: '50%',
       transform: 'translateX(-50%)',
       flexDirection: 'row',
@@ -272,31 +272,33 @@ const GamePage = () => {
                       />
                       <Text
                         mt='2px'
-                        fontSize={['xs', 'sm']}
+                        fontSize={['xl', 'xl']}
                         color='white'
                         fontWeight='bold'
                         textShadow='0 0 3px black'
                         textAlign='center'
                         maxW='80px'
-                        overflow='hidden'
+                        // overflow='hidden'
                         whiteSpace='nowrap'
-                        textOverflow='ellipsis'
+                        // textOverflow='ellipsis'
                       >
                         {player.nickname}
                       </Text>
-                      <Text
-                        mt='1px'
-                        fontSize={['2xs', 'xs']}
-                        color='white'
-                        textShadow='0 0 3px black'
-                        textAlign='center'
-                        maxW='80px'
-                        overflow='hidden'
-                        whiteSpace='nowrap'
-                        textOverflow='ellipsis'
-                      >
-                        hand size: {player?.hand?.length}
-                      </Text>
+                      <HStack spacing='4px' mt='1px'>
+                        <Image
+                          src='/cards/back.png'
+                          alt='Hand Card'
+                          height='25px'
+                          objectFit='contain'
+                        />
+                        <Text
+                          fontSize='l'
+                          color='white'
+                          textShadow='0 0 3px black'
+                        >
+                          ×{player?.hand?.length}
+                        </Text>
+                      </HStack>
                     </Box>
 
                     <Box
@@ -330,7 +332,7 @@ const GamePage = () => {
                                 objectFit='contain'
                               />
                               <Text
-                                fontSize='sm'
+                                fontSize='l'
                                 color='white'
                                 whiteSpace='nowrap'
                               >
