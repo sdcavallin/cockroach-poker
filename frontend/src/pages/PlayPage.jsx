@@ -190,6 +190,15 @@ const PlayPage = () => {
       socket.off('returnGameRoom', handleReturnGameRoom);
     };
   }, []);
+  // PLEASE WORK MODAL PLEASE PLEASEPLEASE
+  useEffect(() => {
+    if (isMyTurn && !isFirstTurnInGameAction) {
+      console.log(
+        'Opening turn modal because isMyTurn is true and not first turn'
+      );
+      turnPlayerModal.onOpen();
+    }
+  }, [isMyTurn, isFirstTurnInGameAction]);
 
   useEffect(() => {
     //Numbers and strings are truthy so it should show as true
@@ -406,24 +415,12 @@ const PlayPage = () => {
                             key={`${card}-${index}`}
                             bg='white'
                             height='200'
-                            // // border='2px solid'
-                            // borderColor={
-                            //   selectedCard === card ? 'teal.500' : 'gray.200'
-                            // }
                             borderRadius='md'
                             display='flex'
                             justifyContent='center'
                             alignItems='center'
                             flexDirection='column'
-                            _hover={
-                              {
-                                // borderColor: 'teal.300',
-                                // transform: 'scale(1.05)',
-                              }
-                            }
                             transition='all 0.2s'
-                            //cursor='pointer'
-                            //onClick={() => handleCardSelection(card)}
                           >
                             <Image
                               src={CardNumberToImage[card]}
@@ -432,25 +429,37 @@ const PlayPage = () => {
                               objectFit='contain'
                               mb={2}
                             />
-                            {/* <Text fontWeight='bold'>
-                          {CardNumberToString[card]}
-                        </Text> */}
                           </Box>
                         )
                       )}
                     </SimpleGrid>
                   </CardBody>
                 </Card>
-                <Button
-                  colorScheme='yellow'
-                  onClick={selectCardDrawer.onOpen}
-                  width='100%'
-                  disabled={!(isMyTurn && isFirstTurnInGameAction)}
-                >
-                  {isMyTurn && isFirstTurnInGameAction
-                    ? 'Play!'
-                    : "It's not your turn yet."}
-                </Button>
+
+                {isFirstTurnInGameAction ? (
+                  <Button
+                    colorScheme='yellow'
+                    onClick={selectCardDrawer.onOpen}
+                    width='100%'
+                  >
+                    Play!
+                  </Button>
+                ) : isMyTurn ? (
+                  <Button
+                    colorScheme='yellow'
+                    width='100%'
+                    onClick={() => {
+                      console.log('Not first turn: opening call/pass modal');
+                      turnPlayerModal.onOpen();
+                    }}
+                  >
+                    It's your turn! (Call or Pass)
+                  </Button>
+                ) : (
+                  <Button colorScheme='gray' width='100%' disabled>
+                    It's not your turn yet.
+                  </Button>
+                )}
               </>
             ) : (
               <>
@@ -492,12 +501,7 @@ const PlayPage = () => {
                     {player?.hand?.map((card) => (
                       <Box
                         key={card}
-                        // bg='white'
                         height='200'
-                        // border='2px solid'
-                        // borderColor={
-                        //   selectedCard === card ? 'teal.500' : 'gray.200'
-                        // }
                         borderRadius='md'
                         display='flex'
                         justifyContent='center'
@@ -518,9 +522,6 @@ const PlayPage = () => {
                           objectFit='contain'
                           mb={2}
                         />
-                        {/* <Text fontWeight='bold'>
-                          {CardNumberToString[card]}
-                        </Text> */}
                       </Box>
                     ))}
                   </SimpleGrid>
