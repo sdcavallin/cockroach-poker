@@ -118,13 +118,18 @@ const PlayPage = () => {
     setIsMyTurn(false);
 
     alert(
-      `Card ${selectedCard} sent to ${selectedPlayer.nickname} with claim: '${claim}'`
+      `Card ${selectedCard} sent to ${selectedPlayer.nickname} with claim ${claim}`
     );
   };
 
   const startCardAction = () => {
     mainActionDrawer.onClose();
     selectCardDrawer.onOpen();
+  };
+
+  const getPlayerName = (uuid) => {
+    const foundPlayer = players.find((p) => p.uuid === uuid);
+    return foundPlayer ? foundPlayer.nickname : 'Unknown Player';
   };
 
   useEffect(() => {
@@ -193,7 +198,7 @@ const PlayPage = () => {
       socket.off('returnGameRoom', handleReturnGameRoom);
     };
   }, []);
-  // PLEASE WORK MODAL PLEASE PLEASEPLEASE
+
   useEffect(() => {
     if (isMyTurn && !isFirstTurnInGameAction) {
       console.log(
@@ -266,11 +271,6 @@ const PlayPage = () => {
     6: '/cards/scorpion.png',
     7: '/cards/spider.png',
     8: '/cards/stinkbug.png',
-  };
-
-  const getPlayerName = (uuid) => {
-    const foundPlayer = players.find((p) => p.uuid === uuid);
-    return foundPlayer ? foundPlayer.nickname : 'Unknown Player';
   };
 
   const avatarMap = {
@@ -709,6 +709,9 @@ const PlayPage = () => {
                                 transform: 'scale(1.05)',
                                 boxShadow: 'md',
                               }}
+                              color={
+                                selectedCard === Number(num) ? 'green.600' : ''
+                              }
                             >
                               {label}
                             </Button>
