@@ -114,6 +114,9 @@ const PlayPage = () => {
     setSelectedCard(null);
     setSelectedPlayer(null);
     setClaim(0);
+    setIsFirstTurnInGameAction(false);
+    setIsMyTurn(false);
+
     alert(
       `Card ${selectedCard} sent to ${selectedPlayer.nickname} with claim: '${claim}'`
     );
