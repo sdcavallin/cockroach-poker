@@ -5,16 +5,49 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { keyframes } from '@emotion/react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Link as ChakraLink } from '@chakra-ui/react';
+import { useToast } from '@chakra-ui/react';
 
 const socketUrl = window.location.origin.includes('localhost')
   ? 'http://localhost:8420'
   : 'https://cockroach.poker';
 const socket = io(socketUrl, { autoConnect: false });
 
+const cardEntrance = keyframes`
+  0% {
+    transform: scale(0.5) rotate(-10deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1) rotate(3deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+`;
+
 const pulseGlow = keyframes`
   0% { box-shadow: 0 0 10px 4px rgba(233, 196, 106, 0.6); }
   50% { box-shadow: 0 0 20px 10px rgba(233, 196, 106, 1); }
   100% { box-shadow: 0 0 10px 4px rgba(233, 196, 106, 0.6); }
+`;
+
+const avatarGlow = keyframes`
+  0% { box-shadow: 0 0 20px 10px rgba(72, 187, 120, 0.6); }
+  50% { box-shadow: 0 0 40px 25px rgba(72, 187, 120, 1); }
+  100% { box-shadow: 0 0 20px 10px rgba(72, 187, 120, 0.6); }
+`;
+
+const correctGlow = keyframes`
+  0% { box-shadow: 0 0 20px 10px rgba(72, 187, 120, 0.6); }
+  50% { box-shadow: 0 0 40px 25px rgba(72, 187, 120, 1); }
+  100% { box-shadow: 0 0 20px 10px rgba(72, 187, 120, 0.6); }
+`;
+
+const incorrectGlow = keyframes`
+  0% { box-shadow: 0 0 20px 10px rgba(255, 0, 0, 0.6); }
+  50% { box-shadow: 0 0 40px 25px rgba(255, 0, 0, 1); }
+  100% { box-shadow: 0 0 20px 10px rgba(255, 0, 0, 0.6); }
 `;
 
 const getPilePosition = (position, index) => {
@@ -102,10 +135,30 @@ const GamePage = () => {
   const [turnPlayerId, setTurnPlayerId] = useState(null);
 
   const [gameRoom, setGameRoom] = useState(null);
+  const isCorrect =
+    gameRoom?.currentAction?.claim === gameRoom?.currentAction?.card;
+  const [callResult, setCallResult] = useState(null);
+  const [showCard, setShowCard] = useState(true); // to hold card for a bit & show color change
+  const [revealPhase, setRevealPhase] = useState('waiting'); // 'waiting', 'revealed', 'hidden'
+  const [savedAction, setSavedAction] = useState(null);
+  const toast = useToast();
+
+  useEffect(() => {
+    if (gameRoom?.currentAction && revealPhase === 'waiting') {
+      setSavedAction(gameRoom.currentAction);
+    }
+  }, [gameRoom?.currentAction, revealPhase]);
 
   const handleJoinRoom = (roomCode) => {
     socket.emit('joinSocketRoom', roomCode);
   };
+  useEffect(() => {
+    console.log('Current turnPlayerId:', turnPlayerId);
+    console.log(
+      'Player IDs:',
+      gameRoom?.players.map((p) => p.uuid)
+    );
+  }, [turnPlayerId, gameRoom]);
 
   useEffect(() => {
     if (!socket.connected) socket.connect();
@@ -126,14 +179,52 @@ const GamePage = () => {
   }, []);
 
   useEffect(() => {
+    socket.on('playerCallResult', ({ correct }) => {
+      console.log('Player call result:', correct);
+
+      setCallResult(correct);
+
+      if (savedAction) {
+        toast({
+          title: correct ? 'Correct!' : 'Wrong!',
+          description: `The actual card was a ${
+            CardNumberToString[savedAction.card]
+          }.`,
+          status: correct ? 'success' : 'error',
+          duration: 4000,
+          isClosable: true,
+        });
+      }
+    });
+
+    return () => {
+      socket.off('playerCallResult');
+    };
+  }, [savedAction]);
+
+  useEffect(() => {
+    if (callResult !== null) {
+      // first show the result
+      setRevealPhase('revealed');
+
+      // then hide after 2 seconds
+      const hideTimer = setTimeout(() => {
+        setRevealPhase('hidden');
+      }, 2000);
+
+      return () => clearTimeout(hideTimer);
+    }
+  }, [callResult]);
+
+  useEffect(() => {
     if (roomCode) {
       handleJoinRoom(roomCode);
     }
   }, [roomCode]);
 
   useEffect(() => {
-    socket.on('turnPlayerUpdated', (uuid) => {
-      setTurnPlayerId(uuid);
+    socket.on('turnPlayerUpdated', ({ turnPlayerId }) => {
+      setTurnPlayerId(turnPlayerId);
     });
 
     return () => {
@@ -163,6 +254,32 @@ const GamePage = () => {
           position='relative'
           width='100%'
         >
+          <Text
+            position='absolute'
+            bottom='-6%'
+            left='50%'
+            transform='translate(-50%, -50%)'
+            fontSize={['30px', '40px', '50px']}
+            fontWeight='bold'
+            color='#264653'
+            textAlign='center'
+            opacity={0.2}
+          >
+            {/*TODO: Change this from low opacity in the center to normal opacity on top somewhere, optionally with glow*/}
+            🔗cockroach.poker
+          </Text>
+          s
+          <Text
+            position='absolute'
+            top='2'
+            fontSize='xl'
+            fontWeight='bold'
+            color='#264653'
+          >
+            {/* TODO: Delete both of these and show in a cooler way */}
+            Room Code: {roomCode} <br />
+            {/* Turn player: {gameRoom?.currentAction?.turnPlayer}{' '} */}
+          </Text>
           {gameRoom ? (
             <Box
               width='90%'
@@ -176,33 +293,6 @@ const GamePage = () => {
               position='relative'
               borderRadius='md'
             >
-              <Text
-                position='absolute'
-                top='4'
-                fontSize='xl'
-                fontWeight='bold'
-                color='#264653'
-              >
-                {/* TODO: Delete both of these and show in a cooler way */}
-                Room Code: {roomCode} <br />
-                Turn player: {gameRoom?.currentAction?.turnPlayer}{' '}
-              </Text>
-
-              <Text
-                position='absolute'
-                top='50%'
-                left='50%'
-                transform='translate(-50%, -50%)'
-                fontSize={['30px', '40px', '50px']}
-                fontWeight='bold'
-                color='#264653'
-                textAlign='center'
-                opacity={0.2}
-              >
-                {/*TODO: Change this from low opacity in the center to normal opacity on top somewhere, optionally with glow*/}
-                🔗cockroach.poker
-              </Text>
-
               {gameRoom.players.map((player, index) => {
                 const pileCounts = player?.pile?.reduce((acc, card) => {
                   acc[card] = (acc[card] || 0) + 1;
@@ -234,14 +324,14 @@ const GamePage = () => {
                       zIndex={2}
                       {...positions[index % positions.length]}
                     >
-                      <Image
-                        src={avatarSrc}
-                        alt={player.nickname}
+                      <Box
                         width={['50px', '65px', '80px']}
+                        height={['50px', '65px', '80px']}
                         borderRadius='full'
+                        overflow='hidden'
                         animation={
-                          player.uuid === turnPlayerId
-                            ? `${pulseGlow} 1.5s ease-in-out infinite`
+                          player.uuid === gameRoom?.currentAction?.turnPlayer
+                            ? `${avatarGlow} 1.5s ease-in-out infinite`
                             : 'none'
                         }
                         filter={
@@ -251,7 +341,33 @@ const GamePage = () => {
                         }
                         opacity={isInConspiracy ? 0.5 : 1}
                         transition='filter 0.5s ease, opacity 0.5s ease'
-                      />
+                        border={
+                          player.uuid === turnPlayerId
+                            ? '2px solid rgba(233, 196, 106, 1)'
+                            : 'none'
+                        }
+                        backgroundColor='rgba(255,255,255,0.1)'
+                      >
+                        <Image
+                          // as='img'
+                          src={avatarSrc}
+                          alt={player.nickname}
+                          width={['50px', '65px', '80px']}
+                          borderRadius='full'
+                          animation={
+                            player.uuid === turnPlayerId
+                              ? `${avatarGlow} 1.5s ease-in-out infinite`
+                              : 'none'
+                          }
+                          filter={
+                            isInConspiracy
+                              ? 'grayscale(100%) brightness(0.5)'
+                              : 'none'
+                          }
+                          opacity={isInConspiracy ? 0.5 : 1}
+                          transition='filter 0.5s ease, opacity 0.5s ease'
+                        />
+                      </Box>
                       <Text
                         mt='2px'
                         fontSize={['xl', 'xl']}
@@ -266,17 +382,17 @@ const GamePage = () => {
                       >
                         {player.nickname}
                       </Text>
-                      <HStack spacing='4px' mt='1px'>
+                      <HStack spacing='8px' mt='1px'>
                         <Image
                           src='/cards/back.png'
                           alt='Hand Card'
-                          height='25px'
+                          height='65px'
                           objectFit='contain'
                         />
                         <Text
-                          fontSize='l'
-                          color='white'
-                          textShadow='0 0 3px black'
+                          fontSize='5xl'
+                          color='black'
+                          textShadow='0 0 9px white'
                         >
                           ×{player?.hand?.length}
                         </Text>
@@ -310,11 +426,11 @@ const GamePage = () => {
                               <Image
                                 src={imageSrc}
                                 alt={label}
-                                height='30px'
+                                height='65px'
                                 objectFit='contain'
                               />
                               <Text
-                                fontSize='l'
+                                fontSize='3xl'
                                 color='white'
                                 whiteSpace='nowrap'
                               >
@@ -328,33 +444,73 @@ const GamePage = () => {
                 );
               })}
 
-              {gameRoom.currentAction &&
-                gameRoom.currentAction.conspiracy.length === 1 && ( // THIS PART CONTROLS CENTER CARD APPEAR/DISAPPEAR
-                  <Box
+              {savedAction &&
+                savedAction.conspiracy.length === 1 &&
+                revealPhase !== 'hidden' && (
+                  // only hide when explicitly in 'hidden' phase
+                  <VStack
                     position='absolute'
                     top='50%'
                     left='50%'
                     transform='translate(-50%, -50%)'
-                    width={['80px', '100px', '120px']}
-                    height={['120px', '140px', '160px']}
-                    backgroundColor='#264653'
-                    border='4px solid white'
-                    borderRadius='md'
-                    display='flex'
-                    justifyContent='center'
-                    alignItems='center'
-                    boxShadow='0 0 20px rgba(0,0,0,0.5)'
+                    spacing={2}
                     zIndex='3'
                   >
-                    <Image
-                      src='/cards/back.png'
-                      alt='Facedown Card'
-                      objectFit='cover'
-                      width='100%'
-                      height='100%'
+                    <Box
+                      width='600'
+                      aspectRatio='6/6'
+                      backgroundColor={
+                        callResult === true
+                          ? '#48BB78' // green for correct
+                          : callResult === false
+                          ? '#F56565' // red for wrong
+                          : '#F3D475' // yellow neutral before call
+                      }
                       borderRadius='md'
-                    />
-                  </Box>
+                      display='flex'
+                      justifyContent='center'
+                      alignItems='center'
+                      boxShadow='0 0 100vw rgba(0,0,0,0.9)'
+                      animation={`${cardEntrance} 0.6s ease`}
+                      transition='background-color 0.5s ease, opacity 0.5s ease'
+                    >
+                      <Image
+                        src={
+                          revealPhase === 'revealed'
+                            ? CardNumberToImage[gameRoom.currentAction.card] // try to show actual card when revealed
+                            : '/cards/back.png'
+                        } // otherwise just show back of card when waiting
+                        alt={
+                          revealPhase === 'revealed'
+                            ? 'Revealed Card'
+                            : 'Facedown Card'
+                        }
+                        width='90%'
+                        height='90%'
+                        objectFit='contain'
+                        borderRadius='md'
+                      />
+                    </Box>
+
+                    <Text
+                      fontSize={['lg', 'xl', '2xl']}
+                      fontWeight='bold'
+                      color='white'
+                      textShadow='0 0 5px black'
+                      bg='rgba(0,0,0,0.5)'
+                      px={4}
+                      py={2}
+                      borderRadius='md'
+                    >
+                      {revealPhase === 'revealed'
+                        ? `ACTUAL CARD: ${
+                            CardNumberToString[gameRoom.currentAction.card]
+                          }`
+                        : `CLAIM IS: ${
+                            CardNumberToString[gameRoom.currentAction.claim]
+                          }`}
+                    </Text>
+                  </VStack>
                 )}
             </Box>
           ) : (
