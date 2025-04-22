@@ -27,6 +27,7 @@ import {
   ModalBody,
   ModalCloseButton,
   ModalFooter,
+  useBreakpointValue,
 } from '@chakra-ui/react';
 
 import { Navigate, useLocation } from 'react-router-dom';
@@ -34,9 +35,10 @@ import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
 import { useToast } from '@chakra-ui/react';
 
-const socket = io('http://localhost:5000', {
-  autoConnect: false,
-});
+const socketUrl = window.location.origin.includes('localhost')
+  ? 'http://localhost:8420'
+  : 'https://cockroach.poker';
+const socket = io(socketUrl, { autoConnect: false });
 
 const PlayPage = () => {
   const toast = useToast();
@@ -58,6 +60,7 @@ const PlayPage = () => {
   const [isMyTurn, setIsMyTurn] = useState(false);
   const [isFirstTurnInGameAction, setIsFirstTurnInGameAction] = useState(false);
   const [players, setPlayers] = useState([]);
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   const selectCardDrawer = useDisclosure();
   const selectPlayerDrawer = useDisclosure();
@@ -423,24 +426,30 @@ const PlayPage = () => {
                   colorScheme='teal'
                 >
                   {showPile ? (
-                    <Text as={'span'}>Show Hand ({player?.handSize})</Text>
+                    <Text as={'span'}>Show Hand</Text>
                   ) : (
-                    <Text as={'span'}>Show Pile ({player?.pileSize})</Text>
+                    <Text as={'span'}>Show Pile</Text>
                   )}
                 </Button>
-                <HStack spacing={3}>
-                  <Avatar
-                    size='md'
-                    src={player.avatar}
-                    name={player.nickname}
-                  />
-                  <Text fontSize='lg' fontWeight='bold'>
+                <HStack spacing={1}>
+                  <Text fontSize='lg' fontWeight='bold' p={2}>
                     {player.nickname}
                   </Text>
+                  <Image
+                    src={`/avatars/${player.playerIcon}.png`}
+                    alt={player.nickname}
+                    width='80%'
+                    borderRadius='full'
+                    mb={2}
+                  />
                 </HStack>
-                <Text fontSize='sm' color='gray.500'>
-                  {`PlayerID: ${player.uuid?.slice(0, 6)}...`}
-                </Text>
+                {isMobile ? (
+                  ''
+                ) : (
+                  <Text fontSize='sm' color='gray.500'>
+                    {`PlayerID: ${player.uuid?.slice(0, 6)}...`}
+                  </Text>
+                )}
               </Box>
             )}
             {gameRoom.gameStatus === 1 ? (

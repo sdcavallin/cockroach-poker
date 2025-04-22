@@ -13,8 +13,10 @@ import FlippingCard from '../components/FlippingCard.jsx';
 import { io } from 'socket.io-client';
 import AudioPlayer from '../components/AudioPlayer.jsx';
 
-// Initialize socket connection
-const socket = io('http://localhost:5000', { autoConnect: false });
+const socketUrl = window.location.origin.includes('localhost')
+  ? 'http://localhost:8420'
+  : 'https://cockroach.poker';
+const socket = io(socketUrl, { autoConnect: false });
 
 const HostPage = () => {
   const [message, setMessage] = useState('Connecting socket...');

@@ -18,7 +18,7 @@ function Navbar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const navLinks = [
-    { to: '/', label: 'Home' },
+    { to: '/', label: 'Play!' },
     { to: '/join', label: 'Join a Game' },
     { to: '/rejoinhost', label: 'Host Rejoin' },
     { to: '/credits', label: 'Credits' },
