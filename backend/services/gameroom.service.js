@@ -265,9 +265,13 @@ export class GameRoomService {
   }
 
   // Check loss condition and end the game if player lost.
-  endGameIfLossCondition(roomCode, prevPlayerId, turnPlayerId) {
-    for (const p of [prevPlayerId, turnPlayerId]) {
-      const player = this.getPlayerByUUID(roomCode, p);
+  endGameIfLossCondition(roomCode) {
+    const gameRoom = this.gameRoomMap.get(roomCode);
+    if (!gameRoom) return false;
+
+    const players = gameRoom.players;
+
+    for (const player of players) {
       const pile = player.pile;
       const hand = player.hand;
 
