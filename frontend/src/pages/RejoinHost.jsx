@@ -9,7 +9,7 @@ const socket = io('http://localhost:5000', {
 
 const RejoinHost = () => {
   const [message, setMessage] = useState('Connecting socket...');
-  const [roomCode, setRoomCode] = useState('123B');
+  const [roomCode, setRoomCode] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
@@ -28,7 +28,7 @@ const RejoinHost = () => {
 
     navigate('/game', {
       state: {
-        roomCode: roomCode,
+        roomCode: roomCode.toUpperCase(),
       },
     });
   };
@@ -88,7 +88,7 @@ const RejoinHost = () => {
         </Heading>
 
         <Text fontSize='md' color='#264653' mb='2'>
-          Socket status: {message}
+          Enter a room code to rejoin a game from the host perspective.
         </Text>
 
         <Text

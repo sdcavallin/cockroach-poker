@@ -19,18 +19,9 @@ function Navbar() {
 
   const navLinks = [
     { to: '/', label: 'Home' },
-    { to: '/host', label: 'Host' },
-    { to: '/game', label: 'Game' },
-    { to: '/join', label: 'Join' },
-    { to: '/play', label: 'Play' },
-    { to: '/rejoin', label: 'Rejoin' },
-    { to: '/rejoinhost', label: 'RejoinHost' },
-    { to: '/dummyplayer', label: 'DummyPlayer' },
-    { to: '/dummyhost', label: 'DummyHost' },
-    { to: '/dummyjoin', label: 'DummyJoin' },
-    { to: '/dummyplay', label: 'DummyPlay' },
-    { to: '/dummysetup', label: 'DummySetup' },
-    { to: '/dummyjoinsetup', label: 'DummyJoinSetup' },
+    { to: '/join', label: 'Join a Game' },
+    { to: '/rejoinhost', label: 'Host Rejoin' },
+    { to: '/credits', label: 'Credits' },
   ];
 
   return (
@@ -49,7 +40,7 @@ function Navbar() {
         <DrawerOverlay />
         <DrawerContent bg='yellow.500' color='white'>
           <DrawerCloseButton />
-          <DrawerHeader>Navigation</DrawerHeader>
+          <DrawerHeader>Cockroach Poker</DrawerHeader>
           <DrawerBody>
             <VStack align='start' spacing={4}>
               {navLinks.map((link) => (
