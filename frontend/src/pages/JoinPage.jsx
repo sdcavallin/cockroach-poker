@@ -6,6 +6,7 @@ import {
   Image,
   useMediaQuery,
   useToast,
+  useBreakpointValue,
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -24,15 +25,15 @@ const avatars = [
   { name: 'genie-lamp', src: '/avatars/genie-lamp.png' },
   { name: 'jake', src: '/avatars/jake.png' },
   { name: 'mermaid', src: '/avatars/mermaid.png' },
-  { name: 'navi-avatar', src: '/avatars/navi-avatar.png' },
   { name: 'wonder-woman', src: '/avatars/wonder-woman.png' },
+  { name: 'bill-cipher', src: '/avatars/bill-cipher.png' },
 ];
 
 const JoinPage = () => {
-  const [isDesktop] = useMediaQuery('(min-width: 768px)');
   const [roomCode, setRoomCode] = useState('');
   const [nickname, setNickname] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState(null);
+  const isMobile = useBreakpointValue({ base: true, md: false });
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -150,7 +151,7 @@ const JoinPage = () => {
           gap='4'
           mb='5'
         >
-          {avatars.map((avatar) => (
+          {avatars.slice(0, isMobile ? 8 : 9).map((avatar) => (
             <Box key={avatar.name} textAlign='center'>
               <Image
                 src={avatar.src}

@@ -142,11 +142,11 @@ const HostPage = () => {
                 <Image
                   src={`/avatars/${player.playerIcon}.png`}
                   alt={player.nickname}
-                  width='100%'
+                  width='80%'
                   borderRadius='full'
                   mb={2}
                 />
-                <Text fontWeight='bold' fontSize='md'>
+                <Text fontWeight='bold' fontSize='lg'>
                   {player.nickname}
                 </Text>
               </Box>

@@ -300,6 +300,7 @@ const PlayPage = () => {
     mermaid: '/avatars/mermaid.png',
     'navi-avatar': '/avatars/navi-avatar.png',
     'wonder-woman': '/avatars/wonder-woman.png',
+    'bill-cipher': '/avatars/bill-cipher.png',
   };
 
   return (
@@ -438,7 +439,7 @@ const PlayPage = () => {
                   <Image
                     src={`/avatars/${player.playerIcon}.png`}
                     alt={player.nickname}
-                    width='80%'
+                    width={'60px'}
                     borderRadius='full'
                     mb={2}
                   />

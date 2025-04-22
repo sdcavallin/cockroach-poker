@@ -58,25 +58,6 @@ const getPilePosition = (position, index) => {
   return base;
 };
 
-const images = [
-  { src: 'avatars/bmo.png', right: '5%', bottom: '5%' },
-  { src: 'avatars/finn.png', right: '5%', top: '5%' },
-  { src: 'avatars/navi-avatar.png', left: '5%', top: '5%' },
-  { src: 'avatars/harry-potter.png', left: '5%', bottom: '5%' },
-  {
-    src: 'avatars/jake.png',
-    left: '50%',
-    top: '0%',
-    transform: 'translateX(-50%)',
-  },
-  {
-    src: 'avatars/wonder-woman.png',
-    left: '50%',
-    bottom: '0%',
-    transform: 'translateX(-50%)',
-  },
-];
-
 const CardNumberToString = {
   0: 'Unknown',
   1: 'Bat',
@@ -112,6 +93,7 @@ const avatarMap = {
   mermaid: '/avatars/mermaid.png',
   'navi-avatar': '/avatars/navi-avatar.png',
   'wonder-woman': '/avatars/wonder-woman.png',
+  'bill-cipher': '/avatars/bill-cipher.png',
 };
 
 const GamePage = () => {
@@ -158,11 +140,6 @@ const GamePage = () => {
       socket.off('turnPlayerUpdated');
     };
   }, []);
-
-  const visibleImages = images.slice(
-    0,
-    gameRoom ? Math.min(gameRoom.players.length, 6) : 0
-  );
 
   return (
     <>
