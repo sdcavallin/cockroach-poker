@@ -5,12 +5,6 @@ import {
   Image,
   VStack,
   HStack,
-  Heading,
-  Stack,
-  StackDivider,
-  Card,
-  CardBody,
-  Container,
   useBreakpointValue,
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
@@ -53,41 +47,6 @@ const HomePage = () => {
     socket.emit('requestCreateEmptyGameRoom');
   };
 
-  // === Waiting Room ===
-  /*
-  if (gameRoom) {
-    return (
-      <Container>
-        <Text>Socket state: {message}</Text>
-        <Heading size='lg'>Game Setup</Heading>
-        <Stack spacing={3}>
-          <Card>
-            <CardBody>
-              <Stack divider={<StackDivider />} spacing={3}>
-                <Heading size='lg'>Join with Code: {gameRoom.roomCode}</Heading>
-                {gameRoom.players.map((player, index) => (
-                  <Box key={index}>
-                    <Heading size='md'>Player: {player.nickname}</Heading>
-                    <Text size='sm'>UUID: {player.uuid}</Text>
-                    <Text size='sm'>Avatar: {player.playerIcon}</Text>
-                    <Text size='sm'>Socket: {player.socketId}</Text>
-                  </Box>
-                ))}
-              </Stack>
-            </CardBody>
-          </Card>
-          <Button
-            isDisabled={gameRoom.numPlayers < 2}
-            onClick={handleStartGame}
-          >
-            Start Game ({gameRoom.numPlayers} players)
-          </Button>
-        </Stack>
-      </Container>
-    );
-  }*/
-
-  // === Default Landing Page ===
   return (
     <Box
       width='100vw'
