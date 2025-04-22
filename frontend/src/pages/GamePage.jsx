@@ -14,17 +14,6 @@ const pulseGlow = keyframes`
   100% { box-shadow: 0 0 10px 4px rgba(233, 196, 106, 0.6); }
 `;
 
-const CardNumberToImage = {
-  0: '/cards/rat.png',
-  1: '/cards/fly.png',
-  2: '/cards/roach.png',
-  3: '/cards/spider.png',
-  4: '/cards/bat.png',
-  5: '/cards/stinkbug.png',
-  6: '/cards/frog.png',
-  7: '/cards/scorpion.png',
-};
-
 const getPilePosition = (position, index) => {
   const base = {};
 
@@ -86,14 +75,27 @@ const images = [
 ];
 
 const CardNumberToString = {
-  0: 'Rat',
-  1: 'Fly',
-  2: 'Cockroach',
-  3: 'Spider',
-  4: 'Bat',
-  5: 'Stinkbug',
-  6: 'Toad',
-  7: 'Scorpion',
+  0: 'Unknown',
+  1: 'Bat',
+  2: 'Fly',
+  3: 'Cockroach',
+  4: 'Toad',
+  5: 'Rat',
+  6: 'Scorpion',
+  7: 'Spider',
+  8: 'Stinkbug',
+};
+
+const CardNumberToImage = {
+  0: '/cards/back.png',
+  1: '/cards/bat.png',
+  2: '/cards/fly.png',
+  3: '/cards/roach.png',
+  4: '/cards/frog.png',
+  5: '/cards/rat.png',
+  6: '/cards/scorpion.png',
+  7: '/cards/spider.png',
+  8: '/cards/stinkbug.png',
 };
 
 const avatarMap = {

@@ -42,7 +42,7 @@ const JoinPage = () => {
           state: {
             uuid: uuid,
             roomCode: returnedRoomCode,
-            avatar: selectedAvatar
+            avatar: selectedAvatar,
           },
         });
       } else {
@@ -114,6 +114,7 @@ const JoinPage = () => {
         <Input
           placeholder='Enter Room Code'
           value={roomCode}
+          maxLength={6}
           onChange={(e) => setRoomCode(e.target.value)}
           textAlign='center'
           fontSize='lg'
@@ -126,6 +127,7 @@ const JoinPage = () => {
         <Input
           placeholder='Enter Nickname'
           value={nickname}
+          maxLength={16}
           onChange={(e) => setNickname(e.target.value)}
           textAlign='center'
           fontSize='lg'

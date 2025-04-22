@@ -39,8 +39,6 @@ import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
 import { useToast } from '@chakra-ui/react';
 
-// const toast = useToast();
-
 const socket = io('http://localhost:5000', {
   autoConnect: false,
 });
@@ -59,7 +57,9 @@ const PlayPage = () => {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [claim, setClaim] = useState(0);
   const [callMode, setCallMode] = useState(false);
+  const [passMode, setPassMode] = useState(false);
   const [gameRoom, setGameRoom] = useState(null);
+  const [currentAction, setCurrentAction] = useState(null);
   const [isMyTurn, setIsMyTurn] = useState(false);
   const [isFirstTurnInGameAction, setIsFirstTurnInGameAction] = useState(false);
 
@@ -123,9 +123,35 @@ const PlayPage = () => {
     setIsFirstTurnInGameAction(false);
     setIsMyTurn(false);
 
-    alert(
-      `Card ${selectedCard} sent to ${selectedPlayer.nickname} with claim ${claim}`
-    );
+    toast({
+      title: 'Card sent!',
+      status: 'success',
+      duration: 4000,
+      isClosable: true,
+    });
+  };
+
+  const handleCallCard = (callAs) => {
+    socket.emit('requestPlayerCallCard', roomCode, uuid, callAs);
+    const reality = currentAction.claim === currentAction.card;
+    if (reality === callAs) {
+      toast({
+        title: 'Phew - good call!',
+        status: 'success',
+        duration: 7000,
+        isClosable: true,
+      });
+    } else {
+      toast({
+        title: `Oops - that's wrong!`,
+        status: 'error',
+        duration: 7000,
+        isClosable: true,
+      });
+    }
+    setCallMode(false);
+    setIsMyTurn(false);
+    turnPlayerModal.onClose();
   };
 
   const startCardAction = () => {
@@ -133,8 +159,8 @@ const PlayPage = () => {
     selectCardDrawer.onOpen();
   };
 
-  const getPlayerName = (uuid) => {
-    const foundPlayer = players.find((p) => p.uuid === uuid);
+  const getPlayerName = (givenUUID) => {
+    const foundPlayer = players.find((p) => p.uuid == givenUUID);
     return foundPlayer ? foundPlayer.nickname : 'Unknown Player';
   };
 
@@ -150,6 +176,24 @@ const PlayPage = () => {
       setSocketReady(true);
     };
 
+    const handleReturnNewRound = (loserId, loserName) => {
+      if (loserId === uuid) {
+        toast({
+          title: 'You lost the round! Go again.',
+          status: 'info',
+          duration: 9000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: `New round! ${loserName} starts.`,
+          status: 'info',
+          duration: 9000,
+          isClosable: true,
+        });
+      }
+    };
+
     const handleReturnPlayer = (player) => {
       if (!player) {
         console.error('Received player: null');
@@ -161,19 +205,15 @@ const PlayPage = () => {
       setPlayer(player);
     };
 
-    const handleRecieveCard = (claim, conspiracyList, prevPlayerId) => {
-      setReceivedCardData({ claim, conspiracyList, prevPlayerId });
-      setCardModalOpen(true);
-    };
-
     const handleReturnGameRoom = (gameRoom) => {
       if (!gameRoom) {
-        console.error('Received game room: null');
+        console.warn('Received game room: null');
         return;
       }
 
       setPlayers(gameRoom.players || []);
       setGameRoom(gameRoom);
+      setCurrentAction(gameRoom.currentAction);
       console.log('Received GameRoom:');
       console.log(gameRoom);
 
@@ -184,10 +224,10 @@ const PlayPage = () => {
         }
       }
 
-      const gameAction = gameRoom.currentAction;
-      if (gameAction && gameAction.turnPlayer === uuid) {
+      const currentAction = gameRoom.currentAction;
+      if (currentAction && currentAction.turnPlayer === uuid) {
         setIsMyTurn(true);
-        if (gameAction.prevPlayer === uuid) {
+        if (currentAction.prevPlayer === uuid) {
           setIsFirstTurnInGameAction(true);
         }
       }
@@ -195,14 +235,14 @@ const PlayPage = () => {
 
     socket.on('connect', handleConnect);
     socket.on('returnPlayer', handleReturnPlayer);
-    socket.on('playerRecieveCard', handleRecieveCard);
     socket.on('returnGameRoom', handleReturnGameRoom);
+    socket.on('returnNewRound', handleReturnNewRound);
 
     return () => {
       socket.off('connect', handleConnect);
       socket.off('returnPlayer', handleReturnPlayer);
-      socket.off('playerRecieveCard', handleRecieveCard);
       socket.off('returnGameRoom', handleReturnGameRoom);
+      socket.off('returnNewRound', handleReturnNewRound);
     };
   }, []);
 
@@ -215,6 +255,7 @@ const PlayPage = () => {
     }
   }, [isMyTurn, isFirstTurnInGameAction]);
 
+  // TODO: Remove?
   useEffect(() => {
     if (socketReady && roomCode && uuid) {
       socket.emit('getPlayer', roomCode, uuid);
@@ -223,33 +264,33 @@ const PlayPage = () => {
     }
   }, [socketReady, location]);
 
-  useEffect(() => {
-    const handleTurnPlayerUpdate = ({ turnPlayerId, isFirstTurn }) => {
-      console.log('[TURN EVENT]', { turnPlayerId, playerId: player?.uuid });
-      if (turnPlayerId === player?.uuid) {
-        console.log('MATCHING TURN PLAYER');
-        setIsMyTurn(true);
-        setIsFirstTurnInGameAction(isFirstTurn);
-        if (isFirstTurn) {
-          toast({
-            title: 'You guessed incorrectly!',
-            description: 'Start a new round by picking a card.',
-            status: 'info',
-            duration: 4000,
-            isClosable: true,
-          });
-        } else {
-          turnPlayerModal.onOpen();
-        }
-      }
-    };
+  // useEffect(() => {
+  //   const handleTurnPlayerUpdate = ({ turnPlayerId, isFirstTurn }) => {
+  //     console.log('[TURN EVENT]', { turnPlayerId, playerId: player?.uuid });
+  //     if (turnPlayerId === player?.uuid) {
+  //       console.log('MATCHING TURN PLAYER');
+  //       setIsMyTurn(true);
+  //       setIsFirstTurnInGameAction(isFirstTurn);
+  //       if (isFirstTurn) {
+  //         toast({
+  //           title: 'You guessed incorrectly!',
+  //           description: 'Start a new round by picking a card.',
+  //           status: 'info',
+  //           duration: 4000,
+  //           isClosable: true,
+  //         });
+  //       } else {
+  //         turnPlayerModal.onOpen();
+  //       }
+  //     }
+  //   };
 
-    socket.on('turnPlayerUpdated', handleTurnPlayerUpdate);
+  //   socket.on('turnPlayerUpdated', handleTurnPlayerUpdate);
 
-    return () => {
-      socket.off('turnPlayerUpdated', handleTurnPlayerUpdate);
-    };
-  }, [player, toast]);
+  //   return () => {
+  //     socket.off('turnPlayerUpdated', handleTurnPlayerUpdate);
+  //   };
+  // }, [player, toast]);
 
   useEffect(() => {
     if (uuid) {
@@ -270,6 +311,7 @@ const PlayPage = () => {
   };
 
   const CardNumberToImage = {
+    0: '/cards/back.png',
     1: '/cards/bat.png',
     2: '/cards/fly.png',
     3: '/cards/roach.png',
@@ -312,17 +354,28 @@ const PlayPage = () => {
           <ModalHeader textAlign='center'>Your Turn!</ModalHeader>
           <ModalCloseButton />
           <ModalBody textAlign='center'>
-            <Text fontSize='lg' mb={3}>
-              {callMode
-                ? receivedCardData?.prevPlayerId
-                  ? `${getPlayerName(
-                      receivedCardData.prevPlayerId
-                    )} sent you a card! They claim it is a ${
-                      CardNumberToString[receivedCardData.claim]
-                    }.`
-                  : 'Do you believe the claim?'
-                : "It's your turn to make a move."}
-            </Text>
+            <VStack>
+              <Image
+                src={CardNumberToImage[0]}
+                alt={CardNumberToString[0]}
+                height='200'
+                objectFit='contain'
+                mb={2}
+              />
+              <Text fontSize='lg'>
+                <Text as={'span'} fontWeight={'bold'}>
+                  {getPlayerName(currentAction?.prevPlayer)}
+                </Text>{' '}
+                says this card is a{' '}
+                <Text as={'span'} fontWeight={'bold'}>
+                  {CardNumberToString[currentAction?.claim]}
+                </Text>
+                .
+              </Text>
+              <Text fontSize='lg' mb={3}>
+                {callMode ? 'Call it!' : 'What will you do?'}
+              </Text>
+            </VStack>
           </ModalBody>
 
           <ModalFooter display='flex' justifyContent='center' gap={4}>
@@ -330,24 +383,11 @@ const PlayPage = () => {
               <>
                 <Button
                   colorScheme='green'
-                  onClick={() => {
-                    console.log('Player thinks the claim is TRUE');
-                    socket.emit('cardResolution', player.uuid, true);
-                    setCallMode(false);
-                    turnPlayerModal.onClose();
-                  }}
+                  onClick={() => handleCallCard(true)}
                 >
                   True
                 </Button>
-                <Button
-                  colorScheme='red'
-                  onClick={() => {
-                    console.log('Player thinks the claim is FALSE');
-                    socket.emit('cardResolution', player.uuid, false);
-                    setCallMode(false);
-                    turnPlayerModal.onClose();
-                  }}
-                >
+                <Button colorScheme='red' onClick={() => handleCallCard(false)}>
                   False
                 </Button>
               </>
@@ -363,14 +403,16 @@ const PlayPage = () => {
                 >
                   Call It
                 </Button>
-                {/* TODO: Gray out Pass button if final player (conspiracy size == numPlayers - 1) */}
                 <Button
                   colorScheme='yellow'
                   onClick={() => {
                     console.log('Player chose to PASS IT');
-                    setCallMode(false);
+                    setPassMode(true);
                     turnPlayerModal.onClose();
                   }}
+                  disabled={
+                    currentAction?.conspiracy.length >= gameRoom?.numPlayers - 1
+                  }
                 >
                   Pass It
                 </Button>
@@ -415,7 +457,11 @@ const PlayPage = () => {
                   variant='outline'
                   colorScheme='teal'
                 >
-                  Show {showPile ? 'Hand' : 'Pile'}
+                  {showPile ? (
+                    <Text as={'span'}>Show Hand ({player?.handSize})</Text>
+                  ) : (
+                    <Text as={'span'}>Show Pile ({player?.pileSize})</Text>
+                  )}
                 </Button>
                 <HStack spacing={3}>
                   <Avatar
@@ -428,7 +474,7 @@ const PlayPage = () => {
                   </Text>
                 </HStack>
                 <Text fontSize='sm' color='gray.500'>
-                  {`You are Player ID: ${player.uuid?.slice(0, 6)}...`}
+                  {`PlayerID: ${player.uuid?.slice(0, 6)}...`}
                 </Text>
               </Box>
             )}
@@ -512,13 +558,12 @@ const PlayPage = () => {
                 </Text>
               </>
             )}
-            {/*TODO: Replace this with a Toast and color change when its your turn and a Modal when you are NOT the first turn in gameAction (to select call or pass)*/}
-            {isMyTurn ? <Text size='lg'>It's your turn!</Text> : ''}
-            {isFirstTurnInGameAction ? (
-              <Text size='lg'>
-                You are starting the turn (e.g. you pick one of your own cards
-                and who to send it to)
-              </Text>
+            {isMyTurn ? (
+              isFirstTurnInGameAction ? (
+                <Text size='lg'>It's your turn to start the round!</Text>
+              ) : (
+                <Text size='lg'>It's your turn!</Text>
+              )
             ) : (
               ''
             )}

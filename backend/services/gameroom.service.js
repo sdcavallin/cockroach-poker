@@ -163,8 +163,8 @@ export class GameRoomService {
       turnPlayer: gameRoom.players[0].uuid,
       prevPlayer: gameRoom.players[0].uuid,
       conspiracy: [],
-      card: 0,
-      claim: 0,
+      card: -1,
+      claim: -1,
     };
   }
 
@@ -268,13 +268,20 @@ export class GameRoomService {
   endGameIfLossCondition(roomCode, playerId) {
     const player = this.getPlayerByUUID(roomCode, playerId);
     const pile = player.pile;
+    const hand = player.hand;
+
+    // Secondary Loss Condition
+    if (hand.length === 0) {
+      this.terminateGameRoomAndSave(roomCode);
+      return true;
+    }
 
     let freq = Array.from({ length: 9 }, () => 0);
-    for (const card in pile) {
+    for (const card of pile) {
       freq[card]++;
     }
-    for (const num in freq) {
-      // Loss Condition
+    for (const num of freq) {
+      // Primary Loss Condition
       if (num >= 4) {
         this.terminateGameRoomAndSave(roomCode);
         return true;

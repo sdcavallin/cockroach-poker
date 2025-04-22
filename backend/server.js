@@ -99,6 +99,17 @@ io.on('connection', (socket) => {
     io.to(GAME_ROOM_PREFIX + roomCode).emit('returnGameRoom', gameRoom);
   };
 
+  const sendNewRoundInfoToEveryoneInRoom = (roomCode) => {
+    const gameRoom = gameRoomService.getGameRoom(roomCode);
+    const loserId = gameRoom.currentAction.turnPlayer;
+    const loser = gameRoomService.getPlayerByUUID(roomCode, loserId);
+    io.to(GAME_ROOM_PREFIX + roomCode).emit(
+      'returnNewRound',
+      loserId,
+      loser.nickname
+    );
+  };
+
   const endGameIfLossCondition = (roomCode, playerId) => {
     const gameOver = gameRoomService.endGameIfLossCondition(roomCode, playerId);
     if (gameOver) {
@@ -206,7 +217,8 @@ io.on('connection', (socket) => {
       if (
         !gameRoom ||
         gameRoom.gameStatus != GameStatus.SETUP ||
-        gameRoom.numPlayers > 6
+        gameRoom.numPlayers > 6 ||
+        nickname.length > 16
       ) {
         socket.emit('returnJoinPlayerToRoom', false, null, null);
       } else {
@@ -421,6 +433,7 @@ io.on('connection', (socket) => {
 
     if (success) {
       sendGameRoomToEveryoneInRoom(roomCode);
+      sendNewRoundInfoToEveryoneInRoom(roomCode);
       endGameIfLossCondition(roomCode, fromPlayer);
     } else {
       console.warn('gameRoomService.callCard() failed');
