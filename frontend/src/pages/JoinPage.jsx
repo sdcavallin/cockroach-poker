@@ -11,7 +11,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:5000', { autoConnect: false });
+const socketUrl = window.location.origin.includes('localhost')
+  ? 'http://localhost:8420'
+  : 'https://cockroach.poker';
+const socket = io(socketUrl, { autoConnect: false });
 
 const avatars = [
   { name: 'baby-yoda', src: '/avatars/baby-yoda.png' },

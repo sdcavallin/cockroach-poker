@@ -6,7 +6,10 @@ import { keyframes } from '@emotion/react';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Link as ChakraLink } from '@chakra-ui/react';
 
-const socket = io('http://localhost:5000', { autoConnect: false });
+const socketUrl = window.location.origin.includes('localhost')
+  ? 'http://localhost:8420'
+  : 'https://cockroach.poker';
+const socket = io(socketUrl, { autoConnect: false });
 
 const pulseGlow = keyframes`
   0% { box-shadow: 0 0 10px 4px rgba(233, 196, 106, 0.6); }

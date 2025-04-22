@@ -34,9 +34,10 @@ import { io } from 'socket.io-client';
 import { useState, useEffect } from 'react';
 import { useToast } from '@chakra-ui/react';
 
-const socket = io('http://localhost:5000', {
-  autoConnect: false,
-});
+const socketUrl = window.location.origin.includes('localhost')
+  ? 'http://localhost:8420'
+  : 'https://cockroach.poker';
+const socket = io(socketUrl, { autoConnect: false });
 
 const PlayPage = () => {
   const toast = useToast();
