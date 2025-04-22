@@ -265,29 +265,30 @@ export class GameRoomService {
   }
 
   // Check loss condition and end the game if player lost.
-  endGameIfLossCondition(roomCode, playerId) {
-    const player = this.getPlayerByUUID(roomCode, playerId);
-    const pile = player.pile;
-    const hand = player.hand;
+  endGameIfLossCondition(roomCode, prevPlayerId, turnPlayerId) {
+    for (const p of [prevPlayerId, turnPlayerId]) {
+      const player = this.getPlayerByUUID(roomCode, p);
+      const pile = player.pile;
+      const hand = player.hand;
 
-    // Secondary Loss Condition
-    if (hand.length === 0) {
-      this.terminateGameRoomAndSave(roomCode);
-      return true;
-    }
-
-    let freq = Array.from({ length: 9 }, () => 0);
-    for (const card of pile) {
-      freq[card]++;
-    }
-    for (const num of freq) {
-      // Primary Loss Condition
-      if (num >= 4) {
+      // Secondary Loss Condition
+      if (hand.length === 0) {
         this.terminateGameRoomAndSave(roomCode);
         return true;
       }
-    }
 
+      let freq = Array.from({ length: 9 }, () => 0);
+      for (const card of pile) {
+        freq[card]++;
+      }
+      for (const num of freq) {
+        // Primary Loss Condition
+        if (num >= 4) {
+          this.terminateGameRoomAndSave(roomCode);
+          return true;
+        }
+      }
+    }
     return false;
   }
 

@@ -69,8 +69,12 @@ io.on('connection', (socket) => {
     );
   };
 
-  const endGameIfLossCondition = (roomCode, playerId) => {
-    const gameOver = gameRoomService.endGameIfLossCondition(roomCode, playerId);
+  const endGameIfLossCondition = (roomCode, prevPlayerId, turnPlayerId) => {
+    const gameOver = gameRoomService.endGameIfLossCondition(
+      roomCode,
+      prevPlayerId,
+      turnPlayerId
+    );
     if (gameOver) {
       io.to(GAME_ROOM_PREFIX + roomCode).emit('returnGameOver', playerId);
     }
@@ -317,13 +321,14 @@ io.on('connection', (socket) => {
       );
       return;
     }
+    const prevPlayer = gameRoom.currentAction?.prevPlayer;
 
     const success = gameRoomService.callCard(roomCode, fromPlayer, callAs);
 
     if (success) {
       sendGameRoomToEveryoneInRoom(roomCode);
       sendNewRoundInfoToEveryoneInRoom(roomCode);
-      endGameIfLossCondition(roomCode, fromPlayer);
+      endGameIfLossCondition(roomCode, prevPlayer.uuid, fromPlayer);
     } else {
       console.warn('gameRoomService.callCard() failed');
     }
