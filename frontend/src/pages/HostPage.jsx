@@ -168,7 +168,6 @@ const HostPage = () => {
           alignItems='center'
           height='100vh'
         >
-          <AudioPlayer filePath={'music/FunkInTheTrunk.mp3'} />
           {/* Top Row of Cards */}
           <Grid
             templateColumns='repeat(3, 1fr)'

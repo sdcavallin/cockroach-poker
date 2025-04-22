@@ -20,11 +20,13 @@ import DummyJoinSetupPage from './pages/DummyJoinSetup.jsx';
 import RejoinPage from './pages/RejoinPlayer.jsx';
 import RejoinHost from './pages/RejoinHost.jsx';
 import Credits from './pages/Credits.jsx';
+import AudioPlayer from './components/AudioPlayer.jsx';
 
 function App() {
   return (
     <Box>
       <Navbar />
+      <AudioPlayer filePath={'music/FunkInTheTrunk.mp3'} />
       <Routes>
         <Route path='/' element={<HomePage />} />
         <Route path='/host' element={<HostPage />} />
