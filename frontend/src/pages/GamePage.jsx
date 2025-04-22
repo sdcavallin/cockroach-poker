@@ -129,6 +129,11 @@ const avatarMap = {
   'bill-cipher': '/avatars/bill-cipher.png',
 };
 
+const getPlayerName = (players, givenUUID) => {
+  const foundPlayer = players.find((p) => p.uuid == givenUUID);
+  return foundPlayer ? foundPlayer.nickname : 'Unknown Player';
+};
+
 const GamePage = () => {
   const location = useLocation();
   const { roomCode } = location.state || {};
@@ -141,7 +146,12 @@ const GamePage = () => {
   const [showCard, setShowCard] = useState(true); // to hold card for a bit & show color change
   const [revealPhase, setRevealPhase] = useState('waiting'); // 'waiting', 'revealed', 'hidden'
   const [savedAction, setSavedAction] = useState(null);
+  const [gameOver, setGameOver] = useState(null);
   const toast = useToast();
+
+  const handleJoinRoom = (roomCode) => {
+    socket.emit('joinSocketRoom', roomCode);
+  };
 
   useEffect(() => {
     if (gameRoom?.currentAction && revealPhase === 'waiting') {
@@ -149,9 +159,6 @@ const GamePage = () => {
     }
   }, [gameRoom?.currentAction, revealPhase]);
 
-  const handleJoinRoom = (roomCode) => {
-    socket.emit('joinSocketRoom', roomCode);
-  };
   useEffect(() => {
     console.log('Current turnPlayerId:', turnPlayerId);
     console.log(
@@ -172,9 +179,14 @@ const GamePage = () => {
       setGameRoom(gameRoom);
     });
 
+    socket.on('returnGameOver', (loserId) => {
+      setGameOver(loserId);
+    });
+
     return () => {
       socket.off('connect');
       socket.off('returnGameRoom');
+      socket.off('returnGameOver');
     };
   }, []);
 
@@ -287,6 +299,29 @@ const GamePage = () => {
               position='relative'
               borderRadius='md'
             >
+              {gameOver ? (
+                <VStack spacing={1}>
+                  <Text fontSize='5xl' fontWeight='bold' color='#172d36'>
+                    Game Over!
+                  </Text>
+                  <Text fontSize='3xl' fontWeight='bold' color='#264653'>
+                    Loser: {getPlayerName(gameRoom.players, gameOver)}
+                  </Text>
+                  <Text
+                    fontSize='2xl'
+                    fontWeight='bold'
+                    color='#172d36'
+                    decoration={'underline'}
+                  >
+                    <ChakraLink as={ReactRouterLink} to='/'>
+                      Play again?
+                    </ChakraLink>
+                  </Text>
+                </VStack>
+              ) : (
+                ''
+              )}
+
               {gameRoom.players.map((player, index) => {
                 const pileCounts = player?.pile?.reduce((acc, card) => {
                   acc[card] = (acc[card] || 0) + 1;
