@@ -31,7 +31,12 @@ const Credits = () => {
           </Link>
         </Text>
         <Text>Adithi Katikhaneni</Text>
-        <Text>Tess Kiddy</Text>
+        <Text>
+          Tess Kiddy{' '}
+          <Link href='https://github.com/Meowzszs' isExternal color='teal.500'>
+            <Icon as={FaGithub} mb={-0.5} />
+          </Link>
+        </Text>
       </VStack>
 
       {/* Assets */}
