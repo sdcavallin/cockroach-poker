@@ -278,7 +278,7 @@ export class GameRoomService {
       // Secondary Loss Condition
       if (hand.length === 0) {
         this.terminateGameRoomAndSave(roomCode);
-        return true;
+        return player.uuid;
       }
 
       let freq = Array.from({ length: 9 }, () => 0);
@@ -289,7 +289,7 @@ export class GameRoomService {
         // Primary Loss Condition
         if (num >= 4) {
           this.terminateGameRoomAndSave(roomCode);
-          return true;
+          return player.uuid;
         }
       }
     }

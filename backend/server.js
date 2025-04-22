@@ -72,7 +72,7 @@ io.on('connection', (socket) => {
   const endGameIfLossCondition = (roomCode) => {
     const gameOver = gameRoomService.endGameIfLossCondition(roomCode);
     if (gameOver) {
-      io.to(GAME_ROOM_PREFIX + roomCode).emit('returnGameOver', playerId);
+      io.to(GAME_ROOM_PREFIX + roomCode).emit('returnGameOver', gameOver);
     }
   };
 
