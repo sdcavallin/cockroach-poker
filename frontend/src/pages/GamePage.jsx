@@ -439,7 +439,7 @@ const GamePage = () => {
               })}
 
               {savedAction &&
-                savedAction.conspiracy.length === 1 &&
+                savedAction.conspiracy.length >= 1 &&
                 revealPhase !== 'hidden' && (
                   // only hide when explicitly in 'hidden' phase
                   <VStack
@@ -499,10 +499,10 @@ const GamePage = () => {
                     >
                       {revealPhase === 'revealed'
                         ? `ACTUAL CARD: ${
-                            CardNumberToString[gameRoom.currentAction.card]
+                            CardNumberToString[gameRoom?.currentAction.card]
                           }`
                         : `CLAIM IS: ${
-                            CardNumberToString[gameRoom.currentAction.claim]
+                            CardNumberToString[gameRoom?.currentAction.claim]
                           }`}
                     </Text>
                   </VStack>
