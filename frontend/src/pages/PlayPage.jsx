@@ -129,6 +129,7 @@ const PlayPage = () => {
 
   const handleCallCard = (callAs) => {
     socket.emit('requestPlayerCallCard', roomCode, uuid, callAs);
+
     const reality = currentAction.claim === currentAction.card;
     if (reality === callAs) {
       toast({
@@ -145,9 +146,29 @@ const PlayPage = () => {
         isClosable: true,
       });
     }
+
     setCallMode(false);
     setIsMyTurn(false);
     turnPlayerModal.onClose();
+  };
+
+  const handlePassCard = (toPlayer, claim) => {
+    socket.emit('requestPlayerPassCard', roomCode, uuid, toPlayer.uuid, claim);
+
+    toast({
+      title: `Card sent to ${toPlayer.nickname}!`,
+      status: 'success',
+      duration: 7000,
+      isClosable: true,
+    });
+
+    makeStatementDrawer.onClose();
+    turnPlayerModal.onClose();
+    setSelectedCard(null);
+    setSelectedPlayer(null);
+    setClaim(0);
+    setPassMode(false);
+    setIsMyTurn(false);
   };
 
   const startCardAction = () => {
@@ -325,8 +346,8 @@ const PlayPage = () => {
           <ModalBody textAlign='center'>
             <VStack>
               <Image
-                src={CardNumberToImage[0]}
-                alt={CardNumberToString[0]}
+                src={CardNumberToImage[passMode ? currentAction.card : 0]}
+                alt={CardNumberToString[passMode ? currentAction.card : 0]}
                 height='200'
                 objectFit='contain'
                 mb={2}
@@ -342,7 +363,11 @@ const PlayPage = () => {
                 .
               </Text>
               <Text fontSize='lg' mb={3}>
-                {callMode ? 'Call it!' : 'What will you do?'}
+                {callMode
+                  ? 'Call it!'
+                  : passMode
+                  ? `It was a ${CardNumberToString[currentAction.card]}!`
+                  : 'What will you do?'}
               </Text>
             </VStack>
           </ModalBody>
@@ -358,6 +383,18 @@ const PlayPage = () => {
                 </Button>
                 <Button colorScheme='red' onClick={() => handleCallCard(false)}>
                   False
+                </Button>
+              </>
+            ) : passMode ? (
+              <>
+                <Button
+                  colorScheme='yellow'
+                  onClick={() => {
+                    setSelectedCard(currentAction.card);
+                    selectPlayerDrawer.onOpen();
+                  }}
+                >
+                  Pass It Along
                 </Button>
               </>
             ) : (
@@ -377,7 +414,7 @@ const PlayPage = () => {
                   onClick={() => {
                     console.log('Player chose to PASS IT');
                     setPassMode(true);
-                    turnPlayerModal.onClose();
+                    //turnPlayerModal.onClose();
                   }}
                   disabled={
                     currentAction?.conspiracy.length >= gameRoom?.numPlayers - 1
@@ -613,9 +650,7 @@ const PlayPage = () => {
                       .filter((p) => p.uuid !== player?.uuid)
                       .map((otherPlayer) => {
                         const isInConspiracy =
-                          receivedCardData?.conspiracyList?.includes(
-                            otherPlayer.uuid
-                          );
+                          currentAction?.conspiracy.includes(otherPlayer.uuid);
 
                         return (
                           <Box
@@ -672,6 +707,7 @@ const PlayPage = () => {
                       selectPlayerDrawer.onClose();
                       selectCardDrawer.onOpen();
                     }}
+                    disabled={passMode}
                   >
                     Back
                   </Button>
@@ -774,7 +810,18 @@ const PlayPage = () => {
                   >
                     Back
                   </Button>
-                  <Button colorScheme='teal' onClick={handleStatementSubmit}>
+                  <Button
+                    colorScheme='teal'
+                    onClick={
+                      passMode
+                        ? () => {
+                            handlePassCard(selectedPlayer, claim);
+                          }
+                        : () => {
+                            handleStatementSubmit();
+                          }
+                    }
+                  >
                     Send Card
                   </Button>
                 </DrawerFooter>
