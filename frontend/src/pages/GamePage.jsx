@@ -256,29 +256,23 @@ const GamePage = () => {
         >
           <Text
             position='absolute'
-            bottom='-6%'
-            left='50%'
-            transform='translate(-50%, -50%)'
-            fontSize={['30px', '40px', '50px']}
-            fontWeight='bold'
-            color='#264653'
-            textAlign='center'
-            opacity={0.2}
-          >
-            {/*TODO: Change this from low opacity in the center to normal opacity on top somewhere, optionally with glow*/}
-            🔗cockroach.poker
-          </Text>
-          s
-          <Text
-            position='absolute'
-            top='2'
-            fontSize='xl'
+            top='3'
+            fontSize='2xl'
             fontWeight='bold'
             color='#264653'
           >
-            {/* TODO: Delete both of these and show in a cooler way */}
-            Room Code: {roomCode} <br />
-            {/* Turn player: {gameRoom?.currentAction?.turnPlayer}{' '} */}
+            Playing at{' '}
+            <Text as={'span'} textDecoration='underline' color='#172d36'>
+              cockroach.poker
+            </Text>
+            ! Room:{' '}
+            <Text
+              as='span'
+              color='#FBC02D'
+              textShadow={'0 0 1px #264653, 0 0 3px #000000, 0 0 15px #264653;'}
+            >
+              {roomCode || 'N/A'}
+            </Text>
           </Text>
           {gameRoom ? (
             <Box
@@ -473,6 +467,7 @@ const GamePage = () => {
                       boxShadow='0 0 100vw rgba(0,0,0,0.9)'
                       animation={`${cardEntrance} 0.6s ease`}
                       transition='background-color 0.5s ease, opacity 0.5s ease'
+                      opacity={1}
                     >
                       <Image
                         src={
