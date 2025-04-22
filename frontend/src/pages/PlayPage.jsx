@@ -4,8 +4,6 @@ import {
   Card,
   CardBody,
   CardHeader,
-  Container,
-  Divider,
   Drawer,
   DrawerBody,
   DrawerFooter,
@@ -15,23 +13,20 @@ import {
   DrawerCloseButton,
   Heading,
   HStack,
-  Input,
   Stack,
-  StackDivider,
   Text,
   useDisclosure,
   SimpleGrid,
   Image,
   Avatar,
   VStack,
-  Textarea,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalCloseButton,
-  ModalFooter, // ← Add this!
+  ModalFooter,
 } from '@chakra-ui/react';
 
 import { Navigate, useLocation } from 'react-router-dom';
@@ -62,9 +57,7 @@ const PlayPage = () => {
   const [currentAction, setCurrentAction] = useState(null);
   const [isMyTurn, setIsMyTurn] = useState(false);
   const [isFirstTurnInGameAction, setIsFirstTurnInGameAction] = useState(false);
-
   const [players, setPlayers] = useState([]);
-  const [cards, setCards] = useState([1, 2, 3, 4, 5, 6, 7, 8]);
 
   const selectCardDrawer = useDisclosure();
   const selectPlayerDrawer = useDisclosure();
@@ -255,7 +248,7 @@ const PlayPage = () => {
     }
   }, [isMyTurn, isFirstTurnInGameAction]);
 
-  // TODO: Remove?
+  // TODO: Remove
   useEffect(() => {
     if (socketReady && roomCode && uuid) {
       socket.emit('getPlayer', roomCode, uuid);
@@ -263,34 +256,6 @@ const PlayPage = () => {
       socket.emit('requestGameRoom', roomCode);
     }
   }, [socketReady, location]);
-
-  // useEffect(() => {
-  //   const handleTurnPlayerUpdate = ({ turnPlayerId, isFirstTurn }) => {
-  //     console.log('[TURN EVENT]', { turnPlayerId, playerId: player?.uuid });
-  //     if (turnPlayerId === player?.uuid) {
-  //       console.log('MATCHING TURN PLAYER');
-  //       setIsMyTurn(true);
-  //       setIsFirstTurnInGameAction(isFirstTurn);
-  //       if (isFirstTurn) {
-  //         toast({
-  //           title: 'You guessed incorrectly!',
-  //           description: 'Start a new round by picking a card.',
-  //           status: 'info',
-  //           duration: 4000,
-  //           isClosable: true,
-  //         });
-  //       } else {
-  //         turnPlayerModal.onOpen();
-  //       }
-  //     }
-  //   };
-
-  //   socket.on('turnPlayerUpdated', handleTurnPlayerUpdate);
-
-  //   return () => {
-  //     socket.off('turnPlayerUpdated', handleTurnPlayerUpdate);
-  //   };
-  // }, [player, toast]);
 
   useEffect(() => {
     if (uuid) {
