@@ -140,7 +140,9 @@ const PlayPage = () => {
       });
     } else {
       toast({
-        title: `Oops - that's wrong!`,
+        title: `Wrong - it was actually a ${
+          CardNumberToString[currentAction.card]
+        }!`,
         status: 'error',
         duration: 7000,
         isClosable: true,
@@ -153,6 +155,16 @@ const PlayPage = () => {
   };
 
   const handlePassCard = (toPlayer, claim) => {
+    if (claim === 0) {
+      toast({
+        title: 'Please pick a claim.',
+        status: 'error',
+        duration: 4000,
+        isClosable: true,
+      });
+      return;
+    }
+
     socket.emit('requestPlayerPassCard', roomCode, uuid, toPlayer.uuid, claim);
 
     toast({
