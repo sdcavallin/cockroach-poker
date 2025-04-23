@@ -391,6 +391,7 @@ const PlayPage = () => {
                   colorScheme='yellow'
                   onClick={() => {
                     setSelectedCard(currentAction.card);
+                    turnPlayerModal.onClose();
                     selectPlayerDrawer.onOpen();
                   }}
                 >
@@ -586,7 +587,7 @@ const PlayPage = () => {
               size='md'
             >
               <DrawerOverlay />
-              <DrawerContent bg='#F4A261'>
+              <DrawerContent bg='#F4A261' overflow='scroll'>
                 <DrawerCloseButton />
                 <DrawerHeader bg='#E76F51'>Select a Card</DrawerHeader>
                 <DrawerBody>
