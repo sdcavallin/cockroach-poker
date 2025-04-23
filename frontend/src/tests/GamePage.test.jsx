@@ -46,7 +46,7 @@ describe('GamePage component', () => {
       </ChakraProvider>
     );
 
-    const title = screen.getByText(/🔗cockroach.poker/);
+    const title = screen.getByText(/cockroach.poker/);
     expect(title).to.exist;
   });
 
