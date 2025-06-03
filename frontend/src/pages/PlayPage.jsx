@@ -243,8 +243,8 @@ const PlayPage = () => {
       setPlayers(gameRoom.players || []);
       setGameRoom(gameRoom);
       setCurrentAction(gameRoom.currentAction);
-      console.log('Received GameRoom:');
-      console.log(gameRoom);
+      //console.log('Received GameRoom:');
+      //console.log(gameRoom);
 
       for (const p of gameRoom.players) {
         if (p.uuid === uuid) {
@@ -277,9 +277,9 @@ const PlayPage = () => {
 
   useEffect(() => {
     if (isMyTurn && !isFirstTurnInGameAction) {
-      console.log(
-        'Opening turn modal because isMyTurn is true and not first turn'
-      );
+      // console.log(
+      //   'Opening turn modal because isMyTurn is true and not first turn'
+      // );
       turnPlayerModal.onOpen();
     }
   }, [isMyTurn, isFirstTurnInGameAction]);
@@ -416,7 +416,7 @@ const PlayPage = () => {
                 <Button
                   colorScheme='green'
                   onClick={() => {
-                    console.log('Player chose to CALL IT');
+                    //console.log('Player chose to CALL IT');
                     setCallMode(true);
                   }}
                 >
@@ -425,7 +425,7 @@ const PlayPage = () => {
                 <Button
                   colorScheme='yellow'
                   onClick={() => {
-                    console.log('Player chose to PASS IT');
+                    //console.log('Player chose to PASS IT');
                     setPassMode(true);
                     //turnPlayerModal.onClose();
                   }}
@@ -557,7 +557,7 @@ const PlayPage = () => {
                     colorScheme='yellow'
                     width='100%'
                     onClick={() => {
-                      console.log('Not first turn: opening call/pass modal');
+                      //console.log('Not first turn: opening call/pass modal');
                       turnPlayerModal.onOpen();
                     }}
                   >

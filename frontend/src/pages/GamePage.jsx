@@ -159,13 +159,13 @@ const GamePage = () => {
     }
   }, [gameRoom?.currentAction, revealPhase]);
 
-  useEffect(() => {
-    console.log('Current turnPlayerId:', turnPlayerId);
-    console.log(
-      'Player IDs:',
-      gameRoom?.players.map((p) => p.uuid)
-    );
-  }, [turnPlayerId, gameRoom]);
+  // useEffect(() => {
+  //   console.log('Current turnPlayerId:', turnPlayerId);
+  //   console.log(
+  //     'Player IDs:',
+  //     gameRoom?.players.map((p) => p.uuid)
+  //   );
+  // }, [turnPlayerId, gameRoom]);
 
   useEffect(() => {
     if (!socket.connected) socket.connect();
@@ -175,7 +175,7 @@ const GamePage = () => {
     });
 
     socket.on('returnGameRoom', (gameRoom) => {
-      console.log('Received returnGameRoom', gameRoom);
+      //console.log('Received returnGameRoom', gameRoom);
       setGameRoom(gameRoom);
     });
 
@@ -192,7 +192,7 @@ const GamePage = () => {
 
   useEffect(() => {
     socket.on('playerCallResult', ({ correct }) => {
-      console.log('Player call result:', correct);
+      //console.log('Player call result:', correct);
 
       setCallResult(correct);
 

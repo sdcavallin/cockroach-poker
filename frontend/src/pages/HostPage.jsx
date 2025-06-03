@@ -77,7 +77,7 @@ const HostPage = () => {
     };
 
     const handleReturnGameRoom = (gameRoom) => {
-      console.log(gameRoom);
+      //console.log(gameRoom);
       setGameRoom(gameRoom);
     };
 
