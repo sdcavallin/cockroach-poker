@@ -44,4 +44,4 @@ Vitest↗ – Testing framework
 
 ### Buy the Game!
 
-Purchase a copy of Cockroach Poker by Drei Magier games!
+Purchase a copy of [Cockroach Poker](https://www.amazon.com/s?k=cockroach+poker) by Drei Magier games!
